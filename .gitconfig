@@ -1,3 +1,5 @@
+[core]
+	editor = vi
 [user]
 	name = Richard Crowley
 	email = r@rcrowley.org
