@@ -12,3 +12,5 @@ source /etc/bash_completion.d/git
 if [[ "\$(type -t __git_ps1)" ]]; then
 	PS1="\$(__git_ps1 '(%s) ')$PS1"
 fi
+
+set -o vi
