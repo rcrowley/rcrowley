@@ -1,0 +1,86 @@
+#!/bin/sh
+
+# Standard trailing whitespace check
+#   Based on the Git-builtin version of Andrew Morton's Perfect Patch
+if git-rev-parse --verify HEAD 2>/dev/null
+then
+	git-diff-index -p -M --cached HEAD --
+else
+	# NEEDSWORK: we should produce a diff with an empty tree here
+	# if we want to do the same verification for the initial import.
+	:
+fi |
+perl -e '
+	my $found_bad = 0;
+	my $filename;
+	my $reported_filename = "";
+	my $lineno;
+	sub bad_line {
+		my ($why, $line) = @_;
+		if (!$found_bad) {
+			print STDERR "*\n";
+			print STDERR "* You have some suspicious patch lines:\n";
+			print STDERR "*\n";
+			$found_bad = 1;
+		}
+		if ($reported_filename ne $filename) {
+			print STDERR "* In $filename\n";
+			$reported_filename = $filename;
+		}
+		print STDERR "* $why (line $lineno)\n";
+		print STDERR "$filename:$lineno:$line\n";
+	}
+	while (<>) {
+		if (m|^diff --git a/(.*) b/\1$|) {
+			$filename = $1;
+			next;
+		}
+		if (/^@@ -\S+ \+(\d+)/) {
+			$lineno = $1 - 1;
+			next;
+		}
+		if (/^ /) {
+			$lineno++;
+			next;
+		}
+		if (s/^\+//) {
+			$lineno++;
+			chomp;
+			if (/\s$/) {
+				bad_line("trailing whitespace", $_);
+			}
+			if (/^\s* \t/) {
+				bad_line("indent SP followed by a TAB", $_);
+			}
+			if (/^([<>])\1{6} |^={7}$/) {
+				bad_line("unresolved merge conflict", $_);
+			}
+		}
+	}
+	exit($found_bad);
+'
+[ "0" != "$?" ] && STATUS=1
+
+# PHP lint
+php -r '
+	$files = array();
+	$status = 0;
+	exec("git rev-parse --verify HEAD 2>/dev/null", $files, $status);
+	$against = $status ? "4b825dc642cb6eb9a060e54bf8d69288fbee4904" : "HEAD";
+	$files = array();
+	exec("git diff-index --cached --name-only $against", $files);
+	$fail = false;
+	foreach ($files as $file) {
+		if (!preg_match("!\.php$!", $file)) { continue; }
+		$lint = array();
+		exec("php -l " . escapeshellarg($file), $lint, $status);
+		if (!$status) { continue; }
+		echo implode("\n", $lint), "\n";
+		$fail = true;
+	}
+	exit((int)$fail);
+'
+[ "0" != "$?" ] && STATUS=1
+
+# If any check failed, fail the commit
+[ -n "$STATUS" ] && exit 1
