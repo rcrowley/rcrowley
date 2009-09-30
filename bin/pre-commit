@@ -84,3 +84,5 @@ php -r '
 
 # If any check failed, fail the commit
 [ -n "$STATUS" ] && exit 1
+
+exit 0
