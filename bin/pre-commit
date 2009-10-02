@@ -62,13 +62,17 @@ perl -e '
 [ "0" != "$?" ] && STATUS=1
 
 # PHP lint
+#   TODO The X (unknown) and B (broken pairing) states that are passed
+#   into git-diff-index may cause problems but I don't know how to get
+#   files into those states so this note will have to do
 php -r '
 	$files = array();
 	$status = 0;
 	exec("git rev-parse --verify HEAD 2>/dev/null", $files, $status);
 	$against = $status ? "4b825dc642cb6eb9a060e54bf8d69288fbee4904" : "HEAD";
 	$files = array();
-	exec("git diff-index --cached --name-only $against", $files);
+	exec("git diff-index --cached --name-only --diff-filter=ACMRTUXB $against",
+		$files);
 	$fail = false;
 	foreach ($files as $file) {
 		if (!preg_match("!\.php$!", $file)) { continue; }
