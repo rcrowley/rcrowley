@@ -14,3 +14,6 @@ if [[ "\$(type -t __git_ps1)" ]]; then
 fi
 
 set -o vi
+
+[ -d ~/bin ] && export PATH="~/bin:$PATH"
+export PATH="/opt/Python-2.6.2/bin:$PATH"
