@@ -13,6 +13,8 @@ if [[ "\$(type -t __git_ps1)" ]]; then
 	PS1="\$(__git_ps1 '(%s) ')$PS1"
 fi
 
-set -o vi
+[ -d ~/bin ] && export PATH="~/bin:$PATH"
+export PATH="/opt/Python-2.6.2/bin:$PATH"
+export PATH="/opt/ruby-1.8.7-p174/bin:$PATH"
 
 . /usr/local/lib/qprof/alias.sh

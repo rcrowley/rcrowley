@@ -1,0 +1,6 @@
+work
+git
+.*
+!.vimrc
+!.profile
+!.gitignore
