@@ -14,3 +14,5 @@ if [[ "\$(type -t __git_ps1)" ]]; then
 fi
 
 set -o vi
+
+. /usr/local/lib/qprof/alias.sh
