@@ -1,0 +1,19 @@
+#!/bin/sh
+if [ -z "$1" ] ; then
+    echo "Usage: swap <file-1> [<file-2>]"
+    exit
+fi
+A="$1"
+if [ -z "$2" ] ; then
+    B="$A.sav"
+else
+    B="$2"
+fi
+if [ -f "$B" ] ; then
+	TMP=`mktemp -t swap.XXXXXXXXXX`
+	cp "$A" "$TMP"
+	cp "$B" "$A"
+	cp "$TMP" "$B"
+else
+	cp "$A" "$B"
+fi
