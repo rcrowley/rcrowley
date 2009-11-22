@@ -10,7 +10,8 @@ au BufRead,BufNewFile fabfile set filetype=python
 au BufRead,BufNewFile *.ru set filetype=ruby
 
 " Blackboard, dammit
-set t_Co=256
+"   This pretty well depends on iTerm's xterm-256color terminal
+"set t_Co=256
 "set t_Co=88
 if (&t_Co == 256 || &t_Co == 88) && !has("gui_running") &&
 	\ filereadable(expand("$HOME/.vim/plugin/guicolorscheme.vim"))
@@ -21,5 +22,5 @@ if (&t_Co == 256 || &t_Co == 88) && !has("gui_running") &&
 else
 	" For 8-color 16-color terminals or for gvim, just use the
 	" regular :colorscheme command.
-	colorscheme blackboar
+	colorscheme blackboard
 endif
