@@ -11,6 +11,7 @@ au BufRead,BufNewFile *.ru set filetype=ruby
 
 " Blackboard, dammit
 "   This pretty well depends on iTerm's xterm-256color terminal
+"   Which, on Debian Etch, requires the ncurses-term package
 "set t_Co=256
 "set t_Co=88
 if (&t_Co == 256 || &t_Co == 88) && !has("gui_running") &&
