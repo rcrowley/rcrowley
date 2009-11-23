@@ -10,3 +10,4 @@
 [alias]
 	stat = status
 	ci = commit
+	co = checkout

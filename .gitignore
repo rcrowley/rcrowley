@@ -1,6 +1,6 @@
-work
-git
-.*
+*
 !.vimrc
 !.profile
 !.gitignore
+!.gitconfig
+!.gitmodules
