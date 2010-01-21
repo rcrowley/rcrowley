@@ -9,6 +9,9 @@ au BufRead,BufNewFile fabfile set filetype=python
 " Rackup files are ruby
 au BufRead,BufNewFile *.ru set filetype=ruby
 
+" Markdown files are just plaintext, lest we hurt ourselves
+au BufRead,BufNewFile *.md,*.markdown set filetype=plaintext
+
 " Blackboard, dammit
 "   This pretty well depends on iTerm's xterm-256color terminal
 "set t_Co=256
