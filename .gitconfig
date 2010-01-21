@@ -11,3 +11,4 @@
 	stat = status
 	ci = commit
 	co = checkout
+	up = !sh -c 'git pull && git log --pretty=format:\"%Cred%ae %Creset- %C(yellow)%s %Creset(%ar)\" HEAD@{1}..'

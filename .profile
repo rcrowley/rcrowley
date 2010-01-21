@@ -24,3 +24,6 @@ fi
 
 # MacPorts
 [[ -d /opt/local/bin ]] && export PATH="/opt/local/bin:$PATH"
+
+# QProf
+[[ -f /usr/local/lib/qprof/alias.sh ]] && . /usr/local/lib/qprof/alias.sh
