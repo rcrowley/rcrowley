@@ -19,8 +19,8 @@ fi
 
 # Preferred versions
 [[ -d /opt/Python-2.6.4/bin ]] && export PATH="/opt/Python-2.6.4/bin:$PATH"
-[[ -d /opt/ruby-1.8.7-p249/bin ]] && [[ "root" != "$(whoami)" ]] && \
-	export PATH="/opt/ruby-1.8.7-p249/bin:$PATH"
+[[ -d /opt/ruby-1.8/bin ]] && [[ "root" != "$(whoami)" ]] && \
+	export PATH="/opt/ruby-1.8/bin:$PATH"
 
 # MacPorts
 [[ -d /opt/local/bin ]] && export PATH="/opt/local/bin:$PATH"
