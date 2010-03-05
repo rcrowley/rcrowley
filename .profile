@@ -17,13 +17,16 @@ fi
 
 [[ -d ~/bin ]] && export PATH="$HOME/bin:$PATH"
 
-# Preferred versions
-[[ -d /opt/Python-2.6.4/bin ]] && export PATH="/opt/Python-2.6.4/bin:$PATH"
-[[ -d /opt/ruby-1.8/bin && "root" != "$(whoami)" ]] \
-	&& export PATH="/opt/ruby-1.8/bin:$PATH"
+# Preferred versions.
+. pick-php 5.3
+. pick-python 2.6
+[[ root != "$(whoami)" ]] && . pick-ruby 1.8
 
-# MacPorts
+# System RubyGems executables.
+export PATH="/var/lib/gems/1.8/bin:$PATH"
+
+# MacPorts.
 [[ -d /opt/local/bin ]] && export PATH="/opt/local/bin:$PATH"
 
-# QProf
+# QProf.
 [[ -f /usr/local/lib/qprof/alias.sh ]] && . /usr/local/lib/qprof/alias.sh
