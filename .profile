@@ -15,12 +15,12 @@ if [[ -f /etc/bash_completion.d/git ]]; then
 	fi
 fi
 
-[[ -d ~/bin ]] && export PATH="~/bin:$PATH"
+[[ -d ~/bin ]] && export PATH="$HOME/bin:$PATH"
 
 # Preferred versions
 [[ -d /opt/Python-2.6.4/bin ]] && export PATH="/opt/Python-2.6.4/bin:$PATH"
-[[ -d /opt/ruby-1.8/bin ]] && [[ "root" != "$(whoami)" ]] && \
-	export PATH="/opt/ruby-1.8/bin:$PATH"
+[[ -d /opt/ruby-1.8/bin && "root" != "$(whoami)" ]] \
+	&& export PATH="/opt/ruby-1.8/bin:$PATH"
 
 # MacPorts
 [[ -d /opt/local/bin ]] && export PATH="/opt/local/bin:$PATH"
