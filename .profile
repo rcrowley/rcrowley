@@ -32,3 +32,4 @@ export PATH="/var/lib/gems/1.8/bin:$PATH"
 [[ -f /usr/local/lib/qprof/alias.sh ]] && . /usr/local/lib/qprof/alias.sh
 
 alias man='man --manpath=$(echo -n $(manpath); for MAN in /var/lib/gems/1.8/gems/*/man; do echo -n :$MAN; done)'
+alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && git clean -fdx'
