@@ -31,6 +31,15 @@ export PATH="/var/lib/gems/1.8/bin:$PATH"
 # QProf.
 [[ -f /usr/local/lib/qprof/alias.sh ]] && . /usr/local/lib/qprof/alias.sh
 
-alias man='man --manpath=$(echo -n $(manpath); for MAN in /var/lib/gems/1.8/gems/*/man; do echo -n :$MAN; done)'
-alias whatis='whatis --manpath=$(echo -n $(manpath); for MAN in /var/lib/gems/1.8/gems/*/man; do echo -n :$MAN; done)'
+DYNAMIC_MANPATH='$(
+	echo -n $(manpath)
+	for MAN in /var/lib/gems/1.8/gems/*/man; do
+		echo -n :$MAN
+	done
+)'
+alias mandb="mandb $DYNAMIC_MANPATH"
+alias man="man -M$DYNAMIC_MANPATH"
+alias whatis="whatis -M$DYNAMIC_MANPATH"
+alias apropos="apropos -M$DYNAMIC_MANPATH"
+
 alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && git clean -fdx'
