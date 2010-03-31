@@ -17,14 +17,6 @@ fi
 
 [[ -d ~/bin ]] && export PATH="$HOME/bin:$PATH"
 
-# Preferred versions.
-[[ -n "$(which pick-php)" ]] && . pick-php 5.3
-[[ -n "$(which pick-python)" ]] && . pick-python 2.6
-[[ -n "$(which pick-ruby)" && root != "$(whoami)" ]] && . pick-ruby 1.8
-
-# System RubyGems executables.
-export PATH="/var/lib/gems/1.8/bin:$PATH"
-
 # MacPorts.
 [[ -d /opt/local/bin ]] && export PATH="/opt/local/bin:$PATH"
 
