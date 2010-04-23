@@ -35,3 +35,5 @@ alias whatis="whatis -M$DYNAMIC_MANPATH"
 alias apropos="apropos -M$DYNAMIC_MANPATH"
 
 alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && git clean -fdx'
+
+[ -f /etc/profile.d/sandbox.sh ] && . /etc/profile.d/sandbox.sh
