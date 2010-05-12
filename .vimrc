@@ -3,17 +3,17 @@ set noai
 syntax on
 
 " Silly Python people like 4 spaces.
-au FileType python set expandtab
+au FileType python setlocal tabstop=4 expandtab
 
 " Silly Rubytards like 2 spaces.
-au FileType ruby set tabstop=2
-au FileType ruby set expandtab
+au FileType ruby setlocal tabstop=2 expandtab
+au BufRead,BufNewFile *.erb setlocal tabstop=2 expandtab
 
-" *.ru and *.gemspec files are Ruby.
-au BufRead,BufNewFile *.ru,*.gemspec set filetype=ruby
+" Capfile, Gemfile, Rakefile, *.ru, and *.gemspec files are Ruby.
+au BufRead,BufNewFile Capfile,Gemfile,Rakefile,*.ru,*.gemspec setlocal ft=ruby
 
 " Markdown files are just plaintext, lest we hurt ourselves.
-au BufRead,BufNewFile *.md,*.markdown set filetype=plaintext
+au BufRead,BufNewFile *.md,*.markdown setlocal ft=plaintext
 
 " Blackboard, dammit!
 "   This pretty well depends on iTerm's xterm-256color terminal,
