@@ -25,7 +25,7 @@ fi
 
 DYNAMIC_MANPATH='$(
 	echo -n $(manpath)
-	for MAN in /var/lib/gems/1.8/gems/*/man; do
+	for MAN in /{usr/lib/ruby,var/lib}/gems/1.8/gems/*/man /opt/local{/share,}/man; do
 		echo -n :$MAN
 	done
 )'
