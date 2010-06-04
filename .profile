@@ -39,7 +39,14 @@ alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && gi
 [ -f /etc/profile.d/sandbox.sh ] && . /etc/profile.d/sandbox.sh
 
 if which ssh-agent >/dev/null; then
-	eval $(ssh-agent)
-	trap 'eval $(ssh-agent -k)' 0
-	#ssh-add
+	SSH_AGENT_PID=$(pgrep ssh-agent) # Requires proctools on OS X.
+	SSH_AUTH_SOCK=$(echo /tmp/ssh-*/agent.*)
+	if [ -n "$SSH_AGENT_PID" ]; then
+		export SSH_AGENT_PID
+		export SSH_AUTH_SOCK
+	else
+		eval $(ssh-agent)
+		trap 'eval $(ssh-agent -k)' 0
+		#ssh-add
+	fi
 fi
