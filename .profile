@@ -41,7 +41,7 @@ alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && gi
 if which ssh-agent >/dev/null; then
 	SSH_AGENT_PID=$(pgrep ssh-agent) # Requires proctools on OS X.
 	SSH_AUTH_SOCK=$(echo /tmp/ssh-*/agent.*)
-	if [ -n "$SSH_AGENT_PID" ]; then
+	if [ -n "$SSH_AGENT_PID" -a -S "$SSH_AUTH_SOCK" ]; then
 		export SSH_AGENT_PID
 		export SSH_AUTH_SOCK
 	else
