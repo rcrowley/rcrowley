@@ -47,6 +47,6 @@ if which ssh-agent >/dev/null; then
 	else
 		eval $(ssh-agent)
 		trap 'eval $(ssh-agent -k)' 0
-		#ssh-add
+		ssh-add
 	fi
 fi
