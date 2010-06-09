@@ -16,9 +16,7 @@ au BufRead,BufNewFile Capfile,Gemfile,Rakefile,*.ru,*.gemspec setlocal ft=ruby
 au BufRead,BufNewFile *.md,*.markdown setlocal ft=plaintext
 
 " Blackboard, dammit!
-"   This pretty well depends on iTerm's xterm-256color terminal,
-"   which, on Debian Etch, requires the ncurses-term package.
-"set t_Co=256
+set t_Co=256
 "set t_Co=88
 if (&t_Co == 256 || &t_Co == 88) && !has("gui_running") &&
 	\ filereadable(expand("$HOME/.vim/plugin/guicolorscheme.vim"))

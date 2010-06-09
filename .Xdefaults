@@ -1,5 +1,5 @@
 ! Dependencies in MacPorts and CPAN:
-!   sudo port install rxvt-unicode
+!   sudo port install rxvt-unicode +xterm_colors_256
 !   sudo port install terminus-font
 !   sudo cpan install Mac::Pasteboard
 
