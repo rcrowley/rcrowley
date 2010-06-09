@@ -12,10 +12,16 @@
 urxvt.geometry: 161x50
 urxvt.background: Black
 urxvt.foreground: White
+urxvt.colorBD: Salmon
+urxvt.colorIT: Salmon
 urxvt.scrollBar_right: true
 urxvt.saveLines: 100000
 urxvt.font: xft:terminus:pixelsize=16
+urxvt.loginShell: true
 
 urxvt.perl-ext-common: macosx-clipboard
 urxvt.keysym.M-c: perl:macosx-clipboard:copy
 urxvt.keysym.M-v: perl:macosx-clipboard:paste
+urxvt.keysym.M-k: command:\033[f\033[2J
+
+! TODO Execute .profile after we have a controlling TTY.
