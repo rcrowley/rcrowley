@@ -1,0 +1,14 @@
+startup_message off
+caption always
+
+escape ^Oo
+
+term rxvt-unicode
+shell -bash
+
+# http://frexx.de/xterm-256-notes/
+attrcolor b ".I"
+termcapinfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+defbce "on"
+
+altscreen on
