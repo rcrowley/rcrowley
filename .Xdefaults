@@ -22,6 +22,5 @@ urxvt.loginShell: true
 urxvt.perl-ext-common: macosx-clipboard
 urxvt.keysym.M-c: perl:macosx-clipboard:copy
 urxvt.keysym.M-v: perl:macosx-clipboard:paste
-urxvt.keysym.M-k: command:\033[f\033[2J
 
 ! TODO Execute .profile after we have a controlling TTY.
