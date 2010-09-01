@@ -16,6 +16,10 @@ au BufRead,BufNewFile Capfile,Gemfile,Rakefile,*.ru,*.gemspec setlocal ft=ruby
 " Markdown files are just plaintext, lest we hurt ourselves.
 au BufRead,BufNewFile *.md,*.markdown setlocal ft=plaintext
 
+" Use the Bash syntax highlighting for all shells.  It's prettier, and
+" I know the difference between POSIX shell and Bash.  It's fine.
+let b:is_bash=1
+
 " Blackboard, dammit!
 set t_Co=256
 "set t_Co=88
