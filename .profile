@@ -36,7 +36,7 @@ alias apropos="apropos -M$DYNAMIC_MANPATH"
 
 alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && git clean -fdx'
 
-[ -f /etc/profile.d/sandbox.sh ] && . /etc/profile.d/sandbox.sh
+[ -f /etc/profile.d/sandbox_prompt.sh ] && . /etc/profile.d/sandbox_prompt.sh
 
 if which ssh-agent >/dev/null; then
 	SSH_AGENT_PID=$(pgrep ssh-agent) # Requires proctools on OS X.
