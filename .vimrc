@@ -18,7 +18,7 @@ au BufRead,BufNewFile *.md,*.markdown setlocal ft=plaintext
 
 " Use the Bash syntax highlighting for all shells.  It's prettier, and
 " I know the difference between POSIX shell and Bash.  It's fine.
-let b:is_bash=1
+let g:is_bash=1
 
 " Blackboard, dammit!
 set t_Co=256
