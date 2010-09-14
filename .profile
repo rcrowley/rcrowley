@@ -46,7 +46,7 @@ if which ssh-agent >/dev/null; then
 		export SSH_AUTH_SOCK
 	else
 		eval $(ssh-agent)
-		trap 'eval $(ssh-agent -k)' 0
+		#trap 'eval $(ssh-agent -k)' 0
 		ssh-add
 	fi
 fi
