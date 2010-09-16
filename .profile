@@ -1,27 +1,21 @@
 # ~/.profile: executed by Bourne-compatible login shells.
 
-if [[ "$BASH" ]]; then
-	if [[ -f ~/.bashrc ]]; then
-		. ~/.bashrc
-	fi
-fi
+[ "$BASH" -a -f ~/.bashrc ] && . ~/.bashrc
 
 mesg n
 
-if [[ -f /etc/bash_completion.d/git ]]; then
+[ -f /etc/bash_completion.d/git ] && {
 	. /etc/bash_completion.d/git
-	if [[ "\$(type -t __git_ps1)" ]]; then
-		PS1="\$(__git_ps1 '(%s) ')$PS1"
-	fi
-fi
+	[ "\$(type -t __git_ps1)" ] && PS1="\$(__git_ps1 '(%s) ')$PS1"
+}
 
-[[ -d ~/bin ]] && export PATH="$HOME/bin:$PATH"
+[ -d ~/bin ] && export PATH="$HOME/bin:$PATH"
 
 # MacPorts.
-[[ -d /opt/local/bin ]] && export PATH="/opt/local/bin:$PATH"
+[ -d /opt/local/bin ] && export PATH="/opt/local/bin:$PATH"
 
 # QProf.
-[[ -f /usr/local/lib/qprof/alias.sh ]] && . /usr/local/lib/qprof/alias.sh
+[ -f /usr/local/lib/qprof/alias.sh ] && . /usr/local/lib/qprof/alias.sh
 
 DYNAMIC_MANPATH='$(
 	echo -n $(manpath)
@@ -38,15 +32,14 @@ alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && gi
 
 [ -f /etc/profile.d/sandbox_prompt.sh ] && . /etc/profile.d/sandbox_prompt.sh
 
-if which ssh-agent >/dev/null; then
-	SSH_AGENT_PID=$(pgrep ssh-agent) # Requires proctools on OS X.
+which ssh-agent >/dev/null && {
+	SSH_AGENT_PID=$(ps x | grep ssh-agent | cut -d" " -f1)
 	SSH_AUTH_SOCK=$(echo /tmp/ssh-*/agent.*)
-	if [ -n "$SSH_AGENT_PID" -a -S "$SSH_AUTH_SOCK" ]; then
+	[ -n "$SSH_AGENT_PID" -a -S "$SSH_AUTH_SOCK" ] && {
 		export SSH_AGENT_PID
 		export SSH_AUTH_SOCK
-	else
+	} || {
 		eval $(ssh-agent)
-		#trap 'eval $(ssh-agent -k)' 0
 		ssh-add
-	fi
-fi
+	}
+}
