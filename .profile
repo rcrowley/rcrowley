@@ -33,10 +33,8 @@ alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && gi
 [ -f /etc/profile.d/sandbox_prompt.sh ] && . /etc/profile.d/sandbox_prompt.sh
 
 which ssh-agent >/dev/null && {
-	: ${SSH_AGENT_PID:=$(ps x | grep ssh-agent | grep -v grep | cut -d" " -f1)}
-	: ${SSH_AUTH_SOCK:=$(echo /tmp/ssh-*/agent.*)}
-	[ -n "$SSH_AGENT_PID" -a -S "$SSH_AUTH_SOCK" ] && {
-		export SSH_AGENT_PID
+	: ${SSH_AUTH_SOCK:=$(echo /tmp/ssh-*/agent.* | cut -d" " -f1)}
+	[ -S "$SSH_AUTH_SOCK" ] && {
 		export SSH_AUTH_SOCK
 	} || {
 		eval $(ssh-agent)
