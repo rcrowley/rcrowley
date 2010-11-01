@@ -13,10 +13,8 @@ PS1="$(lsb_release -c 2>/dev/null | cut -f2)-$(dpkg --print-architecture 2>/dev/
 	[ "\$(type -t __git_ps1)" ] && PS1="\$(__git_ps1 '(%s) ')$PS1"
 }
 
-# My bin.
 [ -d ~/bin ] && export PATH="$HOME/bin:$PATH"
-
-# MacPorts.
+[ -d /var/lib/gems/1.9.1/bin ] && export PATH="$PATH:/var/lib/gems/1.9.1/bin"
 [ -d /opt/local/bin ] && export PATH="/opt/local/bin:$PATH"
 
 # QProf.
