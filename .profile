@@ -5,7 +5,7 @@
 mesg n
 
 # Release and architecture prompt.
-PS1="$(lsb_release -c 2>/dev/null | cut -f2)-$(dpkg --print-architecture 2>/dev/null) \h:\w \033[1m\$\033[0m "
+PS1="$(lsb_release -c 2>/dev/null | cut -f2)-$(dpkg --print-architecture 2>/dev/null) \h:\w \[\e[1m\]\$\[\e[0m\] "
 
 # Git branch in prompt.
 [ -f /etc/bash_completion.d/git ] && {
