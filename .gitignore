@@ -1,9 +1,16 @@
 *
+!.Xdefaults
+!.gemrc
 !.gitconfig
 !.gitignore
 !.gitmodules
 !.profile
 !.screenrc
+!.ssh/config
 !.tmux.conf
+!.vim
 !.vimrc
 !LICENSE
+!bin/errno
+!bin/pre-commit
+!bin/swap

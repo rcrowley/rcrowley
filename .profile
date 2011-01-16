@@ -22,7 +22,7 @@ PS1="$(
 for BINDIR in /opt/local/bin /var/lib/gems/*/bin $HOME/bin
 do
 	[ -d "$BINDIR" ] || continue
-	expr match "$PATH" ".*$BINDIR" >/dev/null && continue
+	expr "$PATH" : ".*$BINDIR" >/dev/null && continue
 	export PATH="$BINDIR:$PATH"
 done
 
