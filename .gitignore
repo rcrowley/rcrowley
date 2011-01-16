@@ -1,7 +1,9 @@
 *
-!.vimrc
-!.profile
-!.gitignore
 !.gitconfig
+!.gitignore
 !.gitmodules
+!.profile
+!.screenrc
+!.tmux.conf
+!.vimrc
 !LICENSE
