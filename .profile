@@ -42,7 +42,10 @@ alias whatis="whatis -M$DYNAMIC_MANPATH"
 alias apropos="apropos -M$DYNAMIC_MANPATH"
 
 # Create a new gh-pages branch.
-alias gh-pages='git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && git clean -fdx'
+alias make-gh-pages="git symbolic-ref HEAD refs/heads/gh-pages && rm .git/index && git clean -fdx"
+
+# Force tmux(1) to use 256 colors.
+alias tmux="tmux -2"
 
 # Find or create an ssh-agent.
 which ssh-agent >/dev/null && {
