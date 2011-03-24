@@ -23,7 +23,7 @@ which sandbox-which >/dev/null && {
 }
 
 # Extra search pathnames.
-for BINDIR in /opt/local/bin /var/lib/gems/*/bin $HOME/bin
+for BINDIR in /opt/local/bin /var/lib/gems/*/bin "$HOME/bin" "$HOME/go/bin"
 do
 	[ -d "$BINDIR" ] || continue
 	expr "$PATH" : ".*$BINDIR" >/dev/null && continue
