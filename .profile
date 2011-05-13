@@ -4,7 +4,7 @@
 
 mesg n
 
-for PATHNAME in .profile.d/*.sh
+for PATHNAME in ~/.profile.d/*.sh
 do
 	. "$PATHNAME"
 done
