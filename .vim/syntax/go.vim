@@ -1,0 +1,1 @@
+/home/vagrant/go/misc/vim/syntax/go.vim
