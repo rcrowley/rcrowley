@@ -16,7 +16,8 @@ which ssh-agent >/dev/null && {
 }
 
 # After an ssh-agent is running, pull the latest home directory from GitHub.
-git remote update origin && git pull origin master
+# Don't bother doing this over and over once tmux is running.
+[ -z "$TMUX" ] && git remote update origin && git pull origin master
 
 for PATHNAME in ~/.profile.d/*.sh
 do
