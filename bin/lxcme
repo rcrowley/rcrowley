@@ -83,7 +83,7 @@ ifconfig br0 >/dev/null || (
 )
 
 # Mount the cgroup filesystem, which is required by the lxc-* tools.
-mkdir /cgroup && {
+mkdir /cgroup 2>/dev/null && {
 	mount none -t cgroup /cgroup
 	echo "none /cgroup cgroup defaults 0 0" >>/etc/fstab
 }
@@ -116,9 +116,10 @@ xargs -I__ echo __ 0 0 >"$FSTAB"
 # accessible to the host system.  It will also have git-core, tmux, and
 # vim so I don't have to keep installing those by hand.
 [ -f "$ROOT/config" ] || lxc-create -f"$CONF" -n"$NAME"
-: ${INCLUDE:="openssh-server,git-core,tmux,vim"}
-[ -d "$ROOTFS" ] ||
-debootstrap --include="$INCLUDE" "$RELEASE" "$ROOTFS" "$ARCHIVE"
+[ -d "$ROOTFS" ] || debootstrap \
+	--include="${INCLUDE="openssh-server,git-core,tmux,vim"}" \
+	--components="${COMPONENTS="main,restricted,universe,multiverse"}" \
+	"$RELEASE" "$ROOTFS" "$ARCHIVE"
 
 # Determine which user and group should be used in the container.  If
 # lxcme is running under sudo -i or is really running as root, go ahead
@@ -140,7 +141,7 @@ S="$(getent passwd "$U" | cut -d: -f7)"
 
 # Find or create an SSH key on the host.  Create an SSH Host config stanza
 # to make the container accessible via SSH at its short name.
-mkdir -m700 "$H/.ssh" || true
+mkdir -m700 "$H/.ssh" 2>/dev/null || true
 [ -f "$H/.ssh/id_rsa.pub" ] || ssh-keygen -f"$H/.ssh/id_rsa" -trsa
 grep "Host $NAME" "$H/.ssh/config" >/dev/null || cat >>"$H/.ssh/config" <<EOF
 
@@ -152,11 +153,14 @@ chown -R "$U:$G" "$H/.ssh"
 
 # Add the appropriate user and group to the container and authorize the
 # SSH key from above.
-chroot "$ROOTFS" groupadd -g"$GID" "$G" || true
-chroot "$ROOTFS" useradd -u"$UID" -g"$GID" -m -s"$S" -m "$U" || true
-mkdir -m700 "$ROOTFS/$H/.ssh" || true
+chroot "$ROOTFS" groupadd -g"$GID" "$G" 2>/dev/null || true
+chroot "$ROOTFS" useradd -u"$UID" -g"$GID" -m -s"$S" "$U" 2>/dev/null || true
+mkdir -m700 "$ROOTFS/$H/.ssh" 2>/dev/null || true
 cp "$H/.ssh/id_rsa.pub" "$ROOTFS/$H/.ssh/authorized_keys"
 chown -R "$U:$G" "$ROOTFS/$H/.ssh"
+
+# Give the container the same sudoers file enjoyed by the host.
+cp "/etc/sudoers" "$ROOTFS/etc/sudoers"
 
 # Start init(8) in the container in the background.
 lxc-start -d -n"$NAME"
