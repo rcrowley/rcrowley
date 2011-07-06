@@ -1,0 +1,170 @@
+#!/bin/sh
+
+set -e
+
+#/ Usage: lxcme [-a<addr>] [--archive=<archive>] -n<name> [-r<release>]
+#/   -a<addr>, --addr=<addr>          address to use for the container's eth0
+#/   --archive=<archive>              Debian archive URL
+#/   -n<name>, --name=<name>          name of the container
+#/   -r<release>, --release=<release> Debian/Ubuntu release codename
+#/   -h, --help                       show this help message
+
+: ${ARCHIVE:="http://us.archive.ubuntu.com/ubuntu"}
+: ${RELEASE:=$(lsb_release -sc)}
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		-a|--addr)
+			ADDR="$2"
+			shift 2;;
+		-a*)
+			ADDR="$(echo $1 | cut -c3-)"
+			shift;;
+		--addr=*)
+			ADDR="$(echo $1 | cut -c8-)"
+			shift;;
+		--archive)
+			ARCHIVE="$2"
+			shift 2;;
+		--archive=*)
+			ARCHIVE="$(echo $1 | cut -c11-)"
+			shift;;
+		-n|--name)
+			NAME="$2"
+			shift 2;;
+		-n*)
+			NAME="$(echo $1 | cut -c3-)"
+			shift;;
+		--name=*)
+			NAME="$(echo $1 | cut -c8-)"
+			shift;;
+		-r|--release)
+			RELEASE="$2"
+			shift 2;;
+		-r*)
+			RELEASE="$(echo $1 | cut -c3-)"
+			shift;;
+		--release=*)
+			RELEASE="$(echo $1 | cut -c11-)"
+			shift;;
+		*)
+			grep "#/" "$0" | cut -c4- 1>&2
+			exit 1;;
+	esac
+done
+HOSTADDR="$(ip -4 -o addr show eth0 | awk -F'[ /]+' '{print $4}')"
+GATEWAY="$(route -n | grep UG | awk '{print $2}')"
+if [ -z "$ADDR" ]
+then
+	echo "The host address is $HOSTADDR and the default gateway is $GATEWAY."
+	read -p "What address should be used for the container's eth0? " ADDR
+fi
+[ -n "$ADDR" ]
+[ -n "$ARCHIVE" ]
+[ -n "$NAME" ]
+[ -n "$RELEASE" ]
+
+CONF="/etc/lxc/$NAME.conf"
+FSTAB="/etc/lxc/$NAME.fstab"
+ROOT="/var/lib/lxc/$NAME"
+ROOTFS="$ROOT/rootfs"
+
+# Install dependencies.
+apt-get -q -y install bridge-utils debootstrap lxc
+
+# Bridge eth0 so the containers can use it.
+ifconfig br0 >/dev/null || (
+	brctl addbr br0
+	brctl setfd br0 0
+	ifconfig br0 "$HOSTADDR" promisc up
+	brctl addif br0 eth0
+	ifconfig eth0 0.0.0.0 up
+	route add -net default gw "$GATEWAY" br0
+)
+
+# Mount the cgroup filesystem, which is required by the lxc-* tools.
+mkdir /cgroup && {
+	mount none -t cgroup /cgroup
+	echo "none /cgroup cgroup defaults 0 0" >>/etc/fstab
+}
+
+# Configure this container, its network, and its filesystems.
+cat >"/etc/lxc/$NAME.conf" <<EOF
+lxc.utsname = $NAME
+lxc.network.type = veth
+lxc.network.flags = up
+lxc.network.link = br0
+lxc.network.name = eth0
+lxc.network.ipv4 = $ADDR
+lxc.mount = $FSTAB
+lxc.rootfs = $ROOTFS
+EOF
+
+# Configure this container's mounted filesystems.  These are a subset
+# of the host system's filesystems and particularly omit the root
+# filesystem (in favor of the container's rootfs) and various tmpfs
+# mounts which would leak information into the container.
+mount |
+egrep 'type (debugfs|devpts|devtmpfs|proc|securityfs|sysfs)' |
+sed 's/on //' |
+sed 's/type //' |
+tr -d '()' |
+xargs -I__ echo __ 0 0 >"$FSTAB"
+
+# Create the container and its rootfs.  The minimal system installed by
+# debootstrap will additionally have openssh-server to make the container
+# accessible to the host system.
+[ -f "$ROOT/config" ] || lxc-create -f"$CONF" -n"$NAME"
+[ -d "$ROOTFS" ] ||
+debootstrap --include=openssh-server "$RELEASE" "$ROOTFS" "$ARCHIVE"
+
+# Determine which user and group should be used in the container.  If
+# lxcme is running under sudo -i or is really running as root, go ahead
+# as root.  Otherwise, add the appropriate user and group to the
+# container and allow that user to login from host to container with
+# an SSH key.  (This seems complex but it's the least surprising thing
+# to do from the user's perspective.)
+if [ "$(getent passwd "$SUDO_USER" | cut -d: -f6)" = "$HOME" ]
+then
+	U="$SUDO_USER"
+else
+	U="$USER"
+fi
+UID="$(getent passwd "$U" | cut -d: -f3)"
+GID="$(getent passwd "$U" | cut -d: -f4)"
+G="$(getent group "$GID" | cut -d: -f1)"
+H="$(getent passwd "$U" | cut -d: -f6)"
+S="$(getent passwd "$U" | cut -d: -f7)"
+
+# Find or create an SSH key on the host.  Create an SSH Host config stanza
+# to make the container accessible via SSH at its short name.
+mkdir -m700 "$H/.ssh" || true
+[ -f "$H/.ssh/id_rsa.pub" ] || ssh-keygen -f"$H/.ssh/id_rsa" -trsa
+grep "Host $NAME" "$H/.ssh/config" >/dev/null || cat >>"$H/.ssh/config" <<EOF
+
+Host $NAME
+	HostName $ADDR
+	User $U
+EOF
+chown -R "$U:$G" "$H/.ssh"
+
+# Add the appropriate user and group to the container and authorize the
+# SSH key from above.
+chroot "$ROOTFS" groupadd -g"$GID" "$G" || true
+chroot "$ROOTFS" useradd -u"$UID" -g"$GID" -m -s"$S" -m "$U" || true
+mkdir -m700 "$ROOTFS/$H/.ssh" || true
+cp "$H/.ssh/id_rsa.pub" "$ROOTFS/$H/.ssh/authorized_keys"
+chown -R "$U:$G" "$ROOTFS/$H/.ssh"
+
+# Start init(8) in the container in the background.
+lxc-start -d -n"$NAME"
+
+cat <<EOF
+
+Done!  The container has been started.  Commands to remember:
+
+     o  Login to the running container:  ssh $NAME
+     o  Stop the container:  lxc-stop -n $NAME
+     o  Start the container:  lxc-start -d -n $NAME
+
+EOF
