@@ -113,10 +113,12 @@ xargs -I__ echo __ 0 0 >"$FSTAB"
 
 # Create the container and its rootfs.  The minimal system installed by
 # debootstrap will additionally have openssh-server to make the container
-# accessible to the host system.
+# accessible to the host system.  It will also have git-core, tmux, and
+# vim so I don't have to keep installing those by hand.
 [ -f "$ROOT/config" ] || lxc-create -f"$CONF" -n"$NAME"
+: ${INCLUDE:="openssh-server,git-core,tmux,vim"}
 [ -d "$ROOTFS" ] ||
-debootstrap --include=openssh-server "$RELEASE" "$ROOTFS" "$ARCHIVE"
+debootstrap --include="$INCLUDE" "$RELEASE" "$ROOTFS" "$ARCHIVE"
 
 # Determine which user and group should be used in the container.  If
 # lxcme is running under sudo -i or is really running as root, go ahead
