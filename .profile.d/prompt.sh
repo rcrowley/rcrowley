@@ -3,12 +3,9 @@ PS1="$(
 	lsb_release -c 2>/dev/null | cut -f2
 )\[\e[1m\]-\[\e[0m\]$(
 	dpkg --print-architecture 2>/dev/null
-) \h\[\e[1m\]:\[\e[0m\]\w\n\[\e[1m\]\$\[\e[0m\] "
-
-# Current sandbox in prompt.
-which sandbox-which >/dev/null && {
-	PS1="\[\e[1m\][\[\e[0m\]$(sudo sandbox-which)\[\e[1m\]]\[\e[0m\] $PS1"
-}
+) \h\[\e[1m\]:\[\e[0m\]\w\n\[\e[1m\]$(
+	[ "$(whoami)" = "root" ] && echo "#" || echo "\$"
+)\[\e[0m\] "
 
 # Git branch in prompt.
 [ -f /etc/bash_completion.d/git ] && {
