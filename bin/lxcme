@@ -184,6 +184,7 @@ do
 	sleep 1
 done
 ssh-keygen -f"$H/.ssh/known_hosts" -R"$ADDR" || :
+chown "$U:$G" "$H/.ssh/known_hosts"
 
 cat <<EOF
 
