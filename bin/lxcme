@@ -70,17 +70,25 @@ ROOT="/var/lib/lxc/$NAME"
 ROOTFS="$ROOT/rootfs"
 
 # Install dependencies.
-apt-get -q -y install bridge-utils debootstrap lxc
+apt-get -q -y install debootstrap lxc
 
 # Bridge eth0 so the containers can use it.
-ifconfig br0 >/dev/null || (
-	brctl addbr br0
-	brctl setfd br0 0
-	ifconfig br0 "$HOSTADDR" promisc up
-	brctl addif br0 eth0
-	ifconfig eth0 0.0.0.0 up
-	route add -net default gw "$GATEWAY" br0
-)
+ifconfig br0 >/dev/null || {
+	cat <<EOF
+
+An ethernet bridge is required to use lxcme.  Replace the current eth0
+configuration in /etc/network/interfaces with the following and restart
+networking or the entire system.
+
+auto eth0
+iface eth0 inet static
+	address 0.0.0.0
+auto br0
+iface br0 inet dhcp
+	bridge_ports eth0
+EOF
+	exit 1
+}
 
 # Mount the cgroup filesystem, which is required by the lxc-* tools.
 mkdir /cgroup 2>/dev/null && {
@@ -148,13 +156,14 @@ grep "Host $NAME" "$H/.ssh/config" >/dev/null || cat >>"$H/.ssh/config" <<EOF
 Host $NAME
 	HostName $ADDR
 	User $U
+	StrictHostKeyChecking no
 EOF
 chown -R "$U:$G" "$H/.ssh"
 
 # Add the appropriate user and group to the container and authorize the
 # SSH key from above.
 chroot "$ROOTFS" groupadd -g"$GID" "$G" 2>/dev/null || true
-chroot "$ROOTFS" useradd -u"$UID" -g"$GID" -m -s"$S" "$U" 2>/dev/null || true
+chroot "$ROOTFS" useradd -u"$UID" -g"$GID" -m -s"$S" -p* "$U" 2>/dev/null || :
 mkdir -m700 "$ROOTFS/$H/.ssh" 2>/dev/null || true
 cp "$H/.ssh/id_rsa.pub" "$ROOTFS/$H/.ssh/authorized_keys"
 chown -R "$U:$G" "$ROOTFS/$H/.ssh"
@@ -164,6 +173,20 @@ cp "/etc/sudoers" "$ROOTFS/etc/sudoers"
 
 # Start init(8) in the container in the background.
 lxc-start -d -n"$NAME"
+
+# Give the container a default route to enable outside network access.
+# At this point it is only able to ping addresses on its subnet, i.e.
+# the gateway and the host system.  It's necessary to wait for the
+# container to boot so try, try again.
+while true
+do
+	ssh-keygen -f"$(getent passwd "$USER" | cut -d: -f6)/.ssh/known_hosts" \
+		-R"$ADDR" || true
+	ssh -l"$U" -i"$H/.ssh/id_rsa" -o StrictHostKeyChecking=no "$ADDR" \
+		sudo route add -net default gw "$GATEWAY" eth0 && break
+	sleep 1
+done
+ssh-keygen -f"$H/.ssh/known_hosts" -R"$ADDR" || true
 
 cat <<EOF
 
