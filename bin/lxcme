@@ -80,9 +80,6 @@ An ethernet bridge is required to use lxcme.  Replace the current eth0
 configuration in /etc/network/interfaces with the following and restart
 networking or the entire system.
 
-auto eth0
-iface eth0 inet static
-	address 0.0.0.0
 auto br0
 iface br0 inet dhcp
 	bridge_ports eth0
