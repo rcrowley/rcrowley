@@ -183,7 +183,7 @@ do
 	ssh-keygen -f"$(getent passwd "$USER" | cut -d: -f6)/.ssh/known_hosts" \
 		-R"$ADDR" || :
 	ssh -l"$U" -i"$H/.ssh/id_rsa" -o StrictHostKeyChecking=no "$ADDR" \
-		sudo route add -net default gw "$GATEWAY" eth0 && break
+		sudo /sbin/route add -net default gw "$GATEWAY" eth0 && break
 	sleep 1
 done
 ssh-keygen -f"$H/.ssh/known_hosts" -R"$ADDR" || :
