@@ -149,7 +149,7 @@ S="$(getent passwd "$U" | cut -d: -f7)"
 
 # Find or create an SSH key on the host.  Create an SSH Host config stanza
 # to make the container accessible via SSH at its short name.
-mkdir -m700 "$H/.ssh" 2>/dev/null || true
+mkdir -m700 "$H/.ssh" 2>/dev/null || :
 [ -f "$H/.ssh/id_rsa.pub" ] || ssh-keygen -f"$H/.ssh/id_rsa" -trsa
 grep "Host $NAME" "$H/.ssh/config" >/dev/null || cat >>"$H/.ssh/config" <<EOF
 
@@ -162,9 +162,9 @@ chown -R "$U:$G" "$H/.ssh"
 
 # Add the appropriate user and group to the container and authorize the
 # SSH key from above.
-chroot "$ROOTFS" groupadd -g"$GID" "$G" 2>/dev/null || true
+chroot "$ROOTFS" groupadd -g"$GID" "$G" 2>/dev/null || :
 chroot "$ROOTFS" useradd -u"$UID" -g"$GID" -m -s"$S" -p* "$U" 2>/dev/null || :
-mkdir -m700 "$ROOTFS/$H/.ssh" 2>/dev/null || true
+mkdir -m700 "$ROOTFS/$H/.ssh" 2>/dev/null || :
 cp "$H/.ssh/id_rsa.pub" "$ROOTFS/$H/.ssh/authorized_keys"
 chown -R "$U:$G" "$ROOTFS/$H/.ssh"
 
@@ -181,12 +181,12 @@ lxc-start -d -n"$NAME"
 while true
 do
 	ssh-keygen -f"$(getent passwd "$USER" | cut -d: -f6)/.ssh/known_hosts" \
-		-R"$ADDR" || true
+		-R"$ADDR" || :
 	ssh -l"$U" -i"$H/.ssh/id_rsa" -o StrictHostKeyChecking=no "$ADDR" \
 		sudo route add -net default gw "$GATEWAY" eth0 && break
 	sleep 1
 done
-ssh-keygen -f"$H/.ssh/known_hosts" -R"$ADDR" || true
+ssh-keygen -f"$H/.ssh/known_hosts" -R"$ADDR" || :
 
 cat <<EOF
 
