@@ -120,10 +120,11 @@ xargs -I__ echo __ 0 0 >"$FSTAB"
 # debootstrap will additionally have openssh-server to make the container
 # accessible to the host system.  It will also have git-core, tmux, and
 # vim so I don't have to keep installing those by hand.
+: ${INCLUDE:="debian-archive-keyring,man,openssh-server,git-core,tmux,vim"}
+: ${COMPONENTS:="main,restricted,universe,multiverse"}
 [ -f "$ROOT/config" ] || lxc-create -f"$CONF" -n"$NAME"
 [ -d "$ROOTFS" ] || debootstrap \
-	--include="${INCLUDE="openssh-server,git-core,tmux,vim"}" \
-	--components="${COMPONENTS="main,restricted,universe,multiverse"}" \
+	--include="$INCLUDE" --components="$COMPONENTS" \
 	"$RELEASE" "$ROOTFS" "$ARCHIVE"
 
 # Determine which user and group should be used in the container.  If
@@ -167,6 +168,9 @@ chown -R "$U:$G" "$ROOTFS/$H/.ssh"
 
 # Give the container the same sudoers file enjoyed by the host.
 cp "/etc/sudoers" "$ROOTFS/etc/sudoers"
+
+# Tell the container to shutup already about the locale.
+chroot "$ROOTFS" locale-gen "$LANG"
 
 # Start init(8) in the container in the background.
 lxc-start -d -n"$NAME"
