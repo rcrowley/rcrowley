@@ -181,6 +181,7 @@ lxc-start -d -n"$NAME"
 # At this point it is only able to ping addresses on its subnet, i.e.
 # the gateway and the host system.  It's necessary to wait for the
 # container to boot so try, try again.
+sleep 5
 while true
 do
 	ssh-keygen -f"$(getent passwd "$USER" | cut -d: -f6)/.ssh/known_hosts" \
