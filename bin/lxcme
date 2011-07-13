@@ -96,6 +96,7 @@ mkdir /cgroup 2>/dev/null && {
 # Configure this container, its network, and its filesystems.
 cat >"/etc/lxc/$NAME.conf" <<EOF
 lxc.utsname = $NAME
+lxc.tty = 6
 lxc.network.type = veth
 lxc.network.flags = up
 lxc.network.link = br0
