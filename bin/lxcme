@@ -167,7 +167,8 @@ mkdir -m700 "$ROOTFS/$H/.ssh" 2>/dev/null || :
 cp "$H/.ssh/id_rsa.pub" "$ROOTFS/$H/.ssh/authorized_keys"
 chown -R "$U:$G" "$ROOTFS/$H/.ssh"
 
-# Give the container the same sudoers file enjoyed by the host.
+# Give the container the same hosts and sudoers files enjoyed by the host.
+cp "/etc/hosts" "$ROOTFS/etc/hosts"
 cp "/etc/sudoers" "$ROOTFS/etc/sudoers"
 
 # Tell the container to shutup already about the locale.
