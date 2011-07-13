@@ -87,6 +87,9 @@ EOF
 	exit 1
 }
 
+# Forward IP traffic.
+sysctl -w net.ipv4.ip_forward=1
+
 # Mount the cgroup filesystem, which is required by the lxc-* tools.
 mkdir /cgroup 2>/dev/null && {
 	mount none -t cgroup /cgroup
