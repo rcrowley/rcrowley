@@ -120,7 +120,7 @@ xargs -I__ echo __ 0 0 >"$FSTAB"
 # debootstrap will additionally have openssh-server to make the container
 # accessible to the host system.  It will also have git-core, tmux, and
 # vim so I don't have to keep installing those by hand.
-: ${INCLUDE:="debian-archive-keyring,man,openssh-server,git-core,tmux,vim"}
+: ${INCLUDE:="debian-archive-keyring,man-db,openssh-server,git-core,tmux,vim"}
 : ${COMPONENTS:="main,restricted,universe,multiverse"}
 [ -f "$ROOT/config" ] || lxc-create -f"$CONF" -n"$NAME"
 [ -d "$ROOTFS" ] || debootstrap \
