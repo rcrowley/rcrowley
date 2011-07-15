@@ -69,7 +69,7 @@ ROOT="/var/lib/lxc/$NAME"
 ROOTFS="$ROOT/rootfs"
 
 # Install dependencies.
-apt-get -q -y install debootstrap lxc
+apt-get -q -y install bridge-utils debootstrap lxc
 
 # Bridge eth0 so the containers can use it.
 ifconfig br0 >/dev/null || {
@@ -81,6 +81,7 @@ networking or the entire system.
 
 auto br0
 iface br0 inet dhcp
+	bridge_fd 0
 	bridge_ports eth0
 EOF
 	exit 1
