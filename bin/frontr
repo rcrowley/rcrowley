@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#/ Usage: piper [-r <r-script>] [-g] [--] [...]
+#/ Usage: frontr [-r <r-script>] [-g] [--] [...]
 #/   -r <r-script>  R script to run non-interactively
 #/   -g, --graphite parse input from Graphite
-#/   --             end of piper arguments, beginning of data command
+#/   --             end of frontr arguments, beginning of data command
 
 set -e
 
@@ -48,7 +48,7 @@ graphite() {
 			# Process the header of a stream of data.  Construct the X
 			# series from the start, end, and step given in the header.
 			\|)
-				echo "piper: found Graphite header" >&2
+				echo "frontr: found Graphite header" >&2
 				NAME="$(cut -d, -f1 header)"
 				seq $(awk -F, '{print $2, $4, $3}' header) >>"$NAME.x"
 				exec 3>"$NAME";;
@@ -56,7 +56,7 @@ graphite() {
 			# Process the end of a stream of data.  Transform the data
 			# into a line-oriented format suitable for Unixing.
 			"") # \n
-				echo "piper: found Graphite data" >&2
+				echo "frontr: found Graphite data" >&2
 				echo >&3
 				tr , \\n <"$NAME" | sed s/None/0.0/ >>"$NAME.y"
 				rm "$NAME"
@@ -85,13 +85,13 @@ do
 	if [ "$X_WC" -gt "$Y_WC" ]
 	then
 		DIFF=$(($X_WC - $Y_WC))
-		echo "piper: truncating $DIFF lines from $NAME.x" >&2
+		echo "frontr: truncating $DIFF lines from $NAME.x" >&2
 		head -n-$DIFF <"$NAME.x" >"$NAME.x.tmp"
 		mv "$NAME.x.tmp" "$NAME.x"
 	elif [ "$X_WC" -lt "$Y_WC" ]
 	then
 		DIFF=$(($Y_WC - $X_WC))
-		echo "piper: truncating $DIFF lines from $NAME.y" >&2
+		echo "frontr: truncating $DIFF lines from $NAME.y" >&2
 		head -n-$DIFF <"$NAME.y" >"$NAME.y.tmp"
 		mv "$NAME.y.tmp" "$NAME.y"
 	fi
@@ -116,7 +116,7 @@ wc -l *
 if [ -z "$R_SCRIPT" ]
 then
 	echo >&2
-	echo "piper:" >&2
+	echo "frontr:" >&2
 	echo "  png(filename=\"$HOME/out.png\", width=1000, height=750)" >&2
 	find . -type f -name \*.x | xargs -I__ basename __ .x | while read NAME
 	do
