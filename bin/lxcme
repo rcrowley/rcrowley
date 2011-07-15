@@ -88,7 +88,8 @@ EOF
 }
 
 # Forward IP traffic.
-sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward = 1" >/etc/sysctl.d/70-lxcme.conf
+start procps
 
 # Mount the cgroup filesystem, which is required by the lxc-* tools.
 mkdir /cgroup 2>/dev/null && {
