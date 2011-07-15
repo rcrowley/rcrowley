@@ -48,7 +48,7 @@ do
 			RELEASE="$(echo $1 | cut -c11-)"
 			shift;;
 		*)
-			grep "#/" "$0" | cut -c4- 1>&2
+			grep "^#/" "$0" | cut -c4- 1>&2
 			exit 1;;
 	esac
 done
