@@ -65,7 +65,6 @@ fi
 [ -n "$RELEASE" ]
 
 CONF="/etc/lxc/$NAME.conf"
-FSTAB="/etc/lxc/$NAME.fstab"
 ROOT="/var/lib/lxc/$NAME"
 ROOTFS="$ROOT/rootfs"
 
@@ -105,20 +104,8 @@ lxc.network.flags = up
 lxc.network.link = br0
 lxc.network.name = eth0
 lxc.network.ipv4 = $ADDR
-lxc.mount = $FSTAB
 lxc.rootfs = $ROOTFS
 EOF
-
-# Configure this container's mounted filesystems.  These are a subset
-# of the host system's filesystems and particularly omit the root
-# filesystem (in favor of the container's rootfs) and various tmpfs
-# mounts which would leak information into the container.
-mount |
-egrep 'type (debugfs|devpts|devtmpfs|proc|securityfs|sysfs)' |
-sed 's/on //' |
-sed 's/type //' |
-tr -d '()' |
-xargs -I__ echo __ 0 0 >"$FSTAB"
 
 # Create the container and its rootfs.  The minimal system installed by
 # debootstrap will additionally have openssh-server to make the container
