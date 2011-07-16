@@ -70,5 +70,7 @@ tac |
 xargs -I__ iptables -t nat -D PREROUTING __
 
 # Add a new rule for this port forwarding to the appropriate address.
+DEST="$(ip -4 -o addr show | awk -F'[ /]+' '{print $4}' | tr \\n ,)"
+DEST="${DEST%%","}" # chomp
 iptables -t nat -A PREROUTING \
-	-p tcp --dport "$PORT" -j DNAT --to-destination "$ADDR"
+	-p tcp -d "$DEST" --dport "$PORT" -j DNAT --to-destination "$ADDR"
