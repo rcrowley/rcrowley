@@ -18,7 +18,7 @@ set -e
 : ${ARCHIVE:="http://us.archive.ubuntu.com/ubuntu"}
 : ${COMPONENTS:="main,restricted,universe,multiverse"}
 : ${INCLUDE:="curl,git-core,man-db,tmux,vim"}
-: ${RELEASE:=$(lsb_release -sc)}
+: ${RELEASE:="$(lsb_release -sc)"}
 usage() {
 	grep "^#/" "$0" | cut -c4- 1>&2
 	exit 1
