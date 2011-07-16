@@ -1,0 +1,69 @@
+#!/bin/sh
+
+set -e
+
+#/ Usage: lxcme-a-port -a<addr>|-n<name> -p<port>
+#/   -a<addr>, --addr=<addr> address for the container's eth0
+#/   -n<name>, --name=<name> name of the container
+#/   -p<port>, --port=<port> port number to forward
+#/   -h, --help              show this help message
+
+[ "$(id -u)" = "0" ] || exec sudo "$0" "$@"
+
+usage() {
+	grep "^#/" "$0" | cut -c4- 1>&2
+	exit 1
+}
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		-a|--addr)
+			ADDR="$2"
+			shift 2;;
+		-a*)
+			ADDR="$(echo $1 | cut -c3-)"
+			shift;;
+		--addr=*)
+			ADDR="$(echo $1 | cut -c8-)"
+			shift;;
+		-n|--name)
+			NAME="$2"
+			shift 2;;
+		-n*)
+			NAME="$(echo $1 | cut -c3-)"
+			shift;;
+		--name=*)
+			NAME="$(echo $1 | cut -c8-)"
+			shift;;
+		-p|--port)
+			PORT="$2"
+			shift 2;;
+		-p*)
+			PORT="$(echo $1 | cut -c3-)"
+			shift;;
+		--port=*)
+			PORT="$(echo $1 | cut -c8-)"
+			shift;;
+		*)
+			usage;;
+	esac
+done
+[ -z "$ADDR" -a -z "$NAME" -o -n "$ADDR" -a -n "$NAME" -o -z "$PORT" ] && usage
+
+# Fetch the appropriate address from the named container.
+if [ -n "$NAME" ]
+then
+	CONF="/etc/lxc/$NAME.conf"
+	ADDR="$(grep "lxc.network.ipv4" "$CONF" | cut -d= -f2 | tr -d " \t")"
+fi
+
+# Check for an existing rule for this port.  If such a rule exists, remove it.
+iptables -t nat -S PREROUTING |
+tail -n+2 |
+grep -n " --dport $PORT " |
+cut -d: -f1 |
+xargs -I__ iptables -t nat -D PREROUTING __
+
+# Add a new rule for this port forwarding to the appropriate address.
+iptables -t nat -A PREROUTING \
+	-p tcp --dport "$PORT" -j DNAT --to-destination "$ADDR"
