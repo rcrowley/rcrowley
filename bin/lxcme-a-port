@@ -57,6 +57,10 @@ then
 	ADDR="$(grep "lxc.network.ipv4" "$CONF" | cut -d= -f2 | tr -d " \t")"
 fi
 
+# Make sure we're masquerading.
+iptables -t nat -S POSTROUTING | grep MASQUERADE >/dev/null ||
+iptables -t nat -A POSTROUTING -j MASQUERADE
+
 # Check for an existing rule for this port.  If such a rule exists, remove it.
 iptables -t nat -S PREROUTING |
 tail -n+2 |
