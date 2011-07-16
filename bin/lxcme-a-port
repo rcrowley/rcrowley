@@ -66,6 +66,7 @@ iptables -t nat -S PREROUTING |
 tail -n+2 |
 grep -n " --dport $PORT " |
 cut -d: -f1 |
+tac |
 xargs -I__ iptables -t nat -D PREROUTING __
 
 # Add a new rule for this port forwarding to the appropriate address.
