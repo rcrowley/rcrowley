@@ -81,18 +81,15 @@ do
 			usage;;
 	esac
 done
-HOSTADDR="$(ip -4 -o addr show eth0 | awk -F'[ /]+' '{print $4}')"
-GATEWAY="$(route -n | grep UG | awk '{print $2}')"
-if [ -z "$ADDR" ]
-then
-	echo "The host address is $HOSTADDR and the default gateway is $GATEWAY."
-	read -p "What address should be used for the container's eth0? " ADDR
-fi
-[ -z "$ADDR" -o -z "$ARCHIVE" -o -z "$NAME" -o -z "$RELEASE" ] && usage
-
 CONF="/etc/lxc/$NAME.conf"
 ROOT="/var/lib/lxc/$NAME"
 ROOTFS="$ROOT/rootfs"
+GATEWAY="$(route -n | grep UG | awk '{print $2}')"
+if [ -z "$ADDR" -a -f "$CONF" ]
+then
+	ADDR="$(grep "lxc.network.ipv4" "$CONF" | cut -d= -f2 | tr -d " \t")"
+fi
+[ -z "$ADDR" -o -z "$ARCHIVE" -o -z "$NAME" -o -z "$RELEASE" ] && usage
 
 # Install dependencies.
 apt-get -q -y install bridge-utils debootstrap lxc
