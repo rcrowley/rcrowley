@@ -1,0 +1,5 @@
+#!/bin/sh
+
+grep -r lxc.network.ipv4 /var/lib/lxc/*/config |
+awk -F'[/: ]' '{print $9,$5}' |
+sort -n
