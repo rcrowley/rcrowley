@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+#/ Usage: gitme <remote>
+
+usage() {
+	grep "^#/" "$0" | cut -c4- 1>&2
+	exit 1
+}
+[ -z "$1" ] && usage
+SERVER="$(echo "$1" | cut -d: -f1)"
+PATHNAME="$(echo "$1" | cut -d: -f2)"
+
+exec ssh "$SERVER" git init --bare "$PATHNAME"
