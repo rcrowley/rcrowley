@@ -3,7 +3,7 @@
 # An homage to debootstrap, hobootstrap bootstraps my home directory in
 # another directory, probably one just created by lxcme.
 
-#/ Usage: hobootstrap <name>
+#/ Usage: hobootstrap <pathname>|<name>
 
 usage() {
 	grep "^#/" "$0" | cut -c4- 1>&2
