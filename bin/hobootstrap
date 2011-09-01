@@ -3,6 +3,14 @@
 # An homage to debootstrap, hobootstrap bootstraps my home directory in
 # another directory, probably one just created by lxcme.
 
+#/ Usage: hobootstrap <name>
+
+usage() {
+	grep "^#/" "$0" | cut -c4- 1>&2
+	exit 1
+}
+[ -z "$1" ] && usage
+
 cd "$1" 2>/dev/null || cd "/var/lib/lxc/$1/rootfs/home/$USER"
 
 cp "$HOME/.ssh/id_rsa" ".ssh"
