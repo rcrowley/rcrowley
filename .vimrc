@@ -6,6 +6,9 @@ syntax on
 set background=dark
 colorscheme solarized
 
+" Various almost-Makefiles are used in Go source trees.
+au BufRead,BufNewFile Make.cmd,Make.inc,Make.pkg setlocal ft=make
+
 " Silly Python people like 4 spaces.
 au FileType python setlocal tabstop=4 expandtab
 
