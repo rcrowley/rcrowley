@@ -1,20 +1,23 @@
 set modeline
 set noai
-set ts=4
+set noexpandtab shiftwidth=4 softtabstop=4 tabstop=4
 
 syntax on
 set background=dark
 colorscheme solarized
 
+" Clojure sort of uses 2 spaces.  It also uses single spaces.
+au BufNewFile,BufRead *.clj setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+
 " Various almost-Makefiles are used in Go source trees.
 au BufRead,BufNewFile Make.cmd,Make.inc,Make.pkg setlocal ft=make
 
 " Silly Python people like 4 spaces.
-au FileType python setlocal tabstop=4 expandtab
+au FileType python setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=4
 
 " Silly Rubytards like 2 spaces.
-au FileType ruby setlocal tabstop=2 expandtab
-au BufRead,BufNewFile *.erb setlocal tabstop=2 expandtab
+au FileType ruby setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
+au BufRead,BufNewFile *.erb setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
 
 " Capfile, Gemfile, Rakefile, *.ru, and *.gemspec files are Ruby.
 au BufRead,BufNewFile Capfile,Gemfile,Rakefile,*.ru,*.gemspec setlocal ft=ruby
