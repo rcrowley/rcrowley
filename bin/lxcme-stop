@@ -4,6 +4,8 @@ set -e
 
 #/ Usage: lxcme-stop -n<name>
 
+[ "$(id -u)" = "0" ] || exec sudo "$0" "$@"
+
 usage() {
 	grep "^#/" "$0" | cut -c4- 1>&2
 	exit 1
@@ -26,4 +28,4 @@ do
 done
 [ -z "$NAME" ] && usage
 
-exec sudo lxc-stop -n"$NAME"
+exec lxc-stop -n"$NAME"
