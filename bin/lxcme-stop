@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+#/ Usage: lxcme-stop -n<name>
+
+exec sudo lxc-stop -n"$1"

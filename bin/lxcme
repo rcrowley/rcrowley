@@ -85,9 +85,13 @@ CONF="/etc/lxc/$NAME.conf"
 ROOT="/var/lib/lxc/$NAME"
 ROOTFS="$ROOT/rootfs"
 GATEWAY="$(route -n | grep UG | awk '{print $2}')"
-if [ -z "$ADDR" -a -f "$CONF" ]
+if [ -z "$ADDR" ]
 then
-	ADDR="$(grep "lxc.network.ipv4" "$CONF" | cut -d= -f2 | tr -d " \t")"
+	ADDR="$(
+		grep -s "lxc.network.ipv4" "/var/lib/lxc/$NAME/config" |
+		cut -d= -f2 |
+		tr -d " \t"
+	)"
 fi
 [ -z "$ADDR" -o -z "$ARCHIVE" -o -z "$NAME" -o -z "$RELEASE" ] && usage
 
@@ -125,11 +129,24 @@ cat >"/etc/lxc/$NAME.conf" <<EOF
 lxc.utsname = $NAME
 lxc.tty = 6
 lxc.network.type = veth
+lxc.network.veth.pair = veth-$NAME
 lxc.network.flags = up
 lxc.network.link = br0
 lxc.network.name = eth0
 lxc.network.ipv4 = $ADDR
 lxc.rootfs = $ROOTFS
+lxc.cgroup.devices.deny = a
+lxc.cgroup.devices.allow = c 1:3 rwm
+lxc.cgroup.devices.allow = c 1:5 rwm
+lxc.cgroup.devices.allow = c 5:1 rwm
+lxc.cgroup.devices.allow = c 5:0 rwm
+lxc.cgroup.devices.allow = c 4:0 rwm
+lxc.cgroup.devices.allow = c 4:1 rwm
+lxc.cgroup.devices.allow = c 1:9 rwm
+lxc.cgroup.devices.allow = c 1:8 rwm
+lxc.cgroup.devices.allow = c 136:* rwm
+lxc.cgroup.devices.allow = c 5:2 rwm
+lxc.cgroup.devices.allow = c 254:0 rwm
 EOF
 
 # Create the container and its rootfs.  The minimal system installed by
@@ -161,17 +178,9 @@ G="$(getent group "$GID" | cut -d: -f1)"
 H="$(getent passwd "$U" | cut -d: -f6)"
 S="$(getent passwd "$U" | cut -d: -f7)"
 
-# Find or create an SSH key on the host.  Create an SSH Host config stanza
-# to make the container accessible via SSH at its short name.
+# Find or create an SSH key on the host.
 mkdir -m700 "$H/.ssh" 2>/dev/null || :
 [ -f "$H/.ssh/id_rsa.pub" ] || ssh-keygen -f"$H/.ssh/id_rsa" -trsa
-grep "Host $NAME" "$H/.ssh/config" >/dev/null || cat >>"$H/.ssh/config" <<EOF
-
-Host $NAME
-	HostName $ADDR
-	User $U
-	StrictHostKeyChecking no
-EOF
 chown -R "$U:$G" "$H/.ssh"
 
 # Add the appropriate user and group to the container and authorize the
@@ -186,34 +195,27 @@ chown -R "$U:$G" "$ROOTFS/$H/.ssh"
 cp "/etc/hosts" "$ROOTFS/etc/hosts"
 cp "/etc/sudoers" "$ROOTFS/etc/sudoers"
 
+# Configure the default route in the container.
+cat >"$ROOTFS/etc/network/if-up.d/lxcme" <<EOF
+#!/bin/sh
+route add -net default gw "$GATEWAY" eth0
+EOF
+chmod 755 "$ROOTFS/etc/network/if-up.d/lxcme"
+
 # Tell the container to shutup already about the locale.
 chroot "$ROOTFS" locale-gen "$LANG"
 
 # Start init(8) in the container in the background.
-lxc-start -d -n"$NAME"
-
-# Give the container a default route to enable outside network access.
-# At this point it is only able to ping addresses on its subnet, i.e.
-# the gateway and the host system.  It's necessary to wait for the
-# container to boot so try, try again.
-sleep 5
-while true
-do
-	ssh-keygen -f"$(getent passwd "$USER" | cut -d: -f6)/.ssh/known_hosts" \
-		-R"$ADDR" || :
-	ssh -l"$U" -i"$H/.ssh/id_rsa" -o StrictHostKeyChecking=no "$ADDR" \
-		sudo /sbin/route add -net default gw "$GATEWAY" eth0 && break
-	sleep 1
-done
-ssh-keygen -f"$H/.ssh/known_hosts" -R"$ADDR" || :
-chown "$U:$G" "$H/.ssh/known_hosts"
+mkdir -p "/var/log/lxc"
+rm -f "/var/log/lxc/$NAME.log"
+lxc-start -d -n"$NAME" -o"/var/log/lxc/$NAME.log" -l"DEBUG"
 
 cat <<EOF
 
 Done!  The container has been started.  Commands to remember:
 
      o  Login to the running container:  ssh $NAME
-     o  Stop the container:  lxc-stop -n $NAME
-     o  Start the container:  lxc-start -d -n $NAME
+     o  Stop the container:  lxcme-stop -n $NAME
+     o  Start the container:  lxcme-start -n $NAME
 
 EOF
