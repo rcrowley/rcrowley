@@ -206,9 +206,7 @@ chmod 755 "$ROOTFS/etc/network/if-up.d/lxcme"
 chroot "$ROOTFS" locale-gen "$LANG"
 
 # Start init(8) in the container in the background.
-mkdir -p "/var/log/lxc"
-rm -f "/var/log/lxc/$NAME.log"
-lxc-start -d -n"$NAME" -o"/var/log/lxc/$NAME.log" -l"DEBUG"
+lxcme-start -n"$NAME"
 
 cat <<EOF
 

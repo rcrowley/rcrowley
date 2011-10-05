@@ -4,4 +4,26 @@ set -e
 
 #/ Usage: lxcme-stop -n<name>
 
-exec sudo lxc-stop -n"$1"
+usage() {
+	grep "^#/" "$0" | cut -c4- 1>&2
+	exit 1
+}
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		-n|--name)
+			NAME="$2"
+			shift 2;;
+		-n*)
+			NAME="$(echo $1 | cut -c3-)"
+			shift;;
+		--name=*)
+			NAME="$(echo $1 | cut -c8-)"
+			shift;;
+		*)
+			usage;;
+	esac
+done
+[ -z "$NAME" ] && usage
+
+exec sudo lxc-stop -n"$NAME"

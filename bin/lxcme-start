@@ -4,4 +4,29 @@ set -e
 
 #/ Usage: lxcme-start -n<name>
 
-exec sudo lxc-start -d -n"$1"
+usage() {
+	grep "^#/" "$0" | cut -c4- 1>&2
+	exit 1
+}
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		-n|--name)
+			NAME="$2"
+			shift 2;;
+		-n*)
+			NAME="$(echo $1 | cut -c3-)"
+			shift;;
+		--name=*)
+			NAME="$(echo $1 | cut -c8-)"
+			shift;;
+		*)
+			usage;;
+	esac
+done
+[ -z "$NAME" ] && usage
+
+mkdir -p "/var/log/lxc"
+rm -f "/var/log/lxc/$NAME.log"
+
+exec sudo lxc-start -d -n"$NAME" -o"/var/log/lxc/$NAME.log" -l"DEBUG"
