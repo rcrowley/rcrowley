@@ -200,13 +200,6 @@ chown -R "$U:$G" "$ROOTFS/$H/.ssh"
 cp "/etc/hosts" "$ROOTFS/etc/hosts"
 cp "/etc/sudoers" "$ROOTFS/etc/sudoers"
 
-# Configure the default route in the container.
-cat >"$ROOTFS/etc/network/if-up.d/lxcme" <<EOF
-#!/bin/sh
-route add -net default gw "$GATEWAY" eth0
-EOF
-chmod 755 "$ROOTFS/etc/network/if-up.d/lxcme"
-
 # Tell the container to shutup already about the locale.
 chroot "$ROOTFS" locale-gen "$LANG"
 
