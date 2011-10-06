@@ -181,6 +181,11 @@ S="$(getent passwd "$U" | cut -d: -f7)"
 # Find or create an SSH key on the host.
 mkdir -m700 "$H/.ssh" 2>/dev/null || :
 [ -f "$H/.ssh/id_rsa.pub" ] || ssh-keygen -f"$H/.ssh/id_rsa" -trsa
+
+# Remove any previously-active known_hosts entries for this address.
+ssh-keygen -f"$H/.ssh/known_hosts" -R "$ADDR"
+
+# Correct ownership of the host's SSH configuration.
 chown -R "$U:$G" "$H/.ssh"
 
 # Add the appropriate user and group to the container and authorize the
