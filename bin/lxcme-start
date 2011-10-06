@@ -29,11 +29,11 @@ done
 [ -z "$NAME" ] && usage
 
 # Configure the default route in the container.
-cat >"$ROOTFS/etc/network/if-up.d/lxcme" <<EOF
+cat >"/var/lib/lxc/$NAME/rootfs/etc/network/if-up.d/lxcme" <<EOF
 #!/bin/sh
-route add -net default gw "$GATEWAY" eth0
+route add default gw "$(route -n | grep UG | awk '{print $2}')" eth0
 EOF
-chmod 755 "$ROOTFS/etc/network/if-up.d/lxcme"
+chmod 755 "/var/lib/lxc/$NAME/rootfs/etc/network/if-up.d/lxcme"
 
 # Prepare to log this LXC session.
 mkdir -p "/var/log/lxc"
