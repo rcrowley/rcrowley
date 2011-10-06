@@ -159,6 +159,7 @@ EOF
 	--components="$COMPONENTS" \
 	"$RELEASE" "$ROOTFS" "$ARCHIVE"
 chroot "$ROOTFS" apt-get -q update
+echo -n "$NAME" >"$ROOTFS/.lxcme"
 
 # Determine which user and group should be used in the container.  If
 # lxcme is running under sudo -i or is really running as root, go ahead
