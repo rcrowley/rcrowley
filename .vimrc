@@ -16,8 +16,8 @@ au BufRead,BufNewFile Make.cmd,Make.inc,Make.pkg setlocal ft=make
 au FileType python setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=4
 
 " Silly Rubytards like 2 spaces.
-au FileType ruby setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
-au BufRead,BufNewFile *.erb setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
+au FileType ruby setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+au BufRead,BufNewFile *.erb setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
 
 " Capfile, Gemfile, Rakefile, *.ru, and *.gemspec files are Ruby.
 au BufRead,BufNewFile Capfile,Gemfile,Rakefile,*.ru,*.gemspec setlocal ft=ruby
