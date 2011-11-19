@@ -8,7 +8,8 @@
 	status = auto
 	branch = auto
 [alias]
-	stat = status
 	ci = commit
 	co = checkout
+	lg = log --all --graph --abbrev-commit --date=relative --pretty=format:'%h -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset'
+	stat = status
 	up = !sh -c 'git pull && git log --pretty=format:\"%Cred%ae %Creset- %C(yellow)%s %Creset(%ar)\" HEAD@{1}..'
