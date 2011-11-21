@@ -122,10 +122,10 @@ EOF
 start procps
 
 # Mount the cgroup filesystem, which is required by the lxc-* tools.
-mkdir /cgroup 2>/dev/null && {
-	mount none -t cgroup /cgroup
-	echo "none /cgroup cgroup defaults 0 0" >>/etc/fstab
-}
+#mkdir /cgroup 2>/dev/null && {
+#	mount none -t cgroup /cgroup
+#	echo "none /cgroup cgroup defaults 0 0" >>/etc/fstab
+#}
 
 # Configure this container, its network, and its filesystems.
 cat >"/etc/lxc/$NAME.conf" <<EOF

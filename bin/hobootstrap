@@ -16,6 +16,8 @@ cd "$1" 2>/dev/null || cd "/var/lib/lxc/$1/rootfs/home/$USER"
 cp "$HOME/.ssh/id_rsa" ".ssh"
 cp "$HOME/.ssh/id_rsa.pub" ".ssh"
 
+rm -f "$HOME/.profile"
+
 git init
 git remote add origin git@github.com:rcrowley/home.git
 git remote update origin
