@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+export GNUPGHOME="$(mktemp -d)"
+trap "rm -rf \"$GNUPGHOME\"" EXIT INT TERM
+
+case "$#" in
+	2) KEYSERVER="keyserver.ubuntu.com" KEY="$1" PATHNAME="$2";;
+	3) KEYSERVER="$1" KEY="$2" PATHNAME="$3";;
+	*)
+		echo "Usage: gpg-recv-key [<keyserver>] <key> <pathname>" >&2
+		exit 1;;
+esac
+
+gpg --keyserver "$KEYSERVER" --recv-keys "$KEY"
+
+chmod 644 "$GNUPGHOME/pubring.gpg"
+mv "$GNUPGHOME/pubring.gpg" "$PATHNAME"
