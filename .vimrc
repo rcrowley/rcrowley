@@ -6,6 +6,9 @@ syntax on
 set background=dark
 colorscheme solarized
 
+" Puppet at Square uses 2 spaces.
+au BufNewFile,BufRead *.pp setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+
 " Clojure sort of uses 2 spaces.  It also uses single spaces.
 au BufNewFile,BufRead *.clj setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
 
