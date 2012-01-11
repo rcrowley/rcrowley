@@ -1,7 +1,7 @@
 [ -f "/etc/bash_completion.d/git" ] && . "/etc/bash_completion.d/git"
 
 PS1="\[\e[1;31m\]█\[\e[0m\] $(
-	lsb_release -sc 2>"/dev/null"
+	cat /etc/redhat-release 2>"/dev/null" || lsb_release -sc 2>"/dev/null"
 )\[\e[1;31m\]-\[\e[0m\]$(
 	dpkg --print-architecture 2>"/dev/null" || rpm --eval "%_arch" 2>"/dev/null"
 ) \h$(
