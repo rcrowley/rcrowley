@@ -15,6 +15,7 @@ au FileType go setlocal noexpandtab
 " JavaScript, especially node, likes to use 2 spaces but at Betable,
 " we use 4 spaces.
 au FileType javascript setlocal shiftwidth=4 softtabstop=4 tabstop=4
+au BufRead,BufNewFile *.ejs setlocal ft=html shiftwidth=4 softtabstop=4 tabstop=4
 
 " Various almost-Makefiles are used in Go source trees.
 au BufRead,BufNewFile Make.cmd,Make.inc,Make.pkg setlocal ft=make
