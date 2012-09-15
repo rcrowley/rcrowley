@@ -9,8 +9,8 @@ colorscheme solarized
 " Clojure sort of uses 2 spaces.  It also uses single spaces.
 au BufNewFile,BufRead *.clj setlocal shiftwidth=2 softtabstop=2 tabstop=2
 
-" Go's gofmt defaults to tabs.  So should I.
-au FileType go setlocal noexpandtab
+" Go's gofmt defaults to tabs.  So should I but I don't.
+"au FileType go setlocal noexpandtab
 
 " JavaScript, especially node, likes to use 2 spaces but at Betable,
 " we use 4 spaces.
