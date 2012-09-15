@@ -1,1 +1,1 @@
-/home/rcrowley/go/misc/vim/syntax/go.vim
+/usr/go/misc/vim/syntax/go.vim
