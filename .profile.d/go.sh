@@ -1,2 +1,2 @@
-export GOROOT="$HOME/go"
+export GOROOT="/usr/go"
 export GOPATH="$HOME"
