@@ -11,6 +11,7 @@ au BufNewFile,BufRead *.clj setlocal shiftwidth=2 softtabstop=2 tabstop=2
 
 " Go's gofmt defaults to tabs.  So should I.
 au FileType go setlocal noexpandtab
+au BufRead,BufNewFile *.proto setlocal noexpandtab
 
 " JavaScript, especially node, likes to use 2 spaces but at Betable,
 " we use 4 spaces.
