@@ -24,6 +24,10 @@ au BufRead,BufNewFile Make.cmd,Make.inc,Make.pkg setlocal ft=make
 " Makefiles absolutely require tabs.
 au FileType make setlocal noexpandtab
 
+" Markdown uses 4-space indentation.  So sayeth Gruber.
+au FileType markdowm setlocal shiftwidth=4 softtabstop=4 tabstop=4
+au BufRead,BufNewFile *.md setlocal shiftwidth=4 softtabstop=4 tabstop=4
+
 " Silly Rubytards like 2 spaces.
 au FileType ruby setlocal shiftwidth=2 softtabstop=2 tabstop=2
 au BufRead,BufNewFile *.erb setlocal shiftwidth=2 softtabstop=2 tabstop=2
