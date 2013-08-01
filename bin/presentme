@@ -29,5 +29,3 @@ curl -o"static/styles.css" "http://127.0.0.1:3999/static/styles.css"
 
 cd "talks"
 curl -o"$(basename "$1" ".slide").html" "http://127.0.0.1:3999/$1"
-
-#sed -i "s!/static!/talks/static!" "$(basename "$1" ".slide").html" "static/slides.js"
