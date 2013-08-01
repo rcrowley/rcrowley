@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e -x
+
+which "present" || {
+    go get "code.google.com/p/go.talks/present"
+    go install "code.google.com/p/go.talks/present"
+}
+
+present -play="false" &
+trap "kill \"$!\"" EXIT INT QUIT TERM
+sleep 1
+
+mkdir -p "$HOME/src/github.com/rcrowley"
+cd "$HOME/src/github.com/rcrowley"
+[ -d "rcrowley" ] || git clone "git@github.com:rcrowley/rcrowley.git"
+
+cd "rcrowley/public"
+mkdir -p "static"
+curl -o"static/slides.js" "http://127.0.0.1:3999/static/slides.js"
+curl -o"static/styles.css" "http://127.0.0.1:3999/static/styles.css"
+
+cd "talks"
+curl -o"$(basename "$1" ".slide").html" "http://127.0.0.1:3999/$1"
+
+#sed -i "s!/static!/talks/static!" "$(basename "$1" ".slide").html" "static/slides.js"
