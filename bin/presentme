@@ -1,6 +1,13 @@
 #!/bin/sh
 
-set -e -x
+set -e
+
+[ "$1" ] || {
+    echo "Usage: presentme <pathname>" >&2
+    exit 1
+}
+
+set -x
 
 which "present" || {
     go get "code.google.com/p/go.talks/present"
