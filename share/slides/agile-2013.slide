@@ -1,0 +1,356 @@
+Developing Operability
+
+Richard Crowley
+Betable operations
+r@rcrowley.org
+[[http://rcrowley.org/talks/agile-2013.html][rcrowley.org/talks/agile-2013.html]]
+@rcrowley
+
+* Hi, I’m Richard
+
+[[mailto:r@rcrowley.org][r@rcrowley.org]] or [[https://twitter.com/rcrowley][@rcrowley]]
+
+* Developer and Operator
+
+(probably not OCD)
+
+* Non-chronological résumé
+
+* OpenDNS circa 2008
+
+Linux development environments
+No automation
+
+* Flickr circa 2007
+
+One development environment
+Lots of automation
+No tests
+Staging used production data
+
+* DevStructure circa 2010
+
+Reduce the distance between development and production
+
+* Betable
+
+Gambling as a Service
+
+* Betable
+
+Heavily regulated
+
+* Betable
+
+Green field
+
+* DevOps
+
+(or however you capitalize it)
+
+* Operability
+
+* Traditional corporate structure
+
+Dev : Ops :: BD : COO, some PMs
+
+* Humans
+
+Not good at multitasking
+
+* Operators
+
+“Ops guy” obscures the meaning
+
+* Inoperable deals
+
+Gift cards for Heroku Dynos
+at Wal-Mart
+
+* Inoperable systems
+
+Rube Goldberg machines
+
+* Operable systems
+
+* Scalability
+
+* Straightforward capacity planning
+
+* Maintainability
+
+* Adaptability
+
+* Visibility
+
+* Orthogonal features
+
+“Orthogonality makes it easier to understand what happens when things combine.” - [[http://golang.org/doc/faq]]
+
+* Stable, well-defined interfaces
+
+No moving targets
+
+* Operability
+
+The degree to which software behaves unsurprisingly in surprising situations
+
+* Operability at Betable
+
+Hint: it starts in development
+
+* Testing
+
+Thousands
+Unit and integration
+
+* Service-oriented architecture
+
+* Node.js
+
+* Micro-services?
+
+At least *services* and not “services”
+
+* Betable admin
+
+Six services
+API-driven
+
+* Library-oriented architecture
+
+* Betable admin
+
+`node-betable-admin`
+
+* Client libraries
+
+`node-betable-accounting`
+`node-betable-cassandra`
+
+* Mocking
+
+* Mock for speed
+
+* Mock for simplicity
+
+* Mock services
+
+Except when testing their client libraries
+
+* Mock libraries
+
+Especially service client libraries
+
+* Mock failures
+
+Especially dependent service failures
+
+* make test
+
+Predictable and standard command-line interface
+
+* Continuous integration
+
+Yep
+
+* Versioning
+
+Build numbers
+Git commit SHAs
+Semantic versions
+
+* Packaging
+
+`fpm` and `freight` make things easy
+Fat packages keep things orthogonal
+
+* Missing link for audits
+
+How do I know the package with a Git commit in its version actually contains that Git commit?
+Give up and deploy Git repositories
+
+* Vendoring
+
+The analogue to fat packages
+
+* Considerations for compilers
+
+Compilers everywhere!
+
+* Security guy says “no compilers”
+
+Compilers everywhere!
+
+* post-receive hooks
+
+`mvn`package`
+`restart`betable-accounting`
+
+* End-to-end audits
+
+`master` to CI to staging to production
+Running process to source code to version
+
+* Deploying
+
+* Aside: deploy web pages
+
+Composability
+Orthogonality
+
+* Push versus pull
+
+* Push
+
+* Push via pull with Puppet and APT
+
+    package { "betable-accounting":
+        ensure => latest,
+    }
+
+`puppet`apply`manifests/site.pp`
+
+* Push with Git
+
+`git`push`git@prod01.betable.com:betable-accounting.git`
+
+* Humans
+
+Can’t be bothered to `git`pull`
+
+* Keeping up-to-date
+
+But not too up-to-date
+
+* Cowboy laptops
+
+* Homogeneous environments
+
+The important part of every engineer’s laptop should be identical
+
+* Deploying to development
+
+* Push versus pull
+
+* Pull
+
+* Pull with Puppet
+
+    git pull origin master
+    puppet apply manifests/site.pp
+
+`puppetme`
+
+* Linux versus Mac
+
+Reduce the distance between development and production
+
+* Real talk with Nick Forte
+
+Mutiny brewin’
+
+* Boxen
+
+Don’t care to manage Spotify
+
+* Not Boxen
+
+Reduce the distance between development and production
+
+* Idempotence
+
+`puppetme` anytime, anywhere
+
+* Dependency management
+
+`package.json`
+`pom.xml`
+`bootstrap.sh` if all else fails
+
+* Early integration testing
+
+`integrate` anytime, anywhere
+
+* Service supervision
+
+You’re likely only working on one thing at a time
+
+* launchd
+
+For what’s not under development
+
+* screen and tmux
+
+For everything else
+If you do this in production, people will laugh at you
+
+* Foreman
+
+All your logs in one terminal
+This is both good and bad
+
+* Pushing code
+
+`git`push`origin`master`
+Initiates Jenkins build, deploy to staging, and `integrate`
+Coworkers run `puppetme` at their leisure
+
+* Staging and production
+
+* Service supervision
+
+You’re not going to watch them, are you?
+
+* Restarting processes
+
+`SIGTERM`
+
+* Upstart
+
+Canonical’s `init(8)` replacement
+Direct parent supervision
+
+* Zero-downtime restart
+
+File descriptor inheritance
+`SCM_RIGHTS` and `unix(7)`
+
+* Caveats
+
+Not typically compatible with direct parent supervision
+
+* systemd
+
+WANT
+
+* Graceful stop
+
+Easier to achieve
+
+* Load balancers
+
+No one here has only one server, right?
+
+* Load balancers
+
+Manage upstream services
+Let upstream services manage themselves
+
+* Serial deploys with retries
+
+* When is it safe to retry?
+
+* Logging and monitoring
+
+We get more out of logs than graphs
+We log full requests and responses
+
+* Recap
+
+Reduce the distance between development and production
+Be mindful of how you deploy
+
+* A word from my sponsors
+
+[[mailto:jobs@betable.com][jobs@betable.com]]

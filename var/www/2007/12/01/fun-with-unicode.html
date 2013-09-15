@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fun with Unicode! &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/12/01/fun-with-unicode">Fun with Unicode!</a> <small>2007/12/01</small></h1>
+<h2>Why can't XULRunner do this already?</h2>
+<p>Without really saying what "this" is, Mozilla wants XULRunner to be the standard play for cross-platform GUI applications and yet it has a bit of trouble interacting with 3rd party libraries.&nbsp; Most mature libraries (say, GraphicsMagick) still use <code>char *</code> or <code>std::string</code> to represent file paths.&nbsp; To interact with them, then, you have to be able to get to a <code>char *</code> representation of files you're trying to open.</p>
+<h2>Windows and Mac character encodings 101</h2>
+<p>As is becoming tradition, Windows makes my life difficult by using <a href="http://en.wikipedia.org/wiki/UTF-16">UTF-16</a> as its Unicode of choice.&nbsp; UTF-16 uses 2 bytes (usually) to represent each character, meaning it isn't binary compatible with ASCII, which uses 1 byte per character.&nbsp; These 2-byte characters are stored in <code>wchar_t</code>s which are twice as wide as <code>char</code>s.&nbsp; It isn't possible to pass a <code>wchar_t *</code> through normal C libraries that expect strings as <code>char *</code>.</p>
+<p>Mac OS X uses UTF-8 internally and is my hero.&nbsp; <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a> is used internally to represent strings and has the advantage of using single bytes (that's <code>char</code> for C programmers playing along) as its base unit.&nbsp; While a single character in UTF-8 can span up to 8 bytes, the in-memory representation of these characters will pass muster with a C compiler.&nbsp; When the UTF-8 bytes are passed through some C library they can arrive intact to the <code>fopen</code> system call, which understands the UTF-8 bytes and acts like you'd expect.</p>
+<h2>There's an easy way?</h2>
+<p>There could be.&nbsp; Using the <code><a href="http://www.xulplanet.com/references/xpcomref/comps/c_filelocal1.html">@mozilla.org/file/local;1</a></code> it might be possible to get the path as an <code>nsACString</code>, Mozilla's portable representation of single-byte ASCII strings.&nbsp; But, the reference warns that the native path available from nsILocalFile is not for passing to C libraries and isn't guaranteed to be correct.&nbsp; So it's up to me.</p>
+<h2>No pain, no gain</h2>
+<p>Bear with me, this gets ugly.&nbsp; The solution that lets me take paths from JavaScript-land to C-land, open Unicode paths with a normal <code>char *</code> and do so on Windows and Mac OS X is stupefying (and stupid).&nbsp; The iinitial path is stored as a JavaScript string, so the boundary between JavaScript and C will be an <code>nsAString</code>, which represents strings as UTF-16.</p>
+<p>The string takes quite a journey here, so let's cover the easy side first.&nbsp; Macs understand UTF-8, and I'm making a transformation to UTF-8 in JavaScript.&nbsp; This means that the only transform needed in C is a type change, not an encoding change.&nbsp; The UTF-8 string enters C-land as wide characters and is simply cast character-by-character down to an array of bytes.</p>
+<p>Windows is quite a bit more work, since a path in Windows that needs Unicode characters can't easily be represented as a <code>char *</code>.&nbsp; Enter the Windows API function <code>GetShortPathName</code>.&nbsp; This can convert any path to an old-school Windows path that fits in ASCII and uses that familiar "8.3" naming convention.&nbsp; I got the Mac half working first, so the Windows implementation is actually more complicated than it needs to be -- more on that later.&nbsp; Without further ado:</p>
+<pre>string * conv_path(const nsAString &amp; fake) {
+
+	// Fun with Windows paths
+#ifdef XP_WIN
+
+	// UTF-16 but really UTF-8 nsAString to really UTF-8 nsCString
+	nsCString utf8 = NS_LossyConvertUTF16toASCII(fake);
+
+	// UTF-8 nsCString to UTF-16 nsEmbedString
+	nsEmbedString &amp; utf16 = NS_ConvertUTF8toUTF16(utf8);
+
+	// UTF-16 nsEmbedString to wchar_t[]
+	wchar_t * w_arr = new wchar_t[utf16.Length() + 1];
+	if (0 == w_arr) return 0;
+	wchar_t * w_arr_p = w_arr;
+	PRUnichar * w_start = (PRUnichar *)utf16.BeginReading();
+	const PRUnichar * w_end = (PRUnichar *)utf16.EndReading();
+	while (w_start !&nbsp; w_end) {
+		*w_arr_p++ = (wchar_t)*w_start++;
+	}
+	*w_arr_p = 0;
+
+	// GetShortPathName to get guaranteed ASCII
+	wchar_t s_arr[4096];
+	if (0 == GetShortPathNameW(w_arr, s_arr, 4096)) {
+		delete [] w_arr;
+		return 0;
+	}
+	delete [] w_arr;
+
+	// wchar_t[] to ASCII nsEmbedString
+	nsEmbedString ascii;
+	wchar_t * s_arr_p = s_arr;
+	while (*s_arr_p) {
+		ascii.Append((char)*s_arr_p++);
+	}
+
+	// Macs don't need any help since they understand UTF-8
+#else
+	nsEmbedString ascii;
+	ascii.Assign(fake);
+#endif
+
+	// Convert the nsEmbedString into a std::string
+	char * c_arr = c_arr = new char[ascii.Length() + 1];
+	if (0 == c_arr) return 0;
+	char * c_arr_p = c_arr;
+	PRUnichar * c_start = (PRUnichar *)ascii.BeginReading();
+	const PRUnichar * c_end = (PRUnichar *)ascii.EndReading();
+	while (c_start !&nbsp; c_end) {
+		*c_arr_p++ = (char)*c_start++;
+	}
+	*c_arr_p = 0;
+	string * str = new string(c_arr);
+	delete [] c_arr;
+	return str;
+
+}</pre>
+<p>This works simply because, on either platform, the result is a <code>char *</code> that actually uniquely represents the desired file.</p>
+<h2>My code sucks, let me count the ways</h2>
+<p>There are of course things that could be better.&nbsp; First of all, after reading the code again (I wrote it Thursday and haven't looked back), I see that I should refactor a bit.&nbsp; By leaving the string in UTF-16 representation for passing to C-land, I can add a transform from UTF-16 to UTF-8 to the Mac version and greatly simplify the Windows version.&nbsp; I'll put that on my to-do list.&nbsp; The other place I hope to improve is in the event that <code>GetShortPathName</code> fails.&nbsp; In this case, copying the file under a new ASCII filename to a temporary directory (found using <code>GetTempPath</code>) would still let the file be accessed with a <code>char *</code> path.</p>
+<h2>Why did I have to do this?</h2>
+<p>It would be sweeeeeet if Mozilla integrated this code (after a healthy dose of optimization) into the toolkit as something like <code>NS_ConvertToNativePath(nsAString)</code> or some such function.&nbsp; Having this will make integrating with third-party libraries much easier.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(7)</small></h1>
+<ol>
+	<li>
+		<p>Yikes..&nbsp; You are a beast for working through this.</p>
+		<p>&mdash; <a href="http://mihasya.com/blog">Mike Panchenko</a> &mdash; 2007/12/01 10:55 am</p>
+	</li>
+
+	<li>
+		<p>The reason we don't do this is that GetShortPathName can fail, and has, if users have NtfsDisable8dot3NameCreation in their registry, or if they are mapping another filesystem (such as NFS) that doesn't have a concept of shortnames: see e.g. https://bugzilla.mozilla.org/show_bug.cgi?id=303598</p>
+		<p>&mdash; <a href="http://benjamin.smedbergs.us/">Benjamin Smedberg</a> &mdash; 2007/12/01 7:11 pm</p>
+	</li>
+
+	<li>
+		<p>Ah, which is why I still need to back all this up with a copy to the TMP directory.&nbsp; I still think there might be a good reason to have this function if just to avoid unnecessary file copying.&nbsp; It isn't foolproof but it is a good shortcut to take when you can.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2007/12/02 9:36 am</p>
+	</li>
+
+	<li>
+		<p>what happens if you do an opendir/readdir (or whatever the windows api equivalent versions are) on a folder with unicode named files in, using the non-unicode windows api (the A functions) wih 8.3 disabled? do the files appear at all? if they do, presumably the filenames given back are able to be passed to fopen, etc. hmm</p>
+		<p>&mdash; cal &mdash; 2007/12/02 1:13 pm</p>
+	</li>
+
+	<li>
+		<p>bah. the answer is that these files are unopenable. nice work windows :(</p>
+		<p>&mdash; cal &mdash; 2007/12/03 11:09 am</p>
+	</li>
+
+	<li>
+		<p>I don't know what all this means, but it makes me want to play with XUL.</p>
+		<p>&mdash; <a href="http://www.andrewmager.com">Andrew Mager</a> &mdash; 2007/12/25 2:29 pm</p>
+	</li>
+
+	<li>
+		<p>well..&nbsp; utf8 is so convenient, that's true, but it's also a major source of bugs in the software industry.
+Many developers do the confusion: they see a char* and consider it's ASCII. They perform then some manipulation on the string using the usual functions, the most disastrous being probably strrchr() that will often break some Asian compounds on utf8 strings, while it virtually never happens with utf16 strings with the equivalent wcsrchr().
+So, there's no black and white. people tend to say that "Apple is cool and Microsoft sucks" but they actually have both advantages.
+To use UTF16 in Windows was a good idea since they defined wchar_t to two bytes. This means you can easily and safely (I would actually say 'almost safely') manipulate Unicode strings natively, meaning you have them readable in your favorite debugger, thanks to the ANSI C string functions (wscpy, etc).
+On the Mac, they decided for some obscure reasons to define the size of wchar_t to 4 bytes. This means the ws functions handle UTF32 that nobody likes to use, and make 50% of the C string functions useless.
+Most multi platform applications used UTF16 because it was safe and until now, supported almost everywhere. 
+Now, developers have to make conversions from UTF16 to UTF8 and/or UTF32 while there is no functions on Mac OS X to help. UTF16 is not supported -from what I know, and I can do mistakes- so developers use all kinds of tricks to convert their UTF16 strings to something else..&nbsp; and bugs happen on the Mac only. So, was it really a judicious choice?</p>
+<p>As we can see, there is not a 'cool Apple' and a 'bad Microsoft'. They both have pros and cons.
+An application that could be compiled for Windows 95 still compiles for Vista, sizes haven't changed and everything runs smoothly; while we have to run after Apple's caprices each time they change their architecture, libraries, frameworks...
+But on the other hand, we must admit that to rewrite code is good, so I wouldn't say that 'Apple sucks' and 'Microsoft is good' ;-)</p>
+<p>But finally, all this comes from a lack of string management in native c/c++ libraries. We can hope that Boost extensions will make our life better, and give a end to these too often useless discussions.</p>
+		<p>&mdash; <a href="http://www.adobe.com">Luc Leroy</a> &mdash; 2008/05/07 8:40 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/ab0c99e86c3640b8fec83a31c7844298?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

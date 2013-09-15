@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Uploadr extension extensions &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/09/07/uploadr-extension-extensions">Uploadr extension extensions</a> <small>2008/09/07</small></h1>
+<p>Getting re-acquainted with Flickr Uploadr, I discovered a sorely missing
+piece of the Extension API.&nbsp; There are plenty of hooks to catch higher-level
+events than clicks and mouseovers &mdash; things like logins, uploads and
+adding photos.&nbsp; However, there is no way to store persistent data and
+associate it with a certain Flickr user.&nbsp; Here is a way:</p>
+
+<pre>var userinfo = {
+	set: function(k, v) {
+
+		// Only allow userinfo if they're signed into Flickr
+		if (!users.nsid) { return false; }
+
+		// It's just a hash for storing whatever you want
+		var u = users.list[users.nsid];
+		u.userinfo = u.userinfo || {};
+		u.userinfo[k] = v;
+
+		return true;
+	},
+	get: function(k) {
+		if (!users.nsid) { return undefined; }
+		if (!users.list[users.nsid].userinfo) { return undefined; }
+		return users.list[users.nsid].userinfo[k];
+	},
+	unset: function(k) {
+		if (!users.nsid) { return true; }
+		if (!users.list[users.nsid].userinfo) { return true; }
+		delete users.list[users.nsid].userinfo[k];
+		return true;
+	}
+};</pre>
+
+<p>Another thing I found missing was an <code>after_logout</code> event.&nbsp; So
+I monkeypatched one:</p>
+
+<pre>users.old_logout = users.logout;
+users.logout = function(save) {
+	users.old_logout(save);
+	extension.after_logout.exec();
+};
+extension.after_logout = new extension.Handler();
+
+extension.after_logout.add(function() {
+	Cc['@mozilla.org/consoleservice;1'].getService(Ci.nsIConsoleService)
+		.logStringMessage('after_logout!');
+});</pre>
+
+<p>T-minus five days and I've got my development environment ready to go.
+I'll be at <a href="http://hackday.org/">Yahoo! Open Hack Day</a>
+September 12-13 in Sunnyvale, hacking on Uploadr.&nbsp; Hopefully others will join
+me in creating some cool extensions.&nbsp; Stop by and say hello.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(0)</small></h1>
+<ol>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/6e9a4088b669d2d540f351f3faf05a1f?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

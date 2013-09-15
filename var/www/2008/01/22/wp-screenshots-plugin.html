@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>wp-screenshots plugin &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/01/22/wp-screenshots-plugin">wp-screenshots plugin</a> <small>2008/01/22</small></h1>
+<p>Ever wanted Wordpress to display small screenshots of pages you're linking to like the <a href="http://del.icio.us/">del.icio.us homepage</a>?&nbsp; Neither have I but a friend wanted it and I wanted to build a Wordpress plugin, so here it is.</p>
+<p><code>wp-screenshots</code> takes the URL of a del.icio.us RSS feed as input and gives back a <code>&lt;ul&gt;</code> containing thumbnails from the unofficial Snap API.</p>
+<p>Installation is as easy as running <code>svn co http://svn.rcrowley.org/svn/wp-screenshots/ ./</code> in your <code>wp-content/plugins/</code> directory.&nbsp; You can then use the PHP function <code>screenshots()</code> anywhere in your templates.&nbsp; As a bonus, if you setup <code>wp-screenshots.php</code> to run as a cronjob, it'll understand what's up and just hit the proper image URLs to make sure Snap's cache is primed for your page views.</p>
+<p><a href="http://svn.rcrowley.org/svn/wp-screenshots/">http://svn.rcrowley.org/svn/wp-screenshots/</a></p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(6)</small></h1>
+<ol>
+	<li>
+		<p>would have been nice if you used the plugin in this post. :-)</p>
+		<p>&mdash; <a href="http://paulstamatiou.com">Paul Stamatiou</a> &mdash; 2008/01/23 1:01 am</p>
+	</li>
+
+	<li>
+		<p>Interesting.&nbsp; I've been looking for some documentation on the snap API, and this is about as much as I've found, so many thanks!</p>
+<p>However, I can't seem to get the request URL to work for me..&nbsp; I always get back the capturing gif, and never get the actual shot:</p>
+<p>http://direct.shots.snap.com/preview/?v=3.11&amp;size=small&amp;lang=en-us&amp;url=http%3A%2F%2Fjounce.net</p>
+<p>Are there other options to the size parameter, such as large or medium?&nbsp; Since I seem to be making some sort of mistake, I can't just go and see for myself.</p>
+<p>Thanks for the great info!</p>
+		<p>&mdash; <a href="http://jounce.net">M. Jackson Wilkinson</a> &mdash; 2008/01/23 1:53 pm</p>
+	</li>
+
+	<li>
+		<p>@ M. Jackson Wilkinson, if you type those in, you'll see large is the other option, giving 427x274 jpegs.
+http://www.snap.com/snapshots_faq.php#Parameters has a list that's semi-related of the parameters.</p>
+<p>If you want larger pictures, webkit2png is wonderful on macs, there are random solutions for linux, but I haven't heard of any that I would describe as great.&nbsp; You can create a job that runs the script to create the image on your server once and you're set, rather than relying on Snaps (which I hate for many reasons, not least of which is that I can't make them update the image of my site, I try, but it doesn't work).</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/01/23 2:32 pm</p>
+	</li>
+
+	<li>
+		<p>@ M. Jackson Wilkinson: The link you posted in the comment actually displays correctly now.&nbsp; They don't have a screenshot for everything but once something is requested the first time, they generate and cache the thumbnail.&nbsp; The cronjob mode of the plugin is there to address this issue.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/01/23 2:43 pm</p>
+	</li>
+
+	<li>
+		<p>Gotcha -- I suppose I was being a bit too impatient :)  Thanks for the info, and thanks for the head start with the plugin!</p>
+		<p>&mdash; <a href="http://jounce.net">M. Jackson Wilkinson</a> &mdash; 2008/01/24 6:47 am</p>
+	</li>
+
+	<li>
+		<p>Thank you :) Ms. Baratz will benefit from this. </p>
+<p>You forgot to mention that free food inspired this plugin.</p>
+		<p>&mdash; <a href="http://www.andrewmager.com">Andrew Mager</a> &mdash; 2008/01/25 12:41 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/6702284fe67b1fd26c30bf34b1bf1cc7?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

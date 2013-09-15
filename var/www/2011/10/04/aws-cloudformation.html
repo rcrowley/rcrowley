@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprints in the new AWS CloudFormation &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://rcrowley.org/index.xml" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+
+<article>
+<header>
+	<time datetime="2011-10-03" pubdate>2011-10-03</time>
+	<h1>Blueprints in the new AWS CloudFormation</h1>
+</header>
+
+<p><em>Cross-posted from the <a href="http://blog.devstructure.com/blueprints-in-the-new-aws-cloudformation">DevStructure Blog</a></em></p>
+
+<p>Just last week, Amazon Web Services rolled out the <a href="http://aws.typepad.com/aws/2011/09/amazon-linux-ami-production-status-new-features.html">first production release of the Amazon Linux AMI</a> and with it some <a href="http://aws.typepad.com/aws/2011/09/powerful-new-features-for-aws-cloudformation.html">powerful new features for CloudFormation</a>.&nbsp; There&#8217;s a lot there (like updating stacks and IAM integration) but we at DevStructure are most excited about Application Bootstrapping.</p>
+
+<p>The new Amazon Linux AMI comes with the <code>aws-cfn-bootstrap</code> package, which can unpack tarballs, place configuration files, install packages, and restart services at provision time.&nbsp; Sound familiar?&nbsp; That&#8217;s right, this new section of the CloudFormation template language uses the <a href="http://devstructure.github.com/blueprint/blueprint.5.html"><code>blueprint</code>(5)</a> file format!</p>
+
+<p>Amazon&#8217;s PDF whitepaper, <a href="https://s3.amazonaws.com/cloudformation-examples/BoostrappingApplicationsWithAWSCloudFormation.pdf">Bootstrapping Applications via AWS CloudFormation</a>, walks through building a complete stack template by hand.&nbsp; To summarize, you&#8217;ll need to create an <a href="http://docs.amazonwebservices.com/AWSCloudFormation/latest/UserGuide/index.html?aws-properties-iam-user.html">IAM resource</a> and declare your EC2 instances like this:</p>
+
+<pre>"Resources": {
+  "DemoInstance": {
+    <strong>"Metadata": {
+      "AWS::CloudFormation::Init": {
+        "config": <em>THIS IS WHERE THE BLUEPRINT GOES!</em>
+      }
+    }</strong>,
+    "Properties": {
+	    "ImageId": {"Fn::FindInMap": [
+	      "AWSRegionArch2AMI",
+	      {"Ref": "AWS::Region"},
+	      {"Fn::FindInMap": [
+	        "AWSInstanceType2Arch",
+	        {"Ref": "InstanceType"},
+	        "Arch"
+	      ]}
+	    ]},
+      "InstanceType": {"Ref": "InstanceType"},
+      "KeyName": {"Ref": "KeyName"},
+      "SecurityGroups": [{"Ref": "DemoSecurityGroup"}],
+      <strong>"UserData" : {"Fn::Base64" : {"Fn::Join" : ["", [
+        "#!/bin/sh\n",
+        "/opt/aws/bin/cfn-init",
+        " -s '", {"Ref" : "AWS::StackName"}, "'",
+        " -r 'DemoInstance'",
+        " --region '", { "Ref" : "AWS::Region" }, "'",
+        " --access-key '", {"Ref": "DemoKey"}, "'",
+        " --secret-key '", {"Fn::GetAtt": ["DemoKey", "SecretAccessKey"]}, "'",
+        "\n",
+        "/opt/aws/bin/cfn-signal",
+        " -e $?",
+        " '", {"Ref" : "DemoWaitConditionHandle"}, "'",
+        "\n"
+      ]]}}</strong>
+    },
+    "Type": "AWS::EC2::Instance"
+  }
+}</pre>
+
+<p>The user-data calls <code>cfn-init</code> with the newly-generated IAM credentials to fetch and process the metadata, and <code>cfn-signal</code> to report success or failure via a <a href="http://docs.amazonwebservices.com/AWSCloudFormation/latest/UserGuide/index.html?aws-properties-waitcondition.html">WaitCondition</a>.</p>
+
+<p>Packages managed by Yum, Python&#8217;s <code>easy_install</code>, and RubyGems plus files and services all work natively within CloudFormation.&nbsp; Source tarballs will work if you upload them someplace and provide the fully-qualified URL.</p>
+
+<p>Going the other direction, the metadata from an existing CloudFormation template can be loaded into Blueprint by copying out the <code>"config"</code> document fragment and passing it on standard input to <a href="http://devstructure.github.com/blueprint/blueprint-create.1.html"><code>blueprint-create</code>(1)</a>.</p>
+
+<p>Our thanks to the Reto Kramer, Chris Whitaker, and Adam Thomas for making it even easier to deploy blueprints to Amazon EC2.</p>
+
+<p>Today, we&#8217;re releasing Blueprint 3.1, which includes <a href="https://github.com/devstructure/blueprint/compare/v3.0.8...v3.1.0">a number of fixes and improvements</a> but most importantly, understands all of Amazon&#8217;s extensions to the <code>blueprint</code>(5) format, allowing seamless transition to and from AWS CloudFormation.&nbsp; Get 3.1 from <a href="https://github.com/devstructure/blueprint">GitHub</a>, <a href="https://github.com/devstructure/blueprint/wiki/Installing-with-a-package-manager">DevStructure&#8217;s Debian archive</a>, or from PyPI.</p>
+
+</article>
+
+<footer class="site">
+
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://pinboard.in/u:rcrowley">Pinboard</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2013 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-20973978-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</body>
+</html>
+

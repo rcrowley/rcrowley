@@ -1,0 +1,169 @@
+#!/usr/bin/env python
+
+from datetime import datetime
+from django import template
+from django.conf import settings
+from django.template import Context, Template
+from django.template import defaultfilters
+from django.template import loader
+import os
+import os.path
+from xml.etree import ElementTree
+
+# A puppy dies every time Fredrik Lundh serializes XML.
+NS = 'http://www.w3.org/2005/Atom'
+ElementTree._namespace_map[NS] = 'atom'
+
+settings.configure(DEBUG=True,
+                   TEMPLATE_DEBUG=True,
+                   TEMPLATE_LOADERS=(
+                       'django.template.loaders.filesystem.Loader',
+                   ),
+                   TEMPLATE_DIRS=(
+                       os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                                     '..',
+                                                     'share',
+                                                     'templates')),
+                   ))
+
+def qname(name):
+    """
+    Return a node name qualified with the Atom namespace.
+    """
+    return unicode(ElementTree.QName(NS, name))
+
+class Atom(object):
+
+    def __init__(self, title, alternate, id, author):
+        """
+        Create an empty Atom feed.
+        """
+        self.title = title
+        self.alternate = alternate
+        self.author = author
+        feed = ElementTree.Element(qname('feed'))
+        ElementTree.SubElement(feed,
+                               qname('title'),
+                               {'type': 'html'}).text = self.title
+        ElementTree.SubElement(feed,
+                               qname('link'),
+                               {'href': id,
+                                'rel': 'self'})
+        ElementTree.SubElement(feed,
+                               qname('link'),
+                               {'href': alternate,
+                                'rel': 'alternate'})
+        ElementTree.SubElement(feed, 'id').text = id
+        ElementTree.SubElement(feed, qname('updated'))
+        ElementTree.SubElement(
+            ElementTree.SubElement(feed,
+                                   qname('author')),
+            qname('name')).text = self.author
+        self.etree = ElementTree.ElementTree(feed)
+
+    def entry(self,
+              title=None,
+              alternate=None,
+              id=None,
+              author=None,
+              content=''):
+        """
+        Create a new <entry> at the end of the Atom feed.  Fill the new
+        <entry> with the parameters or sensible defaults.
+        """
+
+        # Find sensible defaults for omitted arguments.
+        if title is None:
+            title = self.title
+        if alternate is None:
+            alternate = self.alternate
+        if author is None:
+            author = self.author
+
+        # Setup the new <entry>.
+        entry = ElementTree.SubElement(self.etree.getroot(), qname('entry'))
+
+        # Place the article in the <entry>.
+        ElementTree.SubElement(entry,
+                               qname('title'),
+                               {'type': 'html'}).text = title
+        ElementTree.SubElement(entry,
+                               qname('link'),
+                               {'href': alternate,
+                                'rel': 'alternate'})
+        ElementTree.SubElement(entry, qname('id')).text = id
+        ElementTree.SubElement(entry, qname('published')).text \
+            = datetime.today().strftime('%Y-%m-%dT%H:%M:%SZ')
+        ElementTree.SubElement(entry, qname('updated')).text \
+            = datetime.today().strftime('%Y-%m-%dT%H:%M:%SZ')
+        ElementTree.SubElement(
+            ElementTree.SubElement(entry,
+                                   qname('author')),
+            qname('name')).text = author
+        ElementTree.SubElement(entry,
+                               qname('content'),
+                               {'type': 'html'}).text = content
+
+    def __str__(self):
+        """
+        Serialize the Atom feed.
+        """
+        self.etree.find(qname('updated')).text \
+            = datetime.today().strftime('%Y-%m-%dT%H:%M:%SZ')
+        return ElementTree.tostring(self.etree.getroot())
+
+def feed(pathnames):
+
+    document_root = os.path.join(os.path.dirname(__file__), 'public')
+    server_name = 'rcrowley.org'
+    author = 'Richard Crowley'
+    feed_title = 'Richard Crowley&#8217;s blog'
+
+    a = Atom(title=feed_title,
+             alternate='http://{0}/'.format(server_name),
+             id='http://{0}/index.xml'.format(server_name),
+             author=author)
+
+    if 0 == len(pathnames):
+        return str(a)
+    if isinstance(pathnames, str):
+        pathnames = pathnames.rstrip().split('\n')
+    sys.stderr.write('{0}\n'.format(repr(pathnames)))
+    for pathname in pathnames:
+        pathname = pathname.rstrip()
+        url = 'http://{0}/{1}'.format(server_name, pathname)
+        try:
+            source = open(os.path.join('templates', pathname)).read()
+            a.entry(title=title(source),
+                    alternate=url,
+                    id=url,
+                    author=author,
+                    content=content(source))
+        except IOError:
+            a.entry(title=pathname,
+                    alternate=url,
+                    id=url,
+                    author=author,
+                    content='<a href="{0}">{0}</a>'.format(url))
+    return str(a)
+
+# Various ways to render the same Django template.
+def content(source):
+    t = Template('\n'.join(['{% extends "content.html" %}', source]))
+    return t.render(Context())
+def page(source):
+    t = Template('\n'.join(['{% extends "page.html" %}', source]))
+    return t.render(Context())
+def title(source):
+    t = Template('\n'.join(['{% extends "title.html" %}', source]))
+    return defaultfilters.striptags(t.render(Context()))
+
+if '__main__' == __name__:
+    import sys
+    import __main__
+    if 2 == len(sys.argv) and hasattr(__main__, sys.argv[1]):
+        print(getattr(__main__, sys.argv[1])(sys.stdin.read()))
+    else:
+        sys.stderr.write('Usage: {0} feed|page|title\n'.format(
+            os.path.basename(sys.argv[0])))
+        sys.exit(1)

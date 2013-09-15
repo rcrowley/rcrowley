@@ -1,0 +1,111 @@
+Appendix: Crash Course in Go
+
+Richard Crowley
+Betable operations
+r@rcrowley.org
+[[http://rcrowley.org/talks/surge-2013-golang.html]]
+@rcrowley
+
+* Go
+
+Always google it as “golang”
+Approaching four years old
+Thompson, Pike, Cox, Griesemer
+Statically typed
+Not classically object-oriented
+CSP primitives as syntax
+
+* CSP
+
+Tony Hoare’s _Communicating_Sequential_Processes_ in CACM volume 21 issue 8
+“Do not communicate by sharing memory; instead, share memory by communicating.”
+Useful for connection handling, critical sections, and pooled operations
+
+* Channels
+
+    ch := make(chan int, 1) // buffer length of 1
+    ch <- 47 // send
+    <-ch // receive
+
+Buffered or unbuffered
+Concurrent send and receive operations
+[[http://rcrowley.org/2013/04/19/golang-ack-test.html][Faster than mutexes]]
+Buffered channels can easily be misused and introduce data-loss risks
+
+* Goroutines
+
+    in := make(chan int)
+    out := make(chan int)
+
+    go func() {
+        prev := 0
+        for {
+            next := <-in
+            out <- prev + next
+            prev = next
+        }
+    }()
+
+Inexpensive green threads
+Semi-cooperatively scheduled
+
+* Structs
+
+    type Table struct {
+        ID             string
+        GameID         string
+        RoundID        string
+        Players        []Player
+        NextTransition time.Time
+        // ...
+    }
+
+Structs are types
+Zero or more named and typed members
+Structs can embed other structs
+
+* Methods
+
+    func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
+        t := &Table{
+            ID: ct.TableID,
+            // ...
+        }
+        if err := ac.Store(t.ID, t); nil != err {
+            return nil, err
+        }
+        return t, nil
+    }
+
+Method receiver may be any Go type
+Zero or more typed return values
+Embedded structs embed methods, too
+
+* Interfaces
+
+    type ObjectStore interface {
+        Load(string, interface{}) error
+        LoadExcl(string, interface{}) (sync.Locker, error)
+        Store(string, interface{}) error
+        StoreExcl(string, interface{}, sync.Locker) error
+    }
+
+Interfaces are also types
+Zero or more method signatures
+Types that implement all methods implement the interface implicitly
+`if`foo,`ok`:=`i.(Foo);`ok`{}`
+
+* Tags and reflection
+
+    type Table struct {
+        ID     string `bson:"i" index:"-" ring:"-"`
+        GameID string `bson:"g" index:"GameID_TableID"`
+        // ...
+    }
+
+Distribution keys, secondary indexes, and serialized names are declared via tags
+`reflect` can introspect everything
+
+* Meanwhile, back at the ranch...
+
+[[http://rcrowley.org/talks/surge-2013.html]]

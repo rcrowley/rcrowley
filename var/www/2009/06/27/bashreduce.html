@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BashReduce &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2009/06/27/bashreduce">BashReduce</a> <small>2009/06/27</small></h1>
+<p>I might be crazy but I&#8217;m loving Last.fm&#8217;s BashReduce tool
+<a id="f-27-1-src" href="#f-27-1" class="footnote">[1]</a>.&nbsp; So much
+so that I&#8217;ve taken time at work to make some improvements so we
+can use it for some internal data analysis (unrelated to the public DNS
+Stats I spoke about at Velocity
+<a id="f-27-2-src" href="#f-27-2" class="footnote">[2]</a>).</p>
+
+<h2>Changes</h2>
+
+<p>I had to change the argument structure a bit from Erik Frey&#8217;s
+original version to accommodate some of the bigger changes I made:</p>
+<ul>
+	<li><code>-h</code> is now how you specify a list of hosts.</li>
+	<li><code>-?</code> is now how you get the detailed help message.</li>
+	<li><code>-m</code> is now how you specify the map program.</li>
+	<li><code>-M</code> allows you to specify the merge program.</li>
+	<li><code>-i</code> now accepts a file or a directory.</li>
+	<li><code>-f</code> does some DFS-like things I&#8217;ll discuss
+	in more detail later.</li>
+</ul>
+
+<p>I think specifying your own merge step can be pretty useful, especially
+in cases where you want to create a re-reduce step on the end.&nbsp; A user
+still has to be careful to do as little work as possible in the merge
+step since it is serializing the output of map and reduce.</p>
+
+<p>The new <code>-f</code> option causes <code>br</code> to distribute
+filenames instead of lines of data over the network (via
+<code>nc</code>).&nbsp; The implication here is that each node has a
+mirror of the directory specified with <code>-i</code>.</p>
+
+<p>Because <code>br</code> can now act on a directory instead of a single
+file, it&#8217;s possible that you as a user would want to keep some or
+all of this data gzipped.&nbsp; <code>br</code> will transparently handle
+gzipped content when <code>-i</code> is specified (gzipped
+<code>stdin</code> is not supported, use <code>zcat</code>).</p>
+
+<p>One last thing: <code>stderr</code> from most parts of <code>br</code>
+is saved to <code>$tmp/br_stderr</code> where <code>$tmp</code> is the
+<code>-t</code> option (which defaults to <code>/tmp</code>).</p>
+
+<h2>Performance</h2>
+
+<p>I&#8217;ve found performance to pretty well follow with the number of
+cores made available with one caveat: if your dataset is small and your
+merge step is significant, it will dominate and performance gains will
+be reduced.</p>
+
+<h2>Distributed Filesystem</h2>
+
+<p>I want to spend some time talking about what a distributed filesystem
+for <code>br</code> will look like.&nbsp; For OpenDNS&#8217; immediate
+purposes, a filesystem mirrored using <code>rsync</code> is desirable from
+both a performance and durability point-of-view.&nbsp; For more general
+use, being limited by the size of your smallest node is not acceptable.</p>
+
+<p>Growing the dataset beyond the size of the smallest node introduces two
+challenges.&nbsp; First, how to partition and replicate the data and second,
+how to find these partitions later.&nbsp; Ultimately, I realize the answer
+is probably to stop hating and use Hadoop.&nbsp; Humor me.</p>
+
+<p>The simplest solution is probably the RedHat GFS
+<a id="f-27-3-src" href="#f-27-3" class="footnote">[3]</a> since it&#8217;s POSIX-compliant and
+designed to scale beyond one node&#8217;s capacity.&nbsp; The downside is
+that it isn&#8217;t able to take any of the locality considerations
+of HDFS into account.</p>
+
+<p>The other interesting possibility is wiring
+MogileFS <a id="f-27-4-src" href="#f-27-4" class="footnote">[4]</a> or
+HDFS <a id="f-27-5-src" href="#f-27-5" class="footnote">[5]</a>
+itself underneath <code>br</code> as a frontend.&nbsp; With Hadoop Streaming,
+this isn&#8217;t too far fetched and may represent the best route for
+a <code>br</code> user who outgrows a single-node&#8217;s storage
+capacity.</p>
+
+<h2>Licensed by the goodwill of Erik Frey</h2>
+
+<p>Here&#8217;s my version: <big><a href="http://github.com/rcrowley/bashreduce">http://github.com/rcrowley/bashreduce</a></big></p>
+
+
+<ol class="footnote">
+	<li id="f-27-1"><a href="http://blog.last.fm/2009/04/06/mapreduce-bash-script">http://blog.last.fm/2009/04/06/mapreduce-bash-script</a> <a href="#f-27-1-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-27-2"><a href="http://rcrowley.org/2009/06/23/building-opendns-stats-at-velocity">http://rcrowley.org/2009/06/23/building-opendns-stats-at-velocity</a> <a href="#f-27-2-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-27-3"><a href="http://www.redhat.com/gfs/">http://www.redhat.com/gfs/</a> <a href="#f-27-3-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-27-4"><a href="http://www.danga.com/mogilefs/">http://www.danga.com/mogilefs/</a> <a href="#f-27-4-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-27-5"><a href="http://hadoop.apache.org/core/docs/current/hdfs_user_guide.html">http://hadoop.apache.org/core/docs/current/hdfs_user_guide.html</a> <a href="#f-27-5-src" class="footnote-src">&#8617;</a></li>
+</ol>
+
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/8a85e862d26400e8a2f5ce61bf3352db?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

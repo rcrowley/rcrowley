@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OpenDNS MySQL abuses &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+<article>
+<header>
+	<time datetime="2010-02008" pubdate>2010-02-08</time>
+	<h1>OpenDNS MySQL abuses</h1>
+</header>
+<p>Fresh off the beginning of Kellan&#8217;s <a href="http://code.flickr.com/blog/2010/02/08/using-abusing-and-scaling-mysql-at-flickr/">series on Flickr&#8217;s catalog of MySQL abuses</a>, I thought it would be good to document the ways OpenDNS Stats uses and abuses MySQL.&nbsp; At <a href="http://rcrowley.org/2009/06/23/building-opendns-stats-at-velocity.html">Velocity last year</a> I glossed over some MySQL stuff in favor of spending more time talking about <code>std::bad_alloc</code> and fake map/reduce.&nbsp; OpenDNS Stats uses MySQL in three ways, ranging from normal to awesomely stupid.</p>
+<p>The most normal case is a single InnoDB database tracking total DNS requests for each network using stats.&nbsp; The machine is modestly beefy so the dataset can fit in memory.&nbsp; <code>INSERT</code>s come containing up to 100,000 sets of values and uses <code>ON DUPLICATE KEY UPDATE</code> to get <code>+=</code> behavior.&nbsp; Each of these <code>INSERT</code>s contains values that are pre-sorted in <code>PRIMARY KEY</code> order to <a href="http://dev.mysql.com/doc/refman/5.0/en/innodb-deadlocks.html">avoid deadlock</a>: &#8220;Access your tables and rows in a fixed order. Then transactions form well-defined queues and do not deadlock.&#8221;</p>
+<p>The second case is normal but federated.&nbsp; Every domain name encountered is hashed and stored using the packed 20-byte SHA1 as the <code>PRIMARY KEY</code>.&nbsp; The leading bits of the SHA1 are used to determine which master stores that domain.</p>
+<p>The awesomely stupid case is storing top domains data.&nbsp; There&#8217;s a lookup table that maps networks to their shard, on which each network has its own MyISAM tables.&nbsp; The tables are MyISAM because of <a href="http://www.mysqlperformanceblog.com/2009/02/11/limiting-innodb-data-dictionary/">the way InnoDB handles data dictionaries</a>.&nbsp; Because the tables are MyISAM, <a href="http://dev.mysql.com/doc/refman/5.0/en/internal-locking.html"><code>DELETE</code>s are evil</a>: MyISAM can&#8217;t <code>INSERT</code> without extra locks if tables have holes.&nbsp; To delete old data, a new table is swapped into place using <a href="http://dev.mysql.com/doc/refman/5.0/en/rename-table.html"><code>RENAME TABLE</code></a> and all data that is <strong>not</strong> being deleted is <code>INSERT</code>ed into the new table.&nbsp; To cope with so many tables, the <code>key_buffer</code> is set to about 1/3 of memory to leave more than usual for the filesystem cache and the <code>table_cache</code> is set to 300,000.&nbsp; This last bit requires <code>mysqld_safe</code> to be patched to run <code>ulimit -n 600000</code> before <code>mysqld</code> is started.</p>
+<p>Data is stored by day and domain hash with an integer field for each hour of the day (in UTC).&nbsp; Two rows can then be used to build a day as observed in any timezone.&nbsp; The domain hashes are converted to domain names at read time, accelerated by tons (not like Facebook but still a lot) of memory devoted to <code>memcached</code>.</p>
+<p>Nothing we do is terribly groundbreaking but it reinforces Kellan&#8217;s point that MySQL is still a pretty heavy hammer.</p>
+</article>
+<footer class="site">
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2010 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

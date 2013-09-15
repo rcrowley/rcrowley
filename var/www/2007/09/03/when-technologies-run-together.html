@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>XUL and XHTML run together &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/09/03/when-technologies-run-together">XUL and XHTML run together</a> <small>2007/09/03</small></h1>
+<p>I have been spending an inordinate amount of time these days with XULRunner, Mozilla's awesome cross-platform SDK used to build Firefox and Thunderbird.&nbsp; XULRunner is bit of an oddity, more akin to a web browser than the Java Virtual Machine or the Ruby interpreter.&nbsp; While it is most definitely focused on the development of desktop applications, it feels too similar to developing websites in many cases.</p>
+<p>XUL is a specific subset of XML that is understood by XULRunner and is used to visually layout desktop applications.&nbsp; Interaction with a XUL app is handled by Javascript in much the same way that Javascript handles interactions with websites today.&nbsp; You can even include the XHTML namespace in your XUL app to really start to blur the lines between the desktop and the browser:</p>
+<pre>&lt;window id="main" title="&amp;title;" width="750" height="500"
+xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+xmlns:html="http://www.w3.org/1999/xhtml"&gt;</pre>
+<p>But let's stop right there.&nbsp; XUL is not XHTML.&nbsp; They do not work the same way and any attempts to make them do so will result in only frustration.&nbsp; This is where my biggest criticism of XUL comes.&nbsp; Visually, the code looks like a website but functionally the code works much more like Java Swing/AWT or Visual C++ resources.&nbsp; Websites work in blocks while XUL works in boxes.</p>
+<p>Here's a bit of a crash course in boxes.&nbsp; There are two basic types of boxes, vertical and horizontal.&nbsp; A vertical box will stack its child elements vertically, expanding them to fill the entire width available.&nbsp; A horizontal box will do just the opposite.&nbsp; Vertical boxes will by default only use as much vertical space as necessary, but with the <code>flex="1"</code> attribute they can be made to fill all available vertical space, too.&nbsp; Horizontal boxes similarly can be made to take all available horizontal space.</p>
+<p>Throw all your old CSS techniques out the window now.&nbsp; What I found to be most helpful to me while laying out a XUL app was actually to turn CSS off.&nbsp; In contrast to the semantically pristine XHTML 1.1 we've all been writing lately, XUL layouts very much depend on the markup.&nbsp; This is both a blessing and a curse &mdash; our typical CSS kung fu doesn't really matter but now we don't have to worry about graceful degradation since we control the runtime used with our app.</p>
+<p>The takeaway here is to throw semantics out the window for XUL apps.&nbsp; Focusing on building what you want and keeping your code maintainable are two big enough challenges.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(0)</small></h1>
+<ol>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/0ebc6d259ac032ff0410b2b1c03d9a91?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

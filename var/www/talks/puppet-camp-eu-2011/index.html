@@ -1,0 +1,1214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Extending Puppet</title>
+
+  <link rel="stylesheet" href="./css/reset.css" type="text/css"/>
+  <link rel="stylesheet" href="./css/showoff.css" type="text/css"/>
+
+  <script type="text/javascript" src="./js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="./js/jquery.cycle.all.js"></script>
+	<script type="text/javascript" src="./js/jquery-print.js"></script>
+  <script type="text/javascript" src="./js/jquery.batchImageLoad.js"></script>
+
+  <script type="text/javascript" src="./js/jquery.doubletap-0.1.js"></script>
+
+  <script type="text/javascript" src="./js/fg.menu.js"></script>
+  <script type="text/javascript" src="./js/showoff.js"></script>
+  <script type="text/javascript" src="./js/jTypeWriter.js"> </script>
+  <script type="text/javascript" src="./js/sh_main.min.js"></script>
+  <script type="text/javascript" src="./js/core.js"></script>
+  <script type="text/javascript" src="./js/showoffcore.js"></script>
+
+  <link type="text/css" href="./css/fg.menu.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/theme/ui.all.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/sh_style.css" rel="stylesheet" >
+
+  
+    <link rel="stylesheet" href="file/helfuckingvetica.css" type="text/css"/>
+  
+
+  
+    <script type="text/javascript" src="file/sh_ruby.js"></script>
+  
+    <script type="text/javascript" src="file/sh_puppet.js"></script>
+  
+    <script type="text/javascript" src="file/centerdammit.js"></script>
+  
+
+  <script type="text/javascript">
+  $(function(){
+    setupPreso(false, './');
+  });
+  </script>
+</head>
+
+<body>
+
+
+<a tabindex="0" href="#search-engines" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="navmenu"><span class="ui-icon ui-icon-triangle-1-s"></span>slides</a>
+<div id="navigation" class="hidden"></div>
+
+<div id="help">
+  <table>
+    <tr><td class="key">space, &rarr;</td><td>next slide</td></tr>
+    <tr><td class="key">&larr;</td><td>previous slide</td></tr>
+    <tr><td class="key">d</td><td>debug mode</td></tr>
+    <tr><td class="key">## &lt;ret&gt;</td><td>go to slide #</td></tr>
+    <tr><td class="key">c</td><td>table of contents (vi)</td></tr>
+    <tr><td class="key">f</td><td>toggle footer</td></tr>
+    <tr><td class="key">r</td><td>reload slides</td></tr>
+    <tr><td class="key">z</td><td>toggle help (this)</td></tr>
+  </table>
+</div>
+
+<div id="preso">loading presentation...</div>
+<div id="footer">
+  <span id="slideInfo"></span>
+  <span id="debugInfo"></span>
+</div>
+
+<div id="slides" class="offscreen" style="display:none;">
+<div class="slide" data-transition="none"><div class="content bullets" ref="./slides/1">
+<h1>Extending Puppet</h1>
+
+<ul>
+<li><a href="http://rcrowley.org/talks/puppet-camp-eu-2011/">rcrowley.org/talks/puppet-camp-eu-2011/</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/2">
+<h1>Hi, I&#x2019;m Richard Crowley</h1>
+
+<ul>
+<li>Equal opportunity technology hater.</li>
+<li>DevStructure&#x2019;s operator and UNIX hacker.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/3">
+<h2>Part 1</h2>
+
+<h1>Custom types</h1>
+
+<h2>(Warmup.)</h2></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/4">
+<h1>How I&#x2019;m running Puppet</h1>
+
+<pre><code>[main]
+    confdir = /home/rcrowley/work/extending-puppet
+    logdir = /var/log/puppet
+    rundir = /var/run/puppet
+    ssldir = $vardir/ssl
+    vardir = /var/lib/puppet
+
+    pluginsync = true
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/5">
+<h1>How I&#x2019;m running Puppet</h1>
+
+<pre class="sh_sh"><code># Master
+puppet master --confdir=$HOME/work/extending-puppet
+
+# Agent
+puppet agent --confdir=$HOME/work/extending-puppet</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/6">
+<h1>How I&#x2019;m running Puppet</h1>
+
+<ul>
+<li><a href="https://github.com/rcrowley/extending-puppet">github.com/rcrowley/extending-puppet</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/7">
+<h1>Plugins in modules</h1>
+
+<ul>
+<li>Not just &#x201C;plugins.&#x201D;</li>
+<li>Any Puppet source tree.</li>
+<li>Monkey patches, too.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/8">
+<h1>Custom types</h1>
+
+<pre class="sh_Ruby"><code>Puppet::Type.newtype :foo do
+
+  # TODO Properties and parameters.
+
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/9">
+<h1>Properties</h1>
+
+<pre class="sh_Ruby"><code>newproperty :foo do
+  desc "Foo."
+  newvalue :bar
+  newvalue :baz
+end
+
+newproperty :quux do
+  desc "Quux."
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/10">
+<h1>Properties</h1>
+
+<ul>
+<li>Things written to disk.</li>
+<li><code>provider.foo</code> called to read.</li>
+<li><code>provider.foo=</code> called to write.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/11">
+<h1>Properties</h1>
+
+<ul>
+<li>No explicit, documented<br/>guarantees on order.</li>
+<li>Hard to work with in procedural code.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/12">
+<h1>Using properties effectively</h1>
+
+<ul>
+<li>Use only one property per type.</li>
+<li>Usually, this is the <code>ensure</code> property.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/13">
+<h1><code>ensure</code> property</h1>
+
+<ul>
+<li><code>exists?</code></li>
+<li><code>create</code></li>
+<li><code>destroy</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/14">
+<h1><code>ensure</code> property</h1>
+
+<pre class="sh_Ruby"><code>    newvalue(:present) do
+      if @resource.provider and
+         @resource.provider.respond_to?(:create)
+        @resource.provider.create
+      else
+        @resource.create
+      end
+      nil # return nil so the event is autogenerated
+    end
+
+    newvalue(:absent) do
+      if @resource.provider and
+         @resource.provider.respond_to?(:destroy)
+        @resource.provider.destroy
+      else
+        @resource.destroy
+      end
+      nil # return nil so the event is autogenerated
+    end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/15">
+<h1>Parameters</h1>
+
+<pre class="sh_Ruby"><code>newparam :foo do
+  desc "Foo."
+  newvalue :bar
+  newvalue :baz
+end
+
+newparam :quux do
+  desc "Quux."
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/16">
+<h1>Parameters</h1>
+
+<ul>
+<li>Configure the resource.</li>
+<li>No associated actions.</li>
+<li>Use as many as you need.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/17">
+<h1>Types versus providers</h1>
+
+<ul>
+<li>A <code>package</code> is a type.<br/><code>apt</code> is a provider of packages.</li>
+<li>Types parse and normalize arguments.<br/>Providers make it so.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/18">
+<h1>GitHub authorized keys</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/19">
+<h1><code>lib/puppet/type/github.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'puppet/type'
+
+Puppet::Type.newtype :github do
+  @doc = "Send a public key to GitHub."
+
+  newparam :path, :namevar =&gt; true do
+    desc "Private key pathname."
+  end
+
+  newparam :username do
+    desc "GitHub username."
+  end
+
+  newparam :token do
+    desc "GitHub API token."
+  end
+
+  ensurable do
+    defaultvalues
+    defaultto :present
+  end
+
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/20">
+<h1>Example resource</h1>
+
+<pre class="sh_Puppet"><code>github { "/root/.ssh/github":
+    ensure   =&gt; present,
+    token    =&gt; "0123456789abcdef0123456789abcdef",
+    username =&gt; "rcrowley",
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/21">
+<h1><code>lib/puppet/provider/github/https.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'base64'
+require 'json'
+require 'net/http'
+require 'net/https'
+require 'openssl'
+
+Puppet::Type.type(:github).provide :https do
+  @doc = "Send a public key to GitHub."
+
+  defaultfor :operatingsystem =&gt; :ubuntu
+
+  # TODO exists?, create, destroy
+
+  # TODO private methods
+
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/22">
+<h1><code>lib/puppet/provider/github/https.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def exists?
+    return false unless File.exists?("#{@resource[:path]}")
+    return false unless File.exists?("#{@resource[:path]}.pub")
+    !github_id.nil?
+  end
+
+  def create
+    system "ssh-keygen -q -f '#{@resource[:path]
+      }' -b 2048 -N '' -C ''"
+    POST("/api/v2/json/user/key/add",
+      :title =&gt; File.basename("#{@resource[:path]}"),
+      :key =&gt; File.read("#{@resource[:path]}.pub"))
+  end
+
+  def destroy
+    if id = github_id
+      POST("/api/v2/json/user/key/remove", :id =&gt; id)
+    end
+    File.unlink "#{@resource[:path]}"
+    File.unlink "#{@resource[:path]}.pub"
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/23">
+<h1><code>lib/puppet/provider/github/https.rb</code></h1>
+
+<pre class="sh_Ruby"><code>private
+
+  def github_id
+    public_key = File.read("#{@resource[:path]}.pub").strip
+    JSON.parse(
+      GET("/api/v2/json/user/keys").body,
+      :symbolize_names =&gt; true
+    )[:public_keys].find { |gh| gh[:key] == public_key }[:id]
+  rescue NoMethodError
+    nil
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/24">
+<h1><code>lib/puppet/provider/github/https.rb</code></h1>
+
+<pre class="sh_Ruby"><code>private
+
+  def GET(path)
+    request = Net::HTTP::Get.new(path)
+    authorize(request)
+    connection.request(request)
+  end
+
+  def POST(path, options={})
+    request = Net::HTTP::Post.new(path)
+    authorize(request)
+    request.set_form_data(options)
+    connection.request(request)
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/25">
+<h1><code>lib/puppet/provider/github/https.rb</code></h1>
+
+<pre class="sh_Ruby"><code>private
+
+  def connection
+    return @connection if defined?(@connection)
+    @connection = Net::HTTP.new("github.com", 443)
+    @connection.use_ssl = true
+    @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    @connection
+  end
+
+  def authorize(request)
+    request["Authorization"] = "Basic #{Base64.encode64(
+      "#{@resource[:username]}/token:#{@resource[:token]}"
+    ).gsub("\n", "")}"
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/26">
+<ul>
+<li><a href="https://github.com/rcrowley/extending-puppet">github.com/rcrowley/extending-puppet</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/27">
+<h1>Providers for<br/>existing types</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/28">
+<h1><code>puppet-pip</code></h1>
+
+<ul>
+<li><code>package</code> provider for Python&#x2019;s<br/><code>pip</code> package management tool.</li>
+<li>Included in Puppet 2.7 release candiate.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/29">
+<h1>Install <code>puppet-pip</code> on 2.6</h1>
+
+<pre class="sh_sh"><code>gem install puppet-pip
+
+export \
+    RUBYLIB=$GEM_HOME/puppet-pip-1.0.0/lib</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/30">
+<h1><code>lib/puppet/provider/package/pip.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'puppet/provider/package'
+require 'xmlrpc/client'
+
+Puppet::Type.type(:package).provide :pip,
+  :parent =&gt; ::Puppet::Provider::Package do
+
+  desc "Python packages via `pip`."
+
+  has_feature :installable, :uninstallable,
+    :upgradeable, :versionable
+
+  # TODO self.parse, self.instances,
+  # TODO query, latest, install, uninstall, update,
+  # TODO lazy_pip
+
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/31">
+<h1><code>lib/puppet/provider/package/pip.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def self.parse(line)
+    if line.chomp =~ /^([^=]+)==([^=]+)$/
+      {:ensure =&gt; $2, :name =&gt; $1, :provider =&gt; name}
+    else
+      nil
+    end
+  end
+
+  def self.instances
+    packages = []
+    pip_cmd = which('pip') or return []
+    execpipe "#{pip_cmd} freeze" do |process|
+      process.collect do |line|
+        next unless options = parse(line)
+        packages &lt;&lt; new(options)
+      end
+    end
+    packages
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/32">
+<h1><code>lib/puppet/provider/package/pip.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def query
+    self.class.instances.each do |provider_pip|
+      if @resource[:name] == provider_pip.name
+        return provider_pip.properties
+      end
+    end
+    return nil
+  end
+
+  def latest
+    client = XMLRPC::Client.new2("http://pypi.python.org/pypi")
+    client.http_header_extra = {"Content-Type" =&gt; "text/xml"}
+    result = client.call("package_releases", @resource[:name])
+    result.first
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/33">
+<h1><code>lib/puppet/provider/package/pip.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def install
+    args = %w{install -q}
+    if @resource[:source]
+      args &lt;&lt; "-e"
+      if String === @resource[:ensure]
+        args &lt;&lt; "#{@resource[:source]}@#{@resource[:ensure]}" +
+          "#egg=#{@resource[:name]}"
+      else
+        args &lt;&lt; "#{@resource[:source]}#egg=#{@resource[:name]}"
+      end
+    else
+      case @resource[:ensure]
+      when String
+        args &lt;&lt; "#{@resource[:name]}==#{@resource[:ensure]}"
+      when :latest
+        args &lt;&lt; "--upgrade" &lt;&lt; @resource[:name]
+      else
+        args &lt;&lt; @resource[:name]
+      end
+    end
+    lazy_pip *args
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/34">
+<h1><code>lib/puppet/provider/package/pip.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def uninstall
+    lazy_pip "uninstall", "-y", "-q", @resource[:name]
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/35">
+<h1><code>lib/puppet/provider/package/pip.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def update
+    install
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/36">
+<h1><code>lib/puppet/provider/package/pip.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  private
+  def lazy_pip(*args)
+    pip *args
+  rescue NoMethodError =&gt; e
+    if pathname = which('pip')
+      self.class.commands :pip =&gt; pathname
+      pip *args
+    else
+      raise e
+    end
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/37">
+<h1>Example resource</h1>
+
+<pre class="sh_Puppet"><code>package { "django":
+    ensure   =&gt; "1.3",
+    provider =&gt; pip,
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/38">
+<ul>
+<li><a href="https://github.com/rcrowley/puppet-pip">github.com/rcrowley/puppet-pip</a></li>
+<li><a href="https://github.com/puppetlabs/puppet/tree/next">github.com/puppetlabs/puppet/tree/next</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/39">
+<h2>Part 2</h2>
+
+<h1>Custom functions</h1>
+
+<h2>(Because the Puppet master<br/>needs more things to do.)</h2></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/40">
+<h1>GitHub authorized keys</h1>
+
+<h2>Redux</h2>
+
+<ul>
+<li>Don&#x2019;t share GitHub API token with agents.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/41">
+<h1>Example resource</h1>
+
+<pre class="sh_Puppet"><code>file { "/root/.ssh/github":
+    content =&gt; github(
+        "my sweet public key",
+        "rcrowley",
+        "0123456789abcdef0123456789abcdef"
+    ),
+    ensure =&gt; file,
+    group =&gt; "root",
+    mode =&gt; 0600,
+    owner =&gt; "root",
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/42">
+<h1><code>lib/puppet/parser/ functions/github.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'base64'
+require 'net/https'
+require 'sshkey'
+
+Puppet::Parser::Functions.newfunction :github,
+  :type =&gt; :rvalue do |args|
+
+  # TODO Check GitHub for an existing public key.
+
+  key = SSHKey.generate
+  request = Net::HTTP::Post.new("/api/v2/json/user/key/add")
+  request["Authorization"] = "Basic #{Base64.encode64(
+    "#{args[1]}/token:#{args[2]}").gsub("\n", "")}"
+  request.set_form_data(
+    :title =&gt; args[0], :key =&gt; key.ssh_public_key)
+
+  connection = Net::HTTP.new("github.com", 443)
+  connection.use_ssl = true
+  connection.request(request)
+
+  key.rsa_private_key
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/43">
+<ul>
+<li><a href="https://github.com/rcrowley/extending-puppet">github.com/rcrowley/extending-puppet</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/44">
+<h2>Part 3</h2>
+
+<h1>WTF is an indirector?</h1>
+
+<h2>(It&#x2019;s not even in the dictionary.)</h2></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/45">
+<h1>Node terminus</h1>
+
+<pre><code>$ puppet --genconfig | grep node_terminus
+    # node_terminus = plain
+$
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/46">
+<h1>From <code>lib/puppet/ indirector/node/plain.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'puppet/node'
+require 'puppet/indirector/plain'
+
+class Puppet::Node::Plain &lt; Puppet::Indirector::Plain
+  # ...
+
+  # Just return an empty node.
+  def find(request)
+    node = super
+    node.fact_merge
+    node
+  end
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/47">
+<h1>From <code>lib/puppet/indirector/plain.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'puppet/indirector/terminus'
+
+# An empty terminus type, meant to just return empty objects.
+class Puppet::Indirector::Plain &lt; Puppet::Indirector::Terminus
+  # Just return nothing.
+  def find(request)
+    indirection.model.new(request.key)
+  end
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/48">
+<h1>How did we get here?</h1>
+
+<pre class="sh_Ruby"><code>  def find(request)
+    puts caller
+    indirection.model.new(request.key)
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/49">
+<h1>How did we get here?</h1>
+
+<pre>
+lib/puppet/indirector/node/plain.rb:15:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/indirector/catalog/compiler.rb:91:in `find_node'
+lib/puppet/indirector/catalog/compiler.rb:119:in `node_from_request'
+lib/puppet/indirector/catalog/compiler.rb:33:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/network/http/handler.rb:106:in `do_find'
+lib/puppet/network/http/handler.rb:68:in `send'
+lib/puppet/network/http/handler.rb:68:in `process'
+lib/puppet/network/http/webrick/rest.rb:24:in `service'
+# ...
+</pre>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/50">
+<h1><code>Puppet::Indirector:: Indirection#find</code></h1>
+
+<ul>
+<li>Picks and caches the terminus class.</li>
+<li>Dispatches calls to it.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/51">
+
+
+<pre>
+lib/puppet/indirector/node/plain.rb:15:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/indirector/catalog/compiler.rb:91:in `find_node'
+lib/puppet/indirector/catalog/compiler.rb:119:in `node_from_request'
+<strong>lib/puppet/indirector/catalog/compiler.rb:33:in `find'</strong>
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/network/http/handler.rb:106:in `do_find'
+lib/puppet/network/http/handler.rb:68:in `send'
+lib/puppet/network/http/handler.rb:68:in `process'
+lib/puppet/network/http/webrick/rest.rb:24:in `service'
+# ...
+</pre>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/52">
+<h1>What&#x2019;s the node object for?</h1>
+
+<pre class="sh_Ruby"><code>  def find(request)
+    extract_facts_from_request(request)
+
+    node = node_from_request(request)
+
+    if catalog = compile(node)
+      return catalog
+    else
+      # This shouldn't actually happen; we should either return
+      # a config or raise an exception.
+      return nil
+    end
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/53">
+<h1>A node to compile</h1>
+
+<pre class="sh_Ruby"><code>  def find(request)
+    indirection.model.new(request.key)
+  end</code></pre>
+
+<ul>
+<li><code>indirection.model</code> returns <code>Puppet::Node</code>.</li>
+<li>A <code>Puppet::Node</code> has <code>@parameters</code> and <code>@classes</code>.</li>
+<li>The node terminus should populate <code>@parameters</code> and <code>@classes</code>.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/54">
+<h1>Catalog compilation</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/55">
+<h1>From <code>lib/puppet/parser/compiler.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def compile
+    # Set the client's parameters into the top scope.
+    set_node_parameters
+    create_settings_scope
+
+    evaluate_main
+
+    evaluate_ast_node
+
+    evaluate_node_classes
+
+    evaluate_generators
+
+    finish
+
+    fail_on_unevaluated
+
+    @catalog
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/56">
+<h1>Catalog compilation</h1>
+
+<ul>
+<li><code>set_node_parameters</code> and <code>evaluate_node_classes</code> handle<br/><code>@parameters</code> and <code>@classes</code><br/>set by the node terminus.</li>
+<li><code>evaluate_ast_node</code> handles<br/><code>node</code> definitions from Puppet code.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/57">
+<h1><code>@parameters</code> and <code>@classes</code></h1>
+
+<ul>
+<li>Sound suspiciously like the makings<br/>of the external node classifier.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/58">
+<h1>Setup external node classifier in <code>puppet.conf</code></h1>
+
+<pre><code>external_nodes = /usr/local/bin/classifier
+node_terminus = exec
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/59">
+<h1><code>/usr/local/bin/classifier</code></h1>
+
+<pre class="sh_sh"><code>#!/bin/sh
+cat &lt;&lt;EOF
+---
+classes: []
+parameters:
+  foo: bar
+EOF</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/60">
+<h1>From <code>lib/puppet/ indirector/node/exec.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def find(request)
+    output = super or return nil
+
+    # Translate the output to ruby.
+    result = translate(request.key, output)
+
+    create_node(request.key, result)
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/61">
+<h1>From <code>lib/puppet/ indirector/exec.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def find(request)
+    # Run the command.
+    unless output = query(request.key)
+      return nil
+    end
+
+    # Translate the output to ruby.
+    output
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/62">
+<h1>How did we get here?</h1>
+
+<pre class="sh_Ruby"><code>  def find(request)
+    puts caller
+    # Run the command.
+    unless output = query(request.key)
+      return nil
+    end
+
+    # Translate the output to ruby.
+    output
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/63">
+<h1>How did we get here?</h1>
+
+<pre>
+lib/puppet/indirector/node/exec.rb:17:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/indirector/catalog/compiler.rb:91:in `find_node'
+lib/puppet/indirector/catalog/compiler.rb:119:in `node_from_request'
+lib/puppet/indirector/catalog/compiler.rb:33:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/network/http/handler.rb:106:in `do_find'
+lib/puppet/network/http/handler.rb:68:in `send'
+lib/puppet/network/http/handler.rb:68:in `process'
+lib/puppet/network/http/webrick/rest.rb:24:in `service'
+# ...
+</pre>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/64">
+<h1>Node terminus indirected</h1>
+
+<ul>
+<li><p>As expected, everything&#x2019;s the same except where the indirector looked for the node.</p></li>
+<li><p>Where&#x2019;s that <code>foo</code> parameter injected by the external node classifier?</p></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/65">
+
+
+<pre>
+lib/puppet/indirector/node/exec.rb:17:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+<strong>lib/puppet/indirector/catalog/compiler.rb:91:in `find_node'</strong>
+lib/puppet/indirector/catalog/compiler.rb:119:in `node_from_request'
+lib/puppet/indirector/catalog/compiler.rb:33:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/network/http/handler.rb:106:in `do_find'
+lib/puppet/network/http/handler.rb:68:in `send'
+lib/puppet/network/http/handler.rb:68:in `process'
+lib/puppet/network/http/webrick/rest.rb:24:in `service'
+# ...
+</pre>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/66">
+<h1>From <code>lib/puppet/ indirector/catalog/compiler.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def find_node(name)
+    begin
+      return nil unless node =
+        Puppet::Node.indirection.find(name)
+    rescue =&gt; detail
+      puts detail.backtrace if Puppet[:trace]
+      raise Puppet::Error,
+        "Failed when searching for node #{name}: #{detail}"
+    end
+
+
+    # Add any external data to the node.
+    add_node_data(node)
+
+    node
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/67">
+<h1>What&#x2019;s in a <code>node</code>?</h1>
+
+<pre class="sh_Ruby"><code>  def find_node(name)
+    begin
+      return nil unless node =
+        Puppet::Node.indirection.find(name)
+    rescue =&gt; detail
+      puts detail.backtrace if Puppet[:trace]
+      raise Puppet::Error,
+        "Failed when searching for node #{name}: #{detail}"
+    end
+
+
+    # Add any external data to the node.
+    add_node_data(node)
+
+    puts node.inspect
+    node
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/68">
+<h1>What&#x2019;s in a <code>node</code>?</h1>
+
+<pre>
+#&lt;Puppet::Node:0xb70fa674 @name="devstructure.hsd1.ca.comcast.net.",
+@classes={}, @expiration=Sat Jan 08 22:47:33 +0000 2011,
+@parameters={"network_eth1"=&gt;"33.33.33.0", "netmask"=&gt;"255.255.255.0",
+"kernel"=&gt;"Linux", "processorcount"=&gt;"1", "swapfree"=&gt;"998.67 MB",
+"physicalprocessorcount"=&gt;"0", "uniqueid"=&gt;"007f0101",
+"lsbmajdistrelease"=&gt;"10", "fqdn"=&gt;"devstructure.hsd1.ca.comcast.net.",
+"operatingsystemrelease"=&gt;"10.10", "virtual"=&gt;"physical",
+"ipaddress"=&gt;"10.0.2.15", "memorysize"=&gt;"346.15 MB",
+"is_virtual"=&gt;"false", :_timestamp=&gt;Sat Jan 08 22:17:32 +0000 2011,
+"clientversion"=&gt;"2.6.4", "hardwaremodel"=&gt;"i686",
+"kernelrelease"=&gt;"2.6.35-22-generic-pae",
+"rubysitedir"=&gt;"/usr/local/lib/site_ruby/1.8", "ps"=&gt;"ps -ef",
+"macaddress_eth0"=&gt;"08:00:27:8e:9e:65", "domain"=&gt;"hsd1.ca.comcast.net.",
+"netmask_eth0"=&gt;"255.255.255.0", "serverip"=&gt;"10.0.2.15",
+"servername"=&gt;"devstructure.hsd1.ca.comcast.net.", "timezone"=&gt;"UTC",
+"uptime_days"=&gt;"9", "macaddress_eth1"=&gt;"08:00:27:c3:78:5a", "id"=&gt;"root",
+"netmask_eth1"=&gt;"255.255.255.0", "processor0"=&gt;"Intel(R) Core(TM)2 Duo CPU
+T8300  @ 2.40GHz", "hardwareisa"=&gt;"unknown", "lsbdistrelease"=&gt;"10.10",
+"selinux"=&gt;"false", "manufacturer"=&gt;"innotek GmbH", "interfaces"=&gt;"eth0,eth1",
+"memoryfree"=&gt;"225.10 MB", "uptime_hours"=&gt;"216", <strong>"foo"=&gt;"bar"</strong>,
+"lsbdistdescription"=&gt;"Ubuntu 10.10", "lsbdistcodename"=&gt;"maverick", "kernelversion"=&gt;"2.6.35", "path"=&gt;"/home/vagrant/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/var/lib/gems/1.8/bin", "hostname"=&gt;"devstructure", "uptime"=&gt;"9 days", "puppetversion"=&gt;"2.6.4", "environment"=&gt;"production", "serialnumber"=&gt;"0", "macaddress"=&gt;"08:00:27:8e:9e:65", "facterversion"=&gt;"1.5.8", "ipaddress_eth0"=&gt;"10.0.2.15", "kernelmajversion"=&gt;"2.6", "swapsize"=&gt;"1011.00 MB", "sshrsakey"=&gt;"AAAAB3NzaC1yc2EAAAADAQABAAABAQDrJ0U+iSED6LNmnC0bHfpLKaDvWh0UXgQzdElhtY1xOS065TRMJIrb6LPaAxJH3iWXLP57rM8Vldurx+pOJWVz6ZmsGSz/EOugg6rC6K2cPAS8V5nRq6SUKksb/eBR0LbM0ygMoVEKi0ogBIkQuZNeVqdUtIcT5P7DBrasPkxzkBqxqAgYxzMeR82vYSLBEwhpeyrVUzpOHLh9mVxfCQoZRdEpnckGmMxYSOW7OBzf46CBhPrXAB5ZX3aZB+iDxNhMVvMYZFircDb/ZKZ4ph6qHFVWvBtd54N9yXf+XSLZPfox4zIRR8BRoUz8rx7ccZDZ6SWVdMCZ6jO3MuxEIeFJ", "operatingsystem"=&gt;"Ubuntu", "serverversion"=&gt;"2.6.4", "network_eth0"=&gt;"10.0.2.0", "lsbdistid"=&gt;"Ubuntu", "architecture"=&gt;"i386", "uptime_seconds"=&gt;"779012", "sshdsakey"=&gt;"AAAAB3NzaC1kc3MAAACBAJNDwltq7JCbq7ql1a3g2IxLWwhJNLxk0jYj/oLLc7LvpiN1kcfuNoK2bZooUCnGkcyZs+6U3jbz2idISOncq+hfFjrMv0qIGKHXWANh1qLZuhRjBHwRlkD6ll5gw4ioTohmt3VfUbE4hJfK0z3wtQn/SLLoz4MSNnR09OIZOCgzAAAAFQDLW+bfrDl+WdsE4ixDCRr4vEW1lwAAAIBt+Bz62PhQLZSWpLaHCOOaFeoHwv9IPvQ/ors0zDOxDEoK5GHOY3BcCO8s4rHr17aQKmMP5ztNwzUBl+OlkSlQ7kAEMBRvehFbhK+SOcjvqIt6i2i9/3nn9ba0AZ8bQ+1T8Z+A/6lRmWtaeUqsZNRJitfzez7eWRfvd+X/GK1eaAAAAIAqyACyAElrdGd4YfwV/YPGjiUpIjvzqiBCogO2qvMj6/ohzdN7wBmIdIUmYQ1uYsQ6avd3GL5S2I/xJ1uGosIh6xlKa0Dk4SqOq1LGebdCpv1aUKIwecQlkxrQE6Da9Q4zVgHrtlglOW7A8uq8gfl/VQdwU1sow36scLSE8PCn/g==", "rubyversion"=&gt;"1.8.7", "ipaddress_eth1"=&gt;"33.33.33.33", "productname"=&gt;"VirtualBox", "clientcert"=&gt;"devstructure.hsd1.ca.comcast.net."}, @time=Sat Jan 08 22:17:33 +0000 2011, @environment="production"&gt;
+</pre>
+
+
+<ul>
+<li><code>foo</code> is indeed <code>bar</code> but where&#x2019;d the rest of the facts come from?</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/69">
+<h1>From <code>lib/puppet/ indirector/node/exec.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def create_node(name, result)
+    node = Puppet::Node.new(name)
+    set = false
+    [:parameters, :classes, :environment].each do |param|
+      if value = result[param]
+        node.send(param.to_s + "=", value)
+        set = true
+      end
+    end
+
+    node.fact_merge
+    node
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/70">
+<h1>What&#x2019;s in a <code>node</code>?</h1>
+
+<pre class="sh_Ruby"><code>  def create_node(name, result)
+    node = Puppet::Node.new(name)
+    set = false
+    [:parameters, :classes, :environment].each do |param|
+      if value = result[param]
+        node.send(param.to_s + "=", value)
+        set = true
+      end
+    end
+
+    puts node.inspect
+    node.fact_merge
+    node
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/71">
+<h1>What&#x2019;s in a <code>node</code>?</h1>
+
+<pre>
+#&lt;Puppet::Node:0xb71eb704
+@name="devstructure.hsd1.ca.comcast.net.",
+@classes={}, @parameters={<strong>"foo"=&gt;"bar"</strong>},
+@time=Sat Jan 08 22:23:12 +0000 2011&gt;
+</pre>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/72">
+<h1>From <code>lib/puppet/node.pp</code></h1>
+
+<pre class="sh_Ruby"><code>  def fact_merge
+      if facts = Puppet::Node::Facts.indirection.find(name)
+        merge(facts.values)
+      end
+  rescue =&gt; detail
+      error = Puppet::Error.new(
+        "Could not retrieve facts for #{name}: #{detail}")
+      error.set_backtrace(detail.backtrace)
+      raise error
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/73">
+<h1>Facts terminus</h1>
+
+<pre><code>$ puppet --genconfig | grep facts_terminus
+    # facts_terminus = facter
+$
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/74">
+<h1>From <code>lib/puppet/ indirector/facts/facter.rb</code></h1>
+
+<pre class="sh_Ruby"><code>  def find(request)
+    result = Puppet::Node::Facts.new(request.key, Facter.to_hash)
+
+    result.add_local_facts
+    result.stringify
+    result.downcase_if_necessary
+
+    result
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/75">
+<h1>What are our options?</h1>
+
+<pre><code>$ ls -l lib/puppet/indirector/facts/
+total 24
+-rw-r--r-- 1 rcrowley rcrowley 1067 2010-12-22 01:10 active_record.rb
+-rw-r--r-- 1 rcrowley rcrowley  674 2010-12-22 01:10 couch.rb
+-rw-r--r-- 1 rcrowley rcrowley 2296 2010-12-22 01:10 facter.rb
+-rw-r--r-- 1 rcrowley rcrowley  358 2010-12-22 01:10 memory.rb
+-rw-r--r-- 1 rcrowley rcrowley  262 2010-12-22 01:10 rest.rb
+-rw-r--r-- 1 rcrowley rcrowley  235 2010-12-22 01:10 yaml.rb
+$
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/76">
+<h1>See the pattern?</h1>
+
+<pre><code>lib/puppet/indirector/node/plain.rb:15:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/indirector/catalog/compiler.rb:91:in `find_node'
+lib/puppet/indirector/catalog/compiler.rb:119:in `node_from_request'
+lib/puppet/indirector/catalog/compiler.rb:33:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+# ...
+
+lib/puppet/indirector/node/exec.rb:17:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+lib/puppet/indirector/catalog/compiler.rb:91:in `find_node'
+lib/puppet/indirector/catalog/compiler.rb:119:in `node_from_request'
+lib/puppet/indirector/catalog/compiler.rb:33:in `find'
+lib/puppet/indirector/indirection.rb:193:in `find'
+# ...
+</code></pre>
+
+<ul>
+<li>The catalog compiler is itself an indirection we can change!</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/77">
+<h1>Catalog terminus</h1>
+
+<pre><code>$ puppet --genconfig | grep catalog_terminus
+    # catalog_terminus = compiler
+$
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/78">
+<h1>What are our options?</h1>
+
+<pre><code>$ ls -l lib/puppet/indictor/catalog/
+total 24
+-rw-r--r-- 1 rcrowley rcrowley 1198 2010-12-22 01:11 active_record.rb
+-rw-r--r-- 1 rcrowley rcrowley 4933 2011-01-08 22:18 compiler.rb
+-rw-r--r-- 1 rcrowley rcrowley  140 2010-12-22 01:10 queue.rb
+-rw-r--r-- 1 rcrowley rcrowley  189 2010-12-22 01:10 rest.rb
+-rw-r--r-- 1 rcrowley rcrowley  534 2010-12-22 01:10 yaml.rb
+$
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/79">
+<h1>Blazing our own trail</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/80">
+<h1>DNS TXT record<br/>node terminus</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/81">
+<h1><code>lib/puppet/indirector/node/dns.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'puppet/node'
+require 'puppet/indirector/plain'
+require 'resolv'
+
+class Puppet::Node::Dns &lt; Puppet::Indirector::Plain
+
+  def find(request)
+    node = super
+    begin
+      resolver = Resolv::DNS.new
+      resource = resolver.getresource(
+        request.key, Resolv::DNS::Resource::IN::TXT)
+      node.classes += resource.data.split
+    rescue Resolv::ResolvError
+    end
+    node.fact_merge
+    node
+  end
+
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/82">
+<h1>Example record</h1>
+
+<pre><code>foo.example.com. IN TXT foo bar baz quux
+#   certname   #        #   @classes   #
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/83">
+<h1>Hierarchical<br/>facts terminus</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/84">
+<h1><code>lib/puppet/indirector/facts/hier.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'puppet/indirector/facts/facter'
+
+class HierValue &lt; Hash
+  attr_accessor :top
+  def initialize(top=nil)
+    @top = top
+  end
+  def to_s
+    @top
+  end
+end
+
+class Puppet::Node::Facts::Hier &lt; Puppet::Node::Facts::Facter
+  def destroy(facts)
+  end
+  def save(facts)
+  end
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/85">
+<h1><code>lib/puppet/indirector/facts/hier.rb</code></h1>
+
+<pre class="sh_Ruby"><code>class Puppet::Node::Facts::Hier &lt; Puppet::Node::Facts::Facter
+  def find(request)
+    hier = {}
+    super.values.reject do |key, value|
+      Symbol === key
+    end.each do |key, value|
+      value = value.split(",") if value.index(",")
+      h = hier
+      if key.index("_") and keys = key.split("_")
+        while 1 &lt; keys.length and key = keys.shift
+          h = HierValue === h[key] ?
+            h[key] : h[key] = HierValue.new(h[key])
+        end
+        key = keys.shift
+      end
+      if HierValue === h[key]
+        h[key].top = value
+      else
+        h[key] = value
+      end
+    end
+    Puppet::Node::Facts.new(request.key, hier)
+  end
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/86">
+<h1>Example</h1>
+
+<pre><code>{"kernel"=&gt;"Linux",
+ "netmask"=&gt;{"eth0"=&gt;"255.255.255.0", "eth1"=&gt;"255.255.255.0"},
+ "ipaddress"=&gt;{"eth0"=&gt;"10.0.2.15", "eth1"=&gt;"33.33.33.33"},
+ "kernelrelease"=&gt;"2.6.35-22-generic-pae",
+ "ps"=&gt;"ps -ef",
+ "network"=&gt;{"eth0"=&gt;"10.0.2.0", "eth1"=&gt;"33.33.33.0"},
+ "interfaces"=&gt;["eth0", "eth1"],
+ "kernelversion"=&gt;"2.6.35",
+ "puppetversion"=&gt;"2.6.4",
+ "hostname"=&gt;"devstructure",
+ "uptime"=&gt;{"seconds"=&gt;"858930", "days"=&gt;"9", "hours"=&gt;"238"}}
+
+facts["ipaddress"] # =&gt; "10.0.2.15"
+facts["ipaddress"]["eth1"] # =&gt; "33.33.33.33"
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/87">
+<h1>Caching catalog terminus</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/88">
+<h1><code>lib/puppet/indirector/ catalog/caching_compiler.rb</code></h1>
+
+<pre class="sh_Ruby"><code>require 'puppet/indirector/catalog/compiler'
+
+class Puppet::Resource::Catalog::CachingCompiler &lt;
+  Puppet::Resource::Catalog::Compiler
+
+  @commit, @cache = `git rev-parse HEAD`.chomp, {}
+
+  def self.cache
+    commit = `git rev-parse HEAD`.chomp
+    @commit, @cache = commit, {} if @commit != commit
+    @cache
+  end
+
+  def find(request)
+    self.class.cache[request.key] ||= super
+  end
+
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/89">
+<h1>Limitations</h1>
+
+<ul>
+<li>In-process cache is not<br/>shared between masters.</li>
+<li>Invalidation brings a<br/>thundering herd when <code>HEAD</code> moves.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/90">
+<ul>
+<li><a href="https://github.com/rcrowley/extending-puppet">github.com/rcrowley/extending-puppet</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/91">
+<h1>Further reading</h1>
+
+<ul>
+<li><a href="http://docs.puppetlabs.com/guides/custom_types.html">docs.puppetlabs.com/guides/custom_types.html</a></li>
+<li><a href="http://docs.puppetlabs.com/guides/provider_development.html">docs.puppetlabs.com/guides/provider_development.html</a></li>
+<li><a href="http://docs.puppetlabs.com/guides/complete_resource_example.html">docs.puppetlabs.com/guides/complete_resource_example.html</a></li>
+<li><a href="http://docs.puppetlabs.com/guides/custom_functions.html">docs.puppetlabs.com/guides/custom_functions.html</a></li>
+<li><a href="http://projects.puppetlabs.com/projects/puppet/wiki">projects.puppetlabs.com/projects/puppet/wiki</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/92">
+<h1>One more thing:<br/>Puppet faces</h1>
+
+<ul>
+<li>New in 2.7.</li>
+<li>Formerly a module called <code>puppet-interfaces</code>.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/93">
+<h1>Puppet faces</h1>
+
+<pre class="sh_Ruby"><code>require 'puppet/face'
+
+Puppet::Face.define(:configurer, '0.0.1') do
+  action(:synchronize) do
+    when_invoked do |certname, options|
+      facts = Puppet::Face[:facts, '0.0.1'].find(certname)
+      catalog = Puppet::Face[:catalog, '0.0.1'].
+        download(certname, facts)
+      report = Puppet::Face[:catalog, '0.0.1'].apply(catalog)
+      report
+    end
+  end
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/94">
+<h1>Puppet faces</h1>
+
+<ul>
+<li><a href="https://github.com/puppetlabs/puppet/tree/next/lib/puppet/face">github.com/puppetlabs/puppet/tree/next/lib/puppet/face</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/95">
+<h1>Thank you</h1>
+
+<ul>
+<li><a href="mailto:richard@devstructure.com">richard@devstructure.com</a> or <a href="http://twitter.com/rcrowley">@rcrowley</a></li>
+<li>P.S. use DevStructure.</li>
+</ul>
+</div>
+</div>
+</div>
+
+</body>
+</html>

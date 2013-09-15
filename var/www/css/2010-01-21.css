@@ -1,0 +1,135 @@
+/* Baseline grid. */
+
+/*body { background: url(/img/baseline-21px.png); }*/
+
+
+
+/* Fonts and colors */
+
+body, h1, h2, h3, h4, h5, h6 {
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	font-weight: normal;
+	color: #333;
+}
+h1, h2, h3, h4, h5, h6 { color: #111; }
+
+time {
+	color: #aaa;
+	font-family: monospace;
+}
+
+a, a:link, a:hover, a:active, a:visited {
+	color: #3636cf;
+	text-decoration: none;
+	border-bottom: 1px dotted #3636cf;
+}
+a:hover { background: #f4f4fd; }
+a:visited {
+	color: #007;
+	border-color: #007;
+}
+a.foot, a.foot:link, a.foot:hover, a.foot:active, a.foot:visited,
+a.footnote, a.footnote:link, a.footnote:hover, a.footnote:active,
+a.footnote:visited,
+a.footnote-src, a.footnote-src:link, a.footnote-src:hover,
+a.footnote-src:active, a.footnote-src:visited, aside {
+	color: #888;
+	border: 0;
+}
+
+p strong, p em { background: #ffc; }
+/*kbd, code { background: #f4f4f4; }*/
+
+
+
+/* Typography for 14px base font size. */
+
+body { font-size: 14px; }
+
+p, pre {
+	margin: 1.5em 0;
+	font-size: 1em;
+	line-height: 1.5em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 0;
+}
+h1 {
+	font-size: 1.42857em;
+	line-height: 1.05em;
+}
+h2, article section h1, section section h1 {
+	font-size: 1.2857em;
+	line-height: 1.166667em;
+}
+h3, article section section h1, section section section h1, article section h2, section section h2, h4, h5, h6 {
+	font-size: 1.142857em;
+	line-height: 1.3125em;
+}
+
+header time {
+	margin: 0;
+	font-size: 0.857142857em;
+	line-height: 1.75em;
+}
+
+ul, ol {
+	margin: 1.5em 0;
+	padding: 0;
+}
+ul ul, ol ol, ul ol, ol ul { margin: 0 0 0 1.5em; }
+li {
+	margin: 0;
+	font-size: 1em;
+	line-height: 1.5em;
+}
+
+big, small {
+	margin: 0;
+	font-weight: bold;
+	line-height: 0;
+}
+
+
+
+/* A minimal collection of designy bits. */
+
+body {
+	width: 36em;
+	margin: 0 auto;
+}
+
+header.site, footer.site { display: block; }
+header.site {
+	margin: 1.5em 0 1.42857em 0;
+	padding-bottom: 1.5em;
+	border-bottom: 0.07142857em solid #900;
+}
+header.site h1 { font-weight: bold; }
+header.site h1 a {
+	text-decoration: inherit;
+	color: inherit;
+	border: inherit;
+}
+footer.site {
+	margin: 1.42857em 0 1.5em 0;
+	border-top: 0.07142857em solid #900;
+}
+footer.site li {
+	display: table-cell;
+	width: 9em;
+	list-style-type: none;
+}
+footer.site p.copyright { color: #aaa; }
+
+section article {
+	display: block;
+	margin: 1.5em 0 3em 0;
+}
+
+
+
+/* Wide Gists. */
+
+.gist { margin: 0 -5em; }

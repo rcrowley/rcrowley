@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>jQuery conditionals plugin &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/08/22/jquery-conditionals-plugin">jQuery conditionals plugin</a> <small>2007/08/22</small></h1>
+<p><a href="http://jquery.com/">jQuery</a> provides a ton of ways to select sets of elements but pretty much no way to pare down a selection in an arbitrary way.  Fortunately for me it's easy to extend jQuery, so I wrote a plugin that allows you to apply a function to your set of elements to pare the set down before applying an action.  Source first, talk later:</p>
+<pre>jQuery.fn.if = function(arg) {
+    var elems = [];
+    var all = this.get();
+    var ii = all.length;
+    for (var i = 0; i &lt; ii; ++i) {
+        if (arg.apply(all[i])) {
+            elems.push(all[i]);
+        }
+    }
+    return jQuery(elems);
+};</pre>
+<p><a href="http://richarddcrowley.org/wp-content/uploads/2007/08/jqueryif.js">jquery.if.js</a> (version 0.1)</p>
+<p>The plugin takes as its argument a function that must return a boolean value.  This function will be applied to every argument in the current set.  Those that the function finds true will be returned in the final subset.</p>
+<p>The use-case that inspired this quickie plugin is this: I wanted an action to happen to form fields that were empty, which previously required a bit of work.  If I had more work to do with each match or a more complex matching requirement, this could get ugly.</p>
+<pre>$('input.promptable').focus(function() {
+    var to = $(this);
+    if ('' == to.val()) {
+        to.val(this.id);
+        to.addClass('prompt');
+    }
+});</pre>
+<p>With this plugin, the chaining action jQuery is known for is not interrupted.  I can select all <code>input</code> elements with the <code>promptable</code> class and pare down that selection to only those whose value is empty.  On the set returned there I can set values and add classes without breaking the chain.</p>
+<pre>$('input.promptable').focus(function() {
+    $(this).if(function() {
+        return '' == $(this).val();
+    }).val(this.id).addClass('prompt');
+});</pre>
+<p><a href="http://richarddcrowley.org/wp-content/uploads/2007/08/jqueryif.js">jquery.if.js</a> (version 0.1)</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(2)</small></h1>
+<ol>
+	<li>
+		<p>Hey Richard,</p>
+<p>Just wanted to let you know that the functionality you are looking for is built into the .filter() method. Filter can take either a selector or a function. Those jQuery core methods can be hard to find sometimes and it is just so easy to quickly write a plugin for what you need. :)  Anyways, here are the docs for the filter method:
+http://jquery.bassistance.de/api-browser/#filterFunction
+http://jquery.bassistance.de/api-browser/#filterString</p>
+		<p>&mdash; <a href="http://brandonaaron.net/">Brandon Aaron</a> &mdash; 2007/08/22 10:42 am</p>
+	</li>
+
+	<li>
+		<p>D'oh!  You're right, they're sometimes quite hard to find and I never would have called it "filter".  Thanks for the tip, Brandon.</p>
+		<p>&mdash; <a href="http://richarddcrowley.org/">Richard Crowley</a> &mdash; 2007/08/22 10:48 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/f1a4fb1c629b98800151aaa21280586d?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

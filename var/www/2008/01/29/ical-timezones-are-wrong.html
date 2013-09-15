@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iCal timezones are wrong &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/01/29/ical-timezones-are-wrong">iCal timezones are wrong</a> <small>2008/01/29</small></h1>
+<p>A bit ranty, proceed.</p>
+<p>The designers of iCal did it wrong.&nbsp; I applaud them for including timezone support at all because of the can-of-worms I envision it being.&nbsp; Dates are scary in the parsing sense.&nbsp; For the uninitiated, here's about how iCal works now:</p>
+<p>You can enable timezone support (rightfully off by default as it adds clutter that 90% will never click) in Preferences and then have an editable timezone option for every event on your calendar.&nbsp; This part will be strange in text but I'll try: changing the timezone on a single event will cause that event's block of time (in week view or day view) to shift up or down by the offset between your home timezone and the event timezone.&nbsp; Easy-to-follow example: an event in St. Louis (Central Time) at 10:00 am appears at 8:00 am on my calendar because I'm in Pacific Time.</p>
+<p>The right way is to allow setting entire days to a certain timezone.&nbsp; Perhaps this setting would be inferred from a multi-day event on your calendar or (bonus!&nbsp; a feed imported from <a href="http://dopplr.com/traveller/rcrowley">Dopplr</a>?&nbsp; Tying a timezone to a multi-day event would be sweet as it could be expanded to start and stop at certain times of day, thereby satisfying even the craziest of travellers.&nbsp; Assuming this default would eliminate my need to micromanage my calendar.</p>
+<p>Benefits?&nbsp; I could say (to my computer, with mouse clicks), "I will be in the Central timezone from February 1st until February 9th, please show those day's events accordingly." If an event is scheduled on a day that I'm slated to be in the Central timezone, it should always be shown as if it is in the Central timezone.&nbsp; Displaying everything in the current timezone just makes me do extra math.</p>
+<p>The tradeoff in design here is day-to-day consistency versus the rate at which I can consume information from my calendar.&nbsp; I can understand why Apple's designers made the decision they did but respectfully disagree.&nbsp; It is much easier to casually remember where I'll be at any given time (in the macro sense) but much more difficult to remember that I must constantly do timezone math when looking ahead on my calendar.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(6)</small></h1>
+<ol>
+	<li>
+		<p>The reason you're wrong is that iCal can show a lot more than just the owner's events: I'm subscribed to calendars for most of my coworkers, and if one of them has something going on in a different timezone, I want to know how that connects with my own schedule in the my current timezone. Often I enter events in other timezones for myself, for example calls with clients who send reminders from their own context. I think it's important for events to be consistent in relation to one another, and fortunately the inclusion of a zone switcher in the upper-right corner of the iCal window makes it easy to not have to do math as well.</p>
+		<p>&mdash; <a href="http://mike.teczno.com">Michal Migurski</a> &mdash; 2008/01/29 11:23 pm</p>
+	</li>
+
+	<li>
+		<p>I enter almost all my flights in iCal and I agree with you (sort of).&nbsp; It would be lovely to somehow mark that when I get off a certain flight, I will now be in a different time zone.&nbsp; This switch will do 2 things simultaneously, change the view for that time period to the new time zone and change the events entered during that period to the new timezone.&nbsp; And then when I plan that trip, I can enter the events using St. Louis time and iCal knows I'll be in St. Louis and enter the time in a natural way.&nbsp; And you look at your calendar in a natural way.&nbsp; Since I prefer my calendar to look this way, I personally leave time zone support off and just act like iCal is doing that.&nbsp;   If I had coworkers that subscribed to my calendar, it would break their subscriptions to my life, but luckily I don't.</p>
+<p>I wouldn't say what it does now is wrong though.&nbsp; It also has a valid use case.&nbsp; Someone in NYC says they'll be in a meeting 2-5.&nbsp; You right click on that from Mail and add an event.&nbsp; The automatic parsing didn't recognize that as NYC though, so you change the time zone of the event.&nbsp; Also, if there's a conference call you're supposed to be on in SF during the time you're in St. Louis, you can change it's timezone to US/PST to make it easier to enter.</p>
+<p>The user interface of doing this would have to be very carefully implemented though.&nbsp; I could see things going horribly wrong, especially for travel crossing the International Date Line where you could have events at the "same time", but I put my faith in apple's designers to go through hundreds of mock-ups to get that right.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/01/30 6:14 am</p>
+	</li>
+
+	<li>
+		<p>You both have very good points on my system breaking down when multiple timezones are present on the same day.&nbsp; I'll back off the rant-iness and say that they're wrong for me.&nbsp; There's got to be some 80-20 rule here relating to most people using iCal in a vacuum.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/01/30 7:45 am</p>
+	</li>
+
+	<li>
+		<p>I agree with the first poster..&nbsp; I have lots of events on my calendar (not in iCal, unfortunately) that are either CST or EST and I think the correct behavior is for them to show up on my calendar at the time they're going to occur in my current time zone.</p>
+<p>I haven't tried it, but I bet you can get the results you want by changing your computer's timezone instead of changing things in iCal. That's probably what the iCal developers expected, anyways. When you go to the east coast, you change your computer's TZ to EST and all your events shift accordingly. Unfortunately, that doesn't help with your TZ math while you're sitting here in California trying to decide whether you're available for a meeting at 10am on the east coast. You could try changing your TZ temporarily, I suppose, or just try adding the event and seeing if it overlaps with something else in iCal..&nbsp; but I definitely think the use case for TZ tied to events is much more common -- people have meetings with people in different timezones a lot more often than they actually visit different timezones.</p>
+		<p>&mdash; <a href="http://immike.net">Mike Malone</a> &mdash; 2008/01/30 8:56 am</p>
+	</li>
+
+	<li>
+		<p>What Mike said.</p>
+<p>Also tying timezones to specific events is the *only* way to maintain sanity, down all other routes lies madness.&nbsp; (also known as Palm's calendaring)</p>
+		<p>&mdash; <a href="http://laughingmeme.org">kellan</a> &mdash; 2008/01/30 11:28 am</p>
+	</li>
+
+	<li>
+		<p>We should just get rid of timezones and just use the same time. On the east coast you go to work from GMT 12pm to 8pm and on the west coast you work from 3pm to 11pm. </p>
+<p>Now everyone knows what time your meeting is because we all speak the same time 'language'. None of this 'what time is it over there?'.</p>
+		<p>&mdash; Colin &mdash; 2008/10/01 7:05 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/f017369aadb32d0b0053640ec940be3d?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

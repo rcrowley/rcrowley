@@ -1,3 +1,16 @@
 *
+!.bash_profile
+!.gemrc
+!.gitconfig
+!.gitignore
+!.profile
+!.profile.d
+!.ssh/config
+!.tmux.conf
 !.vimrc
 !.vim
+!LICENSE
+!README.md
+!bin
+!share
+!var

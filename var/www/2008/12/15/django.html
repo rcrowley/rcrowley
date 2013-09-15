@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Django &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/12/15/django">Django</a> <small>2008/12/15</small></h1>
+<p>I asked <a href="http://immike.net/">Malone</a> the other week why
+Django made me go all <code>return render_to_response('foo.html')</code>
+in my view named <code>foo</code> instead of assuming some defaults.
+To be explicit, candidates for those defaults might go something along
+the lines of:</p>
+
+<ul>
+	<li>If a view function returns <code>None</code> (which is,
+	it seems what happens when you don't return anything), render the
+	template that shares its name with the view.</li>
+	<li>If a view function returns a <code>dict</code>, render the
+	template that shares its name with the view, passing this
+	<code>dict</code> wrapped up in a <code>Context</code>.</li>
+	<li>If the view function returns a string, take the string as the
+	template name.</li>
+	<li>If the view function returns a 2-<code>tuple</code> containing
+	a string and a <code>dict</code>, take the string as the template
+	name and make the <code>dict</code> into a <code>Context</code>.</li>
+</ul>
+
+<p>On top of that, I asked him why Django didn't figure out what response
+format makes sense, given the URL and headers in the request and the
+formats available for the template chosen.&nbsp; His response was basically
+that Django hates magic.&nbsp; If it did all of these things, it'd favor
+convention over configuration and be called Rails.&nbsp; Or <em>P</em>ails.</p>
+
+<p>After playing around with Django for a few days and now starting to
+use it for a real project, I'm seeing the wisdom in Django's (and indeed,
+Python's) choice to avoid magic.&nbsp; I've already used the word "explicit"
+once in this post and that's what this is really all about.</p>
+
+<blockquote>Additionally, Ruby seems to skew towards implicitness in
+the language, while Python skews toward explicitness. I like explicitness.
+&mdash; <a href="http://www.joestump.net/2008/11/a-discussion-on-languages-and-frameworks.html">Joe
+Stump</a></blockquote>
+
+<p>I'm not here to start a Ruby-versus-Python or Rails-versus-Django fight.
+I'm here to talk about being explicit with code.</p>
+
+<p>My efforts a while back <a
+href="http://rcrowley.org/2008/10/26/hacking-the-ruby-interpreter">hacking
+the Ruby interpreter</a> were a bit misguided.&nbsp; I was heavily and
+prematurely optimizing my desired use case at the expense of code clarity
+and at least seven other traits generally considered to be positive.&nbsp; In
+the resulting Frankenruby interpreter, <code>@foo</code> could show
+up in a file outside of a class with no warning, meaning that file could
+only ever be used by my very streamlined URL-to-code routing script.&nbsp; In
+retrospect, it's a good thing I never got it to work just right.</p>
+
+<p>The desire to remove as many declarative, housekeeping-esque lines of
+code is seemingly noble but it is at odds with another principle of mine,
+learned from years in the trenches writing C(++): always
+<code>#include</code> everything a file uses.&nbsp; This makes files instantly
+more portable and less magical.&nbsp; Despite Django's mascot being a magical
+pony, I gather that it, too, avoids magic in most scenarios.</p>
+
+<p>Being explicit allows Django to be loosely-coupled.&nbsp; Imagine trying to
+remove the Django ORM or templating system if they were omnipresent in
+every Django app from start to finish.&nbsp; Tedious.&nbsp; As it is, a single
+"<code>#</code>" sets you free.&nbsp; Even the concept of having many apps
+within a project enables further explicit use or disuse of each package.</p>
+
+<p>Being explicit also lowers the barriers-to-entry for would-be framework
+hackers like myself.&nbsp; My first serious afternoon saw me trying to create
+a fairly involved template tag.&nbsp; It would have made page titles work just
+about like the excellent Headliner plugin for Rails.&nbsp; I discovered along
+the way that the <code>{% block foo %}</code> template tag, if placed within
+another block, would both override the named block and output its contents
+in place.&nbsp; Observe, here's how I decided to do page titles in Django:</p>
+
+<p><strong>In <code>templates/layout.html</code>:</strong></p>
+<pre>&lt;title&gt;Foo &mdash; {% block title %}{% endblock %}&lt;/title&gt;</pre>
+
+<p><strong>In other templates:</strong></p>
+<pre>{% extends 'layout.html' %}
+{% block title %}Only shows up in the title tag{% endblock %}
+{% block content %}
+&lt;p&gt;foo&lt;/p&gt;
+{% endblock %}</pre>
+<pre>{% extends 'layout.html' %}
+{% block content %}
+&lt;h1&gt;{% block title %}Shows up here and in the title tag{% endblock %}&lt;/h1&gt;
+{% endblock %}</pre>
+
+<p>The ORM looks similarly easy to figure out though I haven't taken the
+plunge yet.&nbsp; I already know what I'm going to build to learn it, though:
+a command-line SQL tool that works through a combination of Python and
+hard links.&nbsp; The python script will find the closest Django settings module
+and use the database connection info there.&nbsp; The command will be invoked by
+typing out a SQL statement on the command line.&nbsp; The SQL statement will be
+<code>' '.join(sys.argv)</code> and the commands <code>SELECT</code>,
+<code>INSERT</code>, etc. will be routed to the Python script using hard
+links.&nbsp; I don't know if this is a good idea but I know it'll be relatively
+easy to do thanks to how easy it seems to be to dive into the Django
+internals.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(1)</small></h1>
+<ol>
+	<li>
+<p>I think part of the reason Django can get away with avoiding magic like this is because of the dynamism of Python. For example, a simple function decorator is sufficient to duplicate the view rendering behavior you're missing from Rails. Here's my 5 minute implementation (minus error handling or any sort of testing):</p>
+		<p>from django.shortcuts import render_to_response
+		<br />from functools import wraps
+		<br />def default_template(view_func):
+		<br />&nbsp;&nbsp;&nbsp; @wraps(view_func)
+		<br />&nbsp;&nbsp;&nbsp; def _wrapper(*args, **kwargs):
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; result = view_func(*args, **kwargs)
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if result is None:
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return render_to_response('%s.html' % func.__name__)
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; elif hasattr(result, 'items'):
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; # result is a dictionary
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return render_to_response('%s.html' % func.__name__, result)
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; elif isinstance(result, basestring):
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; # result is a strong
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return render_to_response(result)
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; elif hasattr(result, '__iter__') and len(result) == 2:
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; # result is an iterable with two elements
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return render_to_response(result[0], result[1])
+		<br />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return result
+		<br />&nbsp;&nbsp;&nbsp; return _wrapper</p>
+		<p>It'd be equally easy to write a decorator that chooses a template based on extension. In fact that's exactly how I tend to do data serialization for APIs written in django. The view returns a dictionary (or a subclass of some object I know how to serialize) and then I look at the extension and serialize to whatever format is desired. That way I'm not duplicating the logic to choose serialization format in every view function. To accomplish this I usually require that view functions have a kwarg called extension that's parsed out of the request URL by the URL handler logic. The nice thing is that I'm imposing this convention on myself, which gives me lots of flexibility. The downside is that I have to write a bit more code (or find it on djangosnippets.org).</p>		<p>&mdash; <a href="http://immike.net/">Mike Malone</a> &mdash; 2009/01/20 2:30 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/484fee8a73ad40d0a234f1033fde5042?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

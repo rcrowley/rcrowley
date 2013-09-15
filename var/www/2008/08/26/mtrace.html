@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mtrace, and the bug I've been chasing for weeks &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/08/26/mtrace">mtrace, and the bug I've been chasing for weeks</a> <small>2008/08/26</small></h1>
+<p><kbd>mtrace(1)</kbd> and <kbd>mtrace(3)</kbd> are my new bicycle.&nbsp; The
+manual for debugging tool design should read <kbd>SEE ALSO mtrace(1),
+mtrace(3)</kbd>.&nbsp; One header file, one environment variable and one on/off
+switch.</p>
+
+<p>The catch to this free lunch is that it doesn't completely work with C++.
+If run over a C program, it can print the file/line that allocated a leaked
+block.&nbsp; If run over a C++ program, it can't do anything but <em>count</em>
+blocks that are allocated but not freed.&nbsp; This is still gun-in-a-knife-fight
+useful.&nbsp; Saying it's a C++ issue is a bit of a lie: because the
+<code>new</code> and <code>delete</code> operators use <code>malloc</code>
+internally, allocations using these operators are reported as coming from
+libstdc++.&nbsp; If you use <code>malloc</code> in C++, it works fine.&nbsp; Because
+the actual call to <code>malloc</code> or <code>free</code> is within
+<code>new</code> or <code>delete</code>, the file/line notation is at best
+useless and at worst an unadorned memory address.</p>
+
+<p>I found it beneficial to create a single-threaded "test script" version
+of my program for mtrace-ing.&nbsp; With a bunch of threads thrashing about,
+there was too much noise from freeing memory that had been allocated in
+other threads for the output to be very useful.&nbsp; Fortunately, removing
+threads was (for me) a functional and expedient solution.</p>
+
+<p>The bug turned out to be difficult to find but embarrassing, so I'm
+not going to tell you what it was.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(4)</small></h1>
+<ol>
+	<li>
+		<p>Lame! I want to know what the bug was. I've listened to you bitch about it for weeks, I deserve to know!</p>
+<p>mtrace sounds fancy though..&nbsp; wonder if it works with objective-c. I bet it's used internally by instruments.</p>
+		<p>&mdash; <a href="http://immike.net">Mike Malone</a> &mdash; 2008/08/26 11:57 am</p>
+	</li>
+
+	<li>
+		<p>When a multithreaded program crashes, does it give you more than one core dump?&nbsp; I ask because crashing on mpi gives you a core dump for every processor.&nbsp; So, say I crash on mpirun -np 128 on blue gene, I have 128 core dumps and that's a bitch.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/08/26 5:03 pm</p>
+	</li>
+
+	<li>
+		<p>I just read your SVN commit and I can't figure it out since you removed your debugging and other stuff in the same commit.&nbsp; Well that and I'm not good at computers.</p>
+<p>Awesome to hear you got it licked though. </p>
+<p>PS, Richard must have been embarrassed, he usually makes good clear commit messages but this one is marked simply "Fixed. Testing." :-)</p>
+		<p>&mdash; David Ulevitch &mdash; 2008/08/26 6:08 pm</p>
+	</li>
+
+	<li>
+		<p>Stop being a pansy and tell the people what they wanna know.</p>
+		<p>&mdash; <a href="http://mihasya.com">Mike P</a> &mdash; 2008/08/27 2:07 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/c760709f10367e4546acae359947aff7?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

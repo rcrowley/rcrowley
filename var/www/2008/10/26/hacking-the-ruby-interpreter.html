@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hacking the Ruby interpreter &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/10/26/hacking-the-ruby-interpreter">Hacking the Ruby interpreter</a> <small>2008/10/26</small></h1>
+<p>I like Ruby.&nbsp; Ruby the language anyway.&nbsp; I have started to have violent
+reactions to PHP's lack of closures.&nbsp; However, Ruby has one deficiency that
+makes me almost as mad as PHP's lack of closures.&nbsp; Assume for this example
+that the file foo.rb looks like this:</p>
+
+<pre>@foo = "I'm getting ready to abuse the instance variable syntax."</pre>
+
+<p>As is, Ruby lets me do the following, which is functionally desirable
+but makes the good programmer part of me twitch:</p>
+
+<pre>class Foo
+    def initialize(path)
+        <strong>self.instance_eval(File.read(path))</strong>
+    end
+end
+f = Foo.new('load_me.rb')
+f.instance_variables # =&gt; ['@foo']</pre>
+
+<p>Replacing the bold line with the following is what I'm after:</p>
+
+<pre>        <strong>load_in_scope path</strong></pre>
+
+<p>In my dream, <code>load_in_scope</code> is a function defined in the C
+code that compiles a file using the Bison parser to read through the file.
+This saves a whole round trip to and from memory, making the program more
+efficient and me less twitchy.</p>
+
+<p>I'm having major trouble getting the Ruby interpreter to do this.
+Starting with a trunk checkout and working backwards from the
+<code>Kernel#load</code> method, I've been able to segfault at least
+two-dozen different ways.&nbsp; I think there are only two changes that are
+necessary.&nbsp; First, after <code>rb_load_file</code> returns a <code>NODE
+*</code>, <code>rb_iseq_new</code> must turn that into an instruction
+sequence with a type other than <code>ISEQ_TYPE_TOP</code> (perhaps
+<code>ISEQ_TYPE_CLASS</code> or <code>ISEQ_TYPE_EVAL</code>?).&nbsp; Second,
+the instruction sequence can't be passed to <code>rb_iseq_eval</code>
+because that calls <code>vm_set_top_stack</code>, so
+<code>load_in_scope</code> must call <code>vm_set_eval_stack</code> and
+<code>vm_exec</code> itself.</p>
+
+<p>Am I insane?</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(0)</small></h1>
+<ol>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/76f277f65824f116f68367f02f61746d?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

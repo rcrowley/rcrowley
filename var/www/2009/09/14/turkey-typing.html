@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Turkey typing &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2009/09/14/turkey-typing">Turkey typing</a> <small>2009/09/14</small></h1>
+<p><a href="http://immike.net/blog/2009/09/14/why-duck-typing-rocks/">Mike
+Malone&#8217;s thrilling response</a> to &#8220;The case against duck
+typing&#8221; <a id="f-14-1-src" href="#f-14-1" class="footnote">[1]</a>
+left me feeling a bit like I didn&#8217;t fully say what I set out to.&nbsp;
+I do not intend to systematically pick holes in Mike&#8217;s arguments as
+that will be much more fun in person with beers.&nbsp; In this installment
+I&#8217;m going to write out some code in an imaginary language called
+Copperhead to illustrate what I called declared typing before and decided
+to call <em>turkey typing</em> today.</p>
+
+<p>A very simple example of balking at anything non-numeric.</p>
+
+<pre>def what_is_rent_in_san_francisco(<strong>float</strong> salary):
+&nbsp; &nbsp; return 47 * salary</pre>
+
+<p>In such simple cases, we can cause plain Python to Do The Right Thing
+by forcing the argument to be a <code>float</code> and catching
+<code>ValueError</code>, thus suppressing strings&#8217; desire to quack.</p>
+
+<pre>def what_is_rent_in_san_francisco(salary):
+&nbsp; &nbsp; return 47 * float(salary)</pre>
+
+<p>It isn&#8217;t always so easy.&nbsp; Duck typing raises exceptions when
+something fails to quack rather than when something is passed to a method
+in which it will fail to quack.&nbsp; The distinction can be important.</p>
+
+<pre>def something_dangerous_then_a_loop(things):
+&nbsp; &nbsp; poke_a_tiger_with_a_stick()
+&nbsp; &nbsp; for thing in things:
+&nbsp; &nbsp; &nbsp; &nbsp; thing.stuff()</pre>
+
+<p>If you&#8217;re fortunate enough to survive the tiger-poke only to be
+greeted by a <code>TypeError</code> when <code>things</code> is not
+iterable, you&#8217;re going to be pretty bummed.&nbsp; A duck typing
+language could push such call-time errors to the beginning of the method
+but I bet there&#8217;s a large amount of code in the wild that relies on
+this <del>bug</del>quirk.&nbsp; A programmer could check types at the top
+of the method, implement database-like transactions or reorder her code
+but none of those options are particularly elegant.</p>
+
+<pre>def something_dangerous_then_a_loop(<strong>iterable</strong> things):
+&nbsp; &nbsp; poke_a_tiger_with_a_stick()
+&nbsp; &nbsp; for thing in things:
+&nbsp; &nbsp; &nbsp; &nbsp; thing.stuff()</pre>
+
+<p>Progress!&nbsp; We won&#8217;t bother with the tiger unless we know the
+loop will be able to execute but this is still relying on duck typing for
+the <code>stuff</code> method of each <code>thing</code>.&nbsp; Perhaps this
+is okay but perhaps we want to get even more specific.&nbsp; I like the
+syntax of the C++ STL for this, so I&#8217;ll steal it.</p>
+
+<pre>def something_dangerous_then_a_loop(<strong>iterable&lt;Thing&gt;</strong> things):
+&nbsp; &nbsp; poke_a_tiger_with_a_stick()
+&nbsp; &nbsp; for thing in things:
+&nbsp; &nbsp; &nbsp; &nbsp; thing.stuff()</pre>
+
+<p>Now we know the <code>iterable</code> contains only <code>Thing</code>s
+and can safely call <code>stuff</code> on each one.&nbsp; If
+<code>Doodad</code>s and <code>Widget</code>s also implement the
+<code>stuff</code> method, one could block out <code>Widget</code>s by
+specifying the argument type as <code>iterable&lt;[Thing,
+Doodad]&gt;</code> (or just <code>[Thing, Doodad]</code> for a scalar
+argument).</p>
+
+<p>It is not my intention to get caught up in syntax.&nbsp; My hope is that
+I can demonstrate how useful turkey typing can be.&nbsp; It isn&#8217;t
+a regression to static typing nor is it mutually exclusive from duck typing:
+note that I use the type <code>iterable</code> above which is not a type in
+any Python I&#8217;ve ever used.&nbsp; <code>iterable</code> could itself
+be a duck type but, importantly, one checked at the top of the method and
+without nasty <code>isinstance</code> or <code>hasattr</code> smells.</p>
+
+<p>Turkey typing is still dynamic typing, meaning values have types but
+symbols do not.&nbsp; The type checking that happens at method call time
+is not an optimization but rather a shortcut.&nbsp; Within method bodies,
+ducks still have to quack.</p>
+
+<p>My motivation always comes back to API design (the real definition of API
+<a id="f-14-2-src" href="#f-14-2" class="footnote">[2]</a>, not
+what Web 2.0 means by API).&nbsp; Automatically generated documentation will
+be better if it&#8217;s generated from method signatures instead of Javadoc
+comments.&nbsp; When documentation inevitably doesn&#8217;t exist or fails
+to measure up, the code tells you exactly what&#8217;s expected.&nbsp; And
+when you barrel into code headfirst, the compiler can tell you what type
+it wants instead of just which method yor&#8217;re not providing.</p>
+
+
+<ol class="footnote">
+	<li id="f-14-1"><a href="http://rcrowley.org/2009/09/12/the-case-against-duck-typing">http://rcrowley.org/2009/09/12/the-case-against-duck-typing</a> <a href="#f-14-1-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-14-2"><a href="http://en.wikipedia.org/wiki/Application_programming_interface">http://en.wikipedia.org/wiki/Application_programming_interface</a> <a href="#f-14-2-src" class="footnote-src">&#8617;</a></li>
+</ol>
+
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/6c4987f8e99115e98e1e892cb15555f0?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

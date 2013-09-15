@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clint, a Ruby command line argument parser &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+<article>
+<header>
+	<time datetime="2010-02-23" pubdate>2010-02-23</time>
+	<h1>Clint, a Ruby command line argument parser</h1>
+</header>
+<p>I&#8217;m programming in Ruby these days and feel more strongly than ever that <a href="http://en.wikipedia.org/wiki/Domain_Specific_Language">DSL</a>s are (usually) evil.&nbsp; The only DSL I&#8217;ve ever met that I liked is <a href="http://www.sinatrarb.com/">Sinatra</a>.&nbsp; So I arrived to the menagerie of Ruby command line argument parsers ready to be let down.&nbsp; For the sake of documentation, here&#8217;s a list of libraries I rejected:</p>
+<ul>
+	<li><a href="http://ruby-doc.org/stdlib/libdoc/optparse/rdoc/classes/OptionParser.html">OptionParser</a>: the undocumented, documentation-generating standard.</li>
+	<li><a href="http://github.com/defunkt/choice">Choice</a>: Chris Wanstrath&#8217;s DSL.</li>
+	<li><a href="http://trollop.rubyforge.org/">Trollop</a>: generates documentation, too!</li>
+	<li><a href="http://stackoverflow.com/questions/897630/really-cheap-command-line-option-parsing-in-ruby">Array</a>: seriously, just use <code>Array#delete</code>, dude.</li>
+</ul>
+<p>I won&#8217;t insult the authors by debunking their hard work individually.&nbsp; I prefer to use the language syntax over DSL methods.&nbsp; I prefer to hand-craft usage and help messages rather than sprinkle partial documentation throughout my code.&nbsp; Finally, I want some support in implementing subcommand-style interfaces a la <code>git</code>, <code>svn</code>, and <code>apt-get</code>.&nbsp; With that, here&#8217;s Clint.</p>
+<p>This example will create a command line tool for this class.</p>
+<pre>class FooBar
+  def initialize(foo)
+    @foo = foo
+  end
+  def foo
+    puts "FooBar#foo @foo: #{@foo}"
+  end
+  def self.bar(options={})
+    puts "FooBar.bar options[:thing]: #{options[:thing]}"
+  end
+end</pre>
+<p>The command line tool first sets up usage and help messages.&nbsp; Next, it reacts to the global <code>-h</code> and <code>--help</code> options, which are bundled into <code>options[:help]</code> because of the <code>:h =&gt; :help</code> alias.&nbsp; Finally, it executes subcommands from the <code>FooBar</code> class, declaring the <code>-t</code> and <code>--thing</code> options for the <code>bar</code> subcommand.</p>
+<pre>require 'clint'
+c = Clint.new
+c.usage do
+  $stderr.puts &lt;&lt;EOF
+Usage: #{File.basename(__FILE__)} foo &lt;foo&gt;
+       #{File.basename(__FILE__)} bar [-t &lt;thing&gt;] [--thing=&lt;thing&gt;]
+       #{File.basename(__FILE__)} [-h|--help]
+EOF
+end
+c.help do
+  $stderr.puts &lt;&lt;EOF
+  -t &lt;thing&gt;, --thing=&lt;thing&gt;  OH HAI
+  -h, --help                   show this help message
+EOF
+end
+c.options :help =&gt; false, :h =&gt; :help
+c.parse ARGV
+if c.options[:help]
+  c.help
+  exit 1
+end
+c.subcommand FooBar do |subcommand|
+  if :bar == subcommand
+    c.options :thing =&gt; String, :t =&gt; :thing
+  end
+  c.parse
+end
+</pre>
+<p>The <a href="http://github.com/rcrowley/clint/blob/master/README.md">README</a> goes into more detail.&nbsp; Read the <a href="http://github.com/rcrowley/clint">code on GitHub</a> or <code>gem&nbsp;install&nbsp;clint</code> from <a href="http://rubygems.org/gems/clint">Gemcutter</a>.</p>
+
+</article>
+<footer class="site">
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2010 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

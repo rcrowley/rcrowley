@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>readelicious &mdash; hacking del.icio.us directly into Google Reader &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/02/08/readelicious-hacking-delicious-directly-into-google-reader">readelicious &mdash; hacking del.icio.us directly into Google Reader</a> <small>2008/02/08</small></h1>
+<p>It's just too many clicks to leave the ol' feed reader to see an article and save it to <a href="http://del.icio.us/">del.icio.us</a>.  I'm not into that kind of commitment.  I am, however, into <a href="http://greasemonkey.mozdev.org/">Greasemonkey</a> so I headed to <a href="http://userscripts.org/">userscripts.org</a> and discovered two fairly poor attempts to do what I wanted.  The first one just took me to the del.icio.us/post page which is a different kind of bad solution.  The second one displayed a nice box in the page for editing the info before saving away to del.icio.us but it appeared halfway off of my screen and I didn't have the patience to figure out why.  Here are those two:</p>
+<ul>
+	<li><a href="http://userscripts.org/scripts/show/11233">http://userscripts.org/scripts/show/11233</a></li>
+	<li><a href="http://userscripts.org/scripts/show/7957">http://userscripts.org/scripts/show/7957</a></li>
+</ul>
+<p>Mine has many virtues.  First off it actually works and on any browser window size larger than 422 pixels.  Secondly it is visually a bit more disruptive than the small Google-styled "window" that one displays but not so obnoxious as to take you off the page entirely.  And finally, it automatically pulls the title, link and selected text from the article.  Fully featured!  As a bonus you get the timeless, classic and beautiful feel of my favorite color, <code>#eee</code>.</p>
+<p>Because of the way del.icio.us' API works, it'll ask you for your username and password the first time through but after that should behave nicely.</p>
+<p><big><a href="http://svn.rcrowley.org/svn/greasemonkey/readelicious.user.js">http://svn.rcrowley.org/svn/greasemonkey/readelicious.user.js</a></big> or <big><a href="http://userscripts.org/scripts/show/22494">http://userscripts.org/scripts/show/22494</a></big></p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(9)</small></h1>
+<ol>
+	<li>
+		<p>Awesome, love it. I'm totally lazy and read 90% of stuff in google reader without actually going to the page (unless I want to read/add a comment). And when I don't have time to read something I have to open it in a tab and leave it there just to read it later... or save it to delicious. Now I can save it to delicious from reader :).</p>
+<p>One problem... you forgot to add a keyboard shortcut. My reader sessions look something like this: jjjjjjvjjsvjjj+s, etc. The mouse is for suckers. I added a keyboard shortcut to launch the delicious bookmark window using the 'd' key, and also added an event handler to close the window if you press escape. The code is at http://immike.net/scripts/readelicious.user.js, feel free to steal it -- it's a pretty minor contribution ;).</p>
+		<p>&mdash; <a href="http://immike.net">Mike Malone</a> &mdash; 2008/02/08 11:59 am</p>
+	</li>
+
+	<li>
+		<p>Cool. I'll have to give that a try, maybe this will woo me away from Camino back to Firefox.</p>
+<p>I've been using the  'Gordita' bookmarklet for Google reader/del.icio.us integration, which works well!</p>
+		<p>&mdash; <a href="http://bluno.org">Bernie</a> &mdash; 2008/02/08 4:17 pm</p>
+	</li>
+
+	<li>
+		<p>this made me curious to look at the del.icio.ous integration in NNW.  It's not as elegant as I would expect.  Maybe I should complain.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/02/09 7:18 am</p>
+	</li>
+
+	<li>
+		<p>@David Hall: It's the dhall way and I expect nothing less.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/02/09 7:20 am</p>
+	</li>
+
+	<li>
+		<p>[...] Previous: readelicious &mdash; hacking del.icio.us directly into Google Reader [...]</p>
+		<p>&mdash; <a href="http://rcrowley.org/2008/02/11/more-greader-hacking-immersion/">More GReader hacking &mdash; immersion &mdash; Richard Crowley&#8217;s blog</a> &mdash; 2008/02/11 10:44 pm</p>
+	</li>
+
+	<li>
+		<p>As mentioned elsewhere can you make your scripts support the list view?
+Also, please include the https urls by default.</p>
+		<p>&mdash; robsan &mdash; 2008/03/24 10:27 am</p>
+	</li>
+
+	<li>
+		<p>Script sounds great, but I can't get it to work (in list view or expanded view).  Greasemonkey says it's installed, but no joy.</p>
+		<p>&mdash; <a href="http://frostymug.blogspot.com">Andy</a> &mdash; 2008/03/26 6:50 am</p>
+	</li>
+
+	<li>
+		<p>Hi Richard! I was just trying this out, and it doesn't seem to work for me either (FF3). Aw.</p>
+		<p>&mdash; <a href="http://jeweledplatypus.org/">Britta</a> &mdash; 2008/07/04 3:17 pm</p>
+	</li>
+
+	<li>
+		<p>Doesn't seem to work here either - running FF3 and no action occurs when trying to add post to Delicious</p>
+		<p>&mdash; <a href="http://fintsomsnus.com">Jonathan</a> &mdash; 2008/07/19 11:35 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/822392be5824c0a7fb1d8ee8f75d1444?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

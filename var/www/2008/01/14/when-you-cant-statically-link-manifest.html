@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>When you can't statically link, manifest &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/01/14/when-you-cant-statically-link-manifest">When you can't statically link, manifest</a> <small>2008/01/14</small></h1>
+<p><em>Manifest (verb): To embed XML describing libraries which are expected to be available at runtime, done in the course of developing software using Microsoft Visual Studio.</em></p>
+<p>The wisdom of the collective T-Rex (<code>#xulrunner</code> on <code>irc.mozilla.org</code>) says that statically linking against the Microsoft C Runtime (<code>msvcr80.dll</code> and friends) is the way to go.&nbsp; However I've run into a case where I cannot do this (deciding whether this is due to technical limitations or lack of competence is for readers to help me decide).</p>
+<p>The image processing component of the Flickr Uploadr links against GraphicsMagick and Exiv2, libraries that do image processing and EXIF/IPTC metadata processing, respectively.&nbsp; Without them, it doesn't fly.&nbsp; Problem is, they both link the C Runtime themselves by using <code>std::string</code> and such.&nbsp; Both of these libraries will build fine given the <code>/MT</code> flag, which instructs them to statically link the C Runtime.&nbsp; When they themselves are statically linked into the XPCOM component later, all hell breaks loose.&nbsp; It seems that the static linker can't resolve the duplicate definitions caused by overzealous static linking.</p>
+<p>The solution, as it stands, is simply to include the C Runtime and its manifest in the distribution.&nbsp; Placing the following files in Uploadr's <code>components/</code> directory has allowed life to go on for the moment.</p>
+<ul>
+	<li><code>msvcr80.dll</code></li>
+	<li><code>msvcp80.dll</code></li>
+	<li><code>msvcm80.dll</code></li>
+	<li><code>Microsoft.VC80.CRT.manifest</code></li>
+</ul>
+<p>Lastly, make sure your XPCOM project in Visual Studio is set to embed its manifest from Project Properties » Manifest Tool » Input and Output » Embed Manifest.</p>
+<p>A more optimal solution might be to combine the Visual Studio projects for GraphicsMagick (and therefore libjpeg, etc), Exiv2 and the XPCOM component into one large tree that Visual Studio might be able to better manage.&nbsp; Has anyone out there done such a thing with Microsoft's static linker (even if not with XULRunner)?</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(3)</small></h1>
+<ol>
+	<li>
+		<p>Yeah, the CRT linkage is a mess.&nbsp; You can go have a look at bug 415928 for my most recent battles with it.&nbsp; Odds are you need to do something similar to get these libs to link properly.&nbsp; It is, in fact, a giant pain.</p>
+		<p>&mdash; <a href="http://ted.mielczarek.org/">Ted Mielczarek</a> &mdash; 2008/02/14 6:02 am</p>
+	</li>
+
+	<li>
+		<p>I ran into a similar problem when trying to create a binary mozilla component that has other (non-mozilla) library dependencies.</p>
+<p>I was stuck on this until I ran across your article here, which helped me to get a workaround solution (though I admit that I still do not understand it all).</p>
+<p>I followed your method above (thanks for blogging it), but I found that I only had to include the "Microsoft.VC80.CRT.manifest" file itself, and did not require the actual msvc*.dll files at all. My extension component then works in Firefox/XulRunner on clean installs of Windows 2000 and XP, without the need to install the VC redistributable files.</p>
+<p>This may work for your case as well...</p>
+		<p>&mdash; <a href="http://pyxpcomext.mozdev.org">Todd Whiteman</a> &mdash; 2008/02/25 10:50 am</p>
+	</li>
+
+	<li>
+		<p>Struggling with this one here..&nbsp; I tool may just be overly dense..&nbsp; you decide.</p>
+<p>Situation: Using VS2008 creating a managed C++ DLL to be deployed to Vista environment that won't have the VS2008 runtime installed. </p>
+<p>I set the manifest name in Project Properties » Manifest Tool » Input and Output » Embed Manifest (I assume I specify the file name in Project Properties » Manifest Tool » Input and Output » Additional Manifest Files). I left the options in Project Properties » Linker » Manifest File alone.</p>
+<p>But when I build my DLL, and check the dependencies, it's still showing the "Microsoft.VC90.DebugCRT" as a dependent assembly in the build-generated manifest.</p>
+<p>I'm all confused now...</p>
+		<p>&mdash; Tony B. &mdash; 2008/04/29 6:09 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/8448b2ab333a72c1d9803823854ee0b2?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

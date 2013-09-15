@@ -1,0 +1,329 @@
+Taming the Cowboy Laptop
+
+Richard Crowley
+Betable operations
+r@rcrowley.org
+[[http://rcrowley.org/talks/puppetconf-2013.html][rcrowley.org/talks/puppetconf-2013.html]]
+@rcrowley
+
+* Hi, I’m Richard
+
+[[mailto:r@rcrowley.org][r@rcrowley.org]] or [[https://twitter.com/rcrowley][@rcrowley]]
+
+* Various work laptops I’ve owned
+
+Flickr
+OpenDNS
+DevStructure
+Square
+Betable
+
+* Various configuration management tools I’ve used
+
+Yahoo’s proprietary Perl mess, `yinst`
+Wiki pages
+[[http://devstructure.com/blueprint/][Blueprint]]
+Shell scripts
+Puppet
+
+* An operator by other names
+
+Have not, until now, officially been an operator
+Always focused on how things work in production
+
+* My biggest mistake
+
+The first thing I did at Betable was build the staging and production environments
+
+* Why this was a mistake
+
+At that time there were no customers
+There were only coworkers
+And I wasn’t serving them
+
+* My best advice
+
+(to which I paid no attention)
+Reduce the distance between development and production
+
+* Confidence in production
+
+\...is earned in development
+
+* Taming the cowboy laptop
+
+(better late than never)
+
+* Goal
+
+Reduce the distance between development and production
+
+* Actionable goals
+
+Homogeneity
+Automatic provisioning
+Automatic maintenance
+Avoid a full-scale IT process
+
+* Options
+
+Shell scripts
+Vagrant
+PXE boot VirtualBox
+Boxen
+Not Boxen, just Puppet
+EC2 or similar (The Cloud)
+Hypervisors in the closet
+
+* Shell scripts
+
+We’ve mostly decided this isn’t good enough for production
+Why should it be good enough for development?
+
+* Good options
+
+Vagrant
+PXE boot VirtualBox
+Boxen
+Not Boxen, just Puppet
+EC2 or similar The Cloud
+Hypervisors in the closet
+
+* A lesson learned at DevStructure
+
+Remote development environments are literally a hard sell
+
+* Local options
+
+Vagrant
+PXE boot VirtualBox
+Boxen
+Not Boxen, just Puppet
+
+* VirtualBox at Square
+
+Built for the production engineering team
+PXE boot VirtualBox to test pre-Puppet automation
+[[https://github.com/rcrowley/puppet-virtualbox][puppet-virtualbox]]
+
+* Vagrant
+
+A great option, well-covered elsewhere
+
+* Real talk with Nick Forte
+
+Given a VM, he’d become a cowboy
+Lots of coworkers felt this way
+Many felt like they had no say in the matter
+
+* Automation, in general
+
+Something must get better
+Nothing can get worse
+
+* Advantage Mac
+
+Editors
+GUIs
+No goofy port forwarding
+No NFS, Samba, SSHFS, or similar
+Offline access (same as a VM)
+UNIX-like
+
+* Something worse but not for engineers
+
+Regardless of what you put on top of it (except a VM), no one’s production environment is well-modeled by a Mac
+
+* Mac options
+
+Boxen
+Not Boxen, just Puppet
+
+* Boxen
+
+[[https://twitter.com/wfarr][@wfarr]] covered this two hours ago
+
+* Not Boxen
+
+Production Puppet codebase
+Focus on development environment, not Evernote, FitBit, and Spotify
+
+* Puppet at Betable
+
+* Staging and production
+
+Masterless
+`git`push` to deploy
+[[https://github.com/rcrowley/puppet-related_nodes][puppet-related_nodes]]
+Assumes Debian/Ubuntu throughout
+VM-based development process
+
+* Minimal additions for the Mac
+
+Homebrew
+XCode command-line tools
+Cassandra schema and fixtures
+
+* Minimal changes for the Mac
+
+Java
+Git and Git repositories
+Shared rather than vendored dependencies
+Service supervision
+`if`"Darwin"`==`$::operatingsystem`
+
+* Git
+
+Chicken and egg
+Well-practiced install automation in shell
+
+    cd "$HOME/Downloads"
+    [ -f "git-$GIT_VERSION-intel-universal-snow-leopard.dmg" ] ||
+    curl -O "https://git-osx-installer.googlecode.com/files/git-$GIT_VERSION-intel-universal-snow-leopard.dmg"
+    [ -d "/Volumes/Git $GIT_VERSION Snow Leopard Intel Universal" ] ||
+    hdiutil attach "git-$GIT_VERSION-intel-universal-snow-leopard.dmg"
+    installer -package "/Volumes/Git $GIT_VERSION Snow Leopard Intel Universal/git-$GIT_VERSION-intel-universal-snow-leopard.pkg" -target "/"
+    cat >"/var/db/.puppet_pkgdmg_installed_git-$GIT_VERSION-intel-universal-snow-leopard.dmg" <<EOF
+    name: 'git-$GIT_VERSION-intel-universal-snow-leopard.dmg'
+    source: 'https://git-osx-installer.googlecode.com/files/git-$GIT_VERSION-intel-universal-snow-leopard.dmg'
+    EOF
+    hdiutil detach "/Volumes/Git $GIT_VERSION Snow Leopard Intel Universal"
+
+* Homebrew
+
+My first experience using the Puppet Forge
+Homebrew makes a lot of our production Puppet code Just Work™.
+
+* XCode
+
+Tedious to automate
+Homebrew module makes it a bit better
+We host `xcode462_cltools_*.dmg`
+
+* XCode and Homebrew
+
+    $command_line_tools_package = $::macosx_productversion_major ? {
+        "10.7" => "xcode462_cltools_10_76938260a.dmg",
+        "10.8" => "xcode462_cltools_10_86938259a.dmg",
+    }
+    class {
+        "homebrew":
+            command_line_tools_package => "$command_line_tools_package",
+            command_line_tools_source => "https://packages.ops.betable.com/$command_line_tools_package",
+            user => "$::user",
+    }
+    file { "/usr/local/bin/xcode-select":
+        content => "#!/bin/sh\n",
+        ensure => file,
+        group => "admin",
+        mode => 0755,
+        owner => "root",
+    }
+    File["/usr/local/bin/brew"] -> Package<| title != "$command_line_tools_package" |>
+    File["/usr/local/bin/xcode-select"] -> Package<| title != "$command_line_tools_package" |>
+    Package["$command_line_tools_package"] -> Package<| title != "$command_line_tools_package" |>
+
+* Java
+
+    package { "JavaForOSX2013-004.dmg":
+        ensure => installed,
+        provider => "pkgdmg",
+        source =>
+        "http://support.apple.com/downloads/DL1572/en_US/JavaForOSX2013-004.dmg",
+    }
+
+It’s really difficult to tell you have the right download
+There’s no way to `ensure`=>`latest`
+
+* Git repositories
+
+`git::repo` resources in every environment
+`staging` and `production`:
+Bare repository in `/var/lib/git`
+Working copy in `/usr/local`
+`development`: working copy in `/Users/$::user/src`
+
+* Node.js dependency management
+
+`npm::link` resources
+`npm::install` resources
+In the future these should parse `package.json`
+
+* Go dependency management
+
+`export`GOPATH="$HOME"`
+
+And you’re done
+
+* Service supervision
+
+Two classes of services:
+Those we actively develop
+Those we don’t
+
+* launchd for Cassandra
+
+    launchd::service { "cassandra":
+        args => ["/usr/local/cassandra/bin/cassandra", "-f"],
+        description => "Cassandra",
+        ensure => running,
+        label => "org.apache.cassandra",
+        log => "/var/log/cassandra/output.log",
+    }
+
+`launchd::service` manages `/Library/LaunchDaemons/$label.plist` and `Service["$name"]`
+
+* screen, tmux, or Foreman
+
+For services we actively develop
+Highly personal
+Not managed by Puppet (yet)
+
+* Deploying to development
+
+16+ services and lots of libraries
+Coworkers can’t be bothered to `git`pull` all of ‘em
+
+* Keeping up-to-date...
+
+\...but not too up-to-date
+Pull, not push
+`puppetme`
+
+* Considerate Git repository updates
+
+    Exec { cwd => "$directory/$name" }
+    exec {
+        "git-clone-$name":
+            command => "git clone git@git.ops.betable.com:$name.git",
+            creates => "$directory/$name",
+            cwd => "$directory",
+            notify => Exec["git-remote-update-$name"];
+        "git-remote-update-$name":
+            command => "git remote update origin",
+            notify => Exec["git-fetch-$name"];
+        "git-fetch-$name":
+            command => "git fetch origin",
+            notify => Exec["git-merge-$name"];
+        "git-merge-$name":
+            command => "git merge --ff-only origin/master",
+            notify => Exec["git-submodule-update-$name"],
+            returns => [0, 1];
+    }
+
+* Deploying to production
+
+`git`push`origin`master`
+Confidently
+
+* Cowboys turned to ranchers
+
+Homogeneity...
+\...between development, staging, and production
+\...and between each other’s laptops
+Automatic provisioning for new hires
+Automatic maintenance as we ship
+
+* A word from my sponsors
+
+[[mailto:jobs@betable.com][jobs@betable.com]]

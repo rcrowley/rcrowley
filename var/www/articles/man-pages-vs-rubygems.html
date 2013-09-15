@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Man pages versus RubyGems &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+<article>
+<header>
+	<time datetime="2010-03-10" pubdate>2010-03-10</time>
+	<h1>Man pages versus RubyGems</h1>
+</header>
+<p>I have long felt RubyGems provides a bad solution to the package management problem.&nbsp; Specifically, I think the solution it provides is at odds with other packaging systems, other programming languages, and the UNIX way.&nbsp; The damage begins with the isolation of each package in its own versioned directory and snowballs from there to cause headaches for Ruby programmers and UNIX admins alike.&nbsp; Tomayko has already covered in detail why <a href="http://gist.github.com/54177">RubyGems makes it hard to use your library</a>.&nbsp; I am similarly concerned that RubyGems makes it hard to use UNIX.</p>
+<p>This has all come to a head in the past few days on Twitter and in the <a href="http://github.com/rcrowley/home/commit/45eea3e25fbe19156a2c7597818f3980d16dd853">rcrowley/home@45eea3e</a> commit comments.&nbsp; With no disrespect to Chris Wanstrath, I feel that <a href="http://defunkt.github.com/gem-man/"><code>gem-man</code>(1)</a> is an ugly solution to RubyGems&#8217; problem.&nbsp; I should not need to know that <code>ronn</code>(1) comes from a gem to find its man page.</p>
+<p>UNIX programs, libraries, and man pages are traditionally installed in a select few well-known locations that reinforce each other (<code>/usr/bin</code>, <code>/usr/lib</code>, and <code>/usr/share/man</code> follow the same pattern as <code>/usr/local/bin</code>, <code>/usr/local/lib</code>, and <code>/usr/local/share/man</code>, for example).&nbsp; This pattern flows all the way up to the standard installation tools where you set a prefix, within which this pattern is followed by default.&nbsp; RubyGems ignores this.&nbsp; Taking <code>ronn</code>(1) as an example, it installs executables at <code>/var/lib/gems/1.8/bin</code>, code libraries in <code>/var/lib/gems/1.8/gems/ronn-0.4.1/lib</code>, and man pages in <code>/var/lib/gems/1.8/gems/ronn-0.4.1/man</code>.</p>
+<p>I offer a two-part solution that I feel fits better into the spirit of UNIX.&nbsp; First, use <a href="http://rcrowley.github.com/manskeleton/"><code>manskeleton</code>(1)</a> to generate the directory structure and makefiles for your project&#8217;s <a href="http://rtomayko.github.com/ronn/"><code>ronn</code>(1)</a>-based man pages.&nbsp; Afterward, alias <code>mandb</code>(1), <code>man</code>(1), <code>whatis</code>(1), and <code>apropos</code>(1) to set the <code>-M</code> option to the current list of man paths, including all your gems as in <a href="http://github.com/rcrowley/home/commit/8a9bef3aafdddee68cd8baab7e99a3ed8db995d7">rcrowley/home@8a9bef3</a>.</p>
+<p>I should mention that the correct directory structure for man pages is <code>$PREFIX/share/man/man$SECTION/$PAGE.$SECTION</code> and the <code>share/</code> component is generally omitted outside of <code>/usr/share/man</code> and sometimes <code>/usr/local/share/man</code>.&nbsp; What is not optional is the <code>man$SECTION/</code> component.&nbsp; <del>While <code>man</code>(1) can handle that omission, <code>whatis</code>(1) and <code>apropos</code>(1) cannot.</del></p>
+<p>There are two ways RubyGems itself could fix this problem.&nbsp; Option one is to treat <code>man/</code> within gems as special, copying these trees to a known location, even if it&#8217;s <code>/var/lib/gems/1.8/man</code>.&nbsp; This would allow us to use the standard tools with the environment variable <code>MANPATH=:/var/lib/gems/1.8/man</code>.&nbsp; Option two is to follow RubyGems runs with <code>mandb -M...</code> to add the new gem to the man page indexes.&nbsp; This would still require <code>man</code>(1), <code>whatis</code>(1), and <code>apropos</code>(1) to be aliased but at least new man pages will be indexed automatically.&nbsp; This second option strikes me as a good RubyGems plugin &mdash; is it possible?</p>
+</article>
+<footer class="site">
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2010 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

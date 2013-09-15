@@ -1,0 +1,11 @@
+{% block content %}
+<article>
+<header>
+	<time datetime="2013-04-19" pubdate>2013-04-19</time>
+	<h1>{% block title %}Go acknowledgement test{% endblock %}</h1>
+</header>
+<p>I have been writing a lot of Go lately at <a href="https://betable.com">Betable</a> and the channels of channels pattern comes up so often that I broken down and benchmarked it.&nbsp; I&#8217;m publishig this more widely at the insistence of Paul Hammond who would agree that this is yet another of the many and persistent reminders that Rob Pike is smarter than I am.</p>
+<p>In summary, it is faster to allocate a one-time-use channel for a goroutine to acknowledge a request than to use a <code>sync.Mutex</code>.<p>
+<script src="https://gist.github.com/rcrowley/5423530.js"></script>
+</article>
+{% endblock %}

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>XUL overlays demystified &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/08/03/xul-overlays-demystified">XUL overlays demystified</a> <small>2007/08/03</small></h1>
+<p><em>This assumes just a little knowledge of how to get a basic Hello World XULRunner app going.  If you need help, I swear by <a href="http://starkravingfinkle.org/blog/2006/07/mozilla-platform-getting-started-with-xulrunner/">Mark Finkle</a>.</em></p>
+<p>Every would-be Firefox extension developer (myself certainly included) has at some point sparred with overlays and been vanquished.  They are not the friendliest things, as they are actually quite powerful and can handle a wide range of tasks.  When building a Firefox extension, you build overlays to hook into the menus, create sidebars and toolbars, add status icons and do most anything else you can dream up.</p>
+<p>To understand overlays, it helps to first get a look at the main application <code>&lt;window&gt;</code>.  Here is a simple application window:</p>
+<pre>&lt;?xml version="1.0"?&gt;
+&lt;?xml-stylesheet href="chrome://global/skin/" type="text/css"?&gt;
+&lt;?xml-stylesheet href="chrome://foo/skin/main.css" type="text/css"?&gt;
+&lt;?xul-overlay href="chrome://foo/content/overlay_asdf.xul"?&gt;
+&lt;?xul-overlay href="chrome://foo/content/overlay_qwerty.xul"?&gt;
+&lt;!DOCTYPE window SYSTEM "chrome://uploadr/locale/foo.dtd"&gt;
+&lt;window id="main" title="&amp;title;" width="750" height="500"
+xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"&gt;
+	&lt;script src="chrome://uploadr/content/main.js" /&gt;
+	&lt;toolbox&gt;
+		&lt;menubar id="menu"&gt;
+			&lt;menu id="menu_file" label="&amp;menu.file;"&gt;
+				&lt;menupopup&gt;
+					&lt;menuitem id="menu_go" label="&amp;menu.file.go;"
+					oncommand="go();" /&gt;
+					&lt;menuitem id="menu_FileQuitItem" label="&amp;menu.file.exit;"
+					oncommand="exit();" /&gt;
+				&lt;/menupopup&gt;
+			&lt;/menu&gt;
+		&lt;/menubar&gt;
+	&lt;/toolbox&gt;
+	&lt;vbox flex="1"&gt;
+		&lt;hbox id="view_asdf" flex="1" /&gt;
+		&lt;vbox id="view_qwerty" flex="1" /&gt;
+	&lt;/vbox&gt;
+&lt;/window&gt;</pre>
+<p>This application does a couple of things of note.  First, it sets up a XULRunner application window with a menu and a couple of boxes, but more importantly, at the top, it includes the two overlays we're about to write.</p>
+<p>Before we write the overlays, though, let's add to the <code>main.css</code> file we're including to make this interesting.  The two overlays are going to be two different views in our application so we won't want to see them both at the same time.  For starters we'll just hide <code>#view_qwerty</code>.</p>
+<pre>#view_qwerty {
+	display: none;
+}</pre>
+<p>Now come the overlays.  An <code>&lt;overlay&gt;</code> is contructed very much like a <code>&lt;window&gt;</code> and can include all of the same types of content.  The trick is in how they are inserted into the DOM.  When an overlay is being processed, elements whose ID is shared by a similarly typed element in the main window, the contents of the overlay element are appended to the contents of the same element in the main window.</p>
+<p>Knowing that, let's write our two overlays.  First <code>overlay_asdf.xul</code> and then <code>overlay_qwerty.xul</code>.</p>
+<pre>&lt;?xml version="1.0"?&gt;
+&lt;?xml-stylesheet href="chrome://global/skin/" type="text/css"?&gt;
+&lt;?xml-stylesheet href="chrome://foo/skin/main.css" type="text/css"?&gt;
+&lt;!DOCTYPE overlay SYSTEM "chrome://foo/locale/main.dtd"&gt;
+&lt;overlay id="overlay_asdf"
+xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+xmlns:html="http://www.w3.org/1999/xhtml"&gt;
+	&lt;hbox id="view_asdf" flex="1"&gt;
+		&lt;html:p&gt;This is view asdf.&lt;/html:p&gt;
+	&lt;/hbox&gt;
+&lt;/overlay&gt;</pre>
+<pre>&lt;?xml version="1.0"?&gt;
+&lt;?xml-stylesheet href="chrome://global/skin/" type="text/css"?&gt;
+&lt;?xml-stylesheet href="chrome://foo/skin/main.css" type="text/css"?&gt;
+&lt;!DOCTYPE overlay SYSTEM "chrome://foo/locale/main.dtd"&gt;
+&lt;overlay id="overlay_qwerty"
+xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+xmlns:html="http://www.w3.org/1999/xhtml"&gt;
+	&lt;vbox id="view_qwerty" flex="1"&gt;
+		&lt;html:p&gt;This is view qwerty.&lt;/html:p&gt;
+	&lt;/vbox&gt;
+&lt;/overlay&gt;</pre>
+<p>The structure of the overlays is very similar to the structure of the window, so we'll just take that as is and move on.  The important thing to notice here is the way that <code>#view_asdf</code> is a <code>&lt;hbox&gt;</code> just as it is in the main window, while <code>#view_qwerty</code> is a <code>&lt;vbox&gt;</code>, again as it is in the main window.  This is not strictly required, as the elements must only be similar, but because boxes want to be horizontal, you can introduce weirdness into your app if you're careless about matching these tags up.  So the moral of the story is to match your overlay tags with the tag being overlaid in the main window.</p>
+<p>So now we have an app that, when run, will show us a window with a menu and a paragraph proclaiming "This is view asdf."  Too exciting.  One little bit of Javascript in <code>main.js</code> will bring it all together.</p>
+<pre>var go = function() {
+	var asdf = document.getElementById('view_asdf');
+	var qwerty = document.getElementById('view_qwerty');
+	if ('none' == asdf.style.display) {
+		asdf.style.display = '-moz-box';
+		qwerty.style.display = 'none';
+	} else {
+		asdf.style.display = 'none';
+		qwerty.style.display = '-moz-box';
+	}
+};</pre>
+<p>With any luck, running your app will be able to toggle between its two views by selecting the "Go" option from the "File" menu.  Here's a peek under the hood.  When XULRunner brings in your overlays, it's updating the main DOM.  The end result is a DOM that looks like this:</p>
+<pre>&lt;?xml version="1.0"?&gt;
+&lt;?xml-stylesheet href="chrome://global/skin/" type="text/css"?&gt;
+&lt;?xml-stylesheet href="chrome://foo/skin/main.css" type="text/css"?&gt;
+&lt;?xul-overlay href="chrome://foo/content/overlay_asdf.xul"?&gt;
+&lt;?xul-overlay href="chrome://foo/content/overlay_qwerty.xul"?&gt;
+&lt;!DOCTYPE window SYSTEM "chrome://uploadr/locale/foo.dtd"&gt;
+&lt;window id="main" title="&amp;title;" width="750" height="500"
+xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"&gt;
+	&lt;script src="chrome://uploadr/content/main.js" /&gt;
+	&lt;toolbox&gt;
+		&lt;menubar id="menu"&gt;
+			&lt;menu id="menu_file" label="&amp;menu.file;"&gt;
+				&lt;menupopup&gt;
+					&lt;menuitem id="menu_go" label="&amp;menu.file.go;"
+					oncommand="go();" /&gt;
+					&lt;menuitem id="menu_FileQuitItem" label="&amp;menu.file.exit;"
+					oncommand="exit();" /&gt;
+				&lt;/menupopup&gt;
+			&lt;/menu&gt;
+		&lt;/menubar&gt;
+	&lt;/toolbox&gt;
+	&lt;vbox flex="1"&gt;
+		&lt;hbox id="view_asdf" flex="1"&gt;
+			<strong>&lt;html:p&gt;This is view asdf.&lt;/html:p&gt;</strong>
+		&lt;/hbox&gt;
+		&lt;vbox id="view_qwerty" flex="1"&gt;
+			<strong>&lt;html:p&gt;This is view qwerty.&lt;/html:p&gt;</strong>
+		&lt;/vbox&gt;
+	&lt;/vbox&gt;
+&lt;/window&gt;</pre>
+<p>The overlays buy us code separation, shorter files, and more sanity.  Three cheers for overlays!</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(5)</small></h1>
+<ol>
+	<li>
+		<p>Nice post, only thing missing is how to include same overlay twice in single xul file,and keep element id unique, as far as I know it is not possible to do this at this time.</p>
+		<p>&mdash; <a href="http://www.gregbugaj.com">Greg Bugaj</a> &mdash; 2007/09/13 8:31 am</p>
+	</li>
+
+	<li>
+		<p>hi,
+iam have built 2 toolbar with very little difference. they work seperately fine.the problem is when i install both of them together one gets overlayed upon other. can u guide me on how to  position the toolbar properly..is there anyway to do it.
+thanks for the gud post</p>
+		<p>&mdash; dhanalakshmi kannan &mdash; 2008/02/28 4:34 am</p>
+	</li>
+
+	<li>
+		<p>hMZYIN  mhbzvjrwvwbr, [url=http://zxcpefwcwunz.com/]zxcpefwcwunz[/url], [link=http://zfcqrbtjctfh.com/]zfcqrbtjctfh[/link], http://tsknxhgrwhnt.com/</p>
+		<p>&mdash; <a href="http://iajetwbnpqju.com/">cuzowblx</a> &mdash; 2008/09/15 3:57 pm</p>
+	</li>
+
+	<li>
+		<p>hMZYIN  mhbzvjrwvwbr, [url=http://zxcpefwcwunz.com/]zxcpefwcwunz[/url], [link=http://zfcqrbtjctfh.com/]zfcqrbtjctfh[/link], http://tsknxhgrwhnt.com/</p>
+		<p>&mdash; <a href="http://iajetwbnpqju.com/">cuzowblx</a> &mdash; 2008/09/15 3:57 pm</p>
+	</li>
+
+	<li>
+		<p>gOvGwE  gsjntuiqtpev, [url=http://xfomniwgsydm.com/]xfomniwgsydm[/url], [link=http://utmogmqckemp.com/]utmogmqckemp[/link], http://ahvgqfnbffro.com/</p>
+		<p>&mdash; <a href="http://jjfstpdcfqoq.com/">kduurx</a> &mdash; 2008/09/15 5:29 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/c60f26b9461564dcb70ed99b30065acb?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

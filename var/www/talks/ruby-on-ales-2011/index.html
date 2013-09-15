@@ -1,0 +1,624 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Why is configuration management software written in Ruby?</title>
+
+  <link rel="stylesheet" href="./css/reset.css" type="text/css"/>
+  <link rel="stylesheet" href="./css/showoff.css" type="text/css"/>
+
+  <script type="text/javascript" src="./js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="./js/jquery.cycle.all.js"></script>
+	<script type="text/javascript" src="./js/jquery-print.js"></script>
+  <script type="text/javascript" src="./js/jquery.batchImageLoad.js"></script>
+
+  <script type="text/javascript" src="./js/jquery.doubletap-0.1.js"></script>
+
+  <script type="text/javascript" src="./js/fg.menu.js"></script>
+  <script type="text/javascript" src="./js/showoff.js"></script>
+  <script type="text/javascript" src="./js/jTypeWriter.js"> </script>
+  <script type="text/javascript" src="./js/sh_main.min.js"></script>
+  <script type="text/javascript" src="./js/core.js"></script>
+  <script type="text/javascript" src="./js/showoffcore.js"></script>
+
+  <link type="text/css" href="./css/fg.menu.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/theme/ui.all.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/sh_style.css" rel="stylesheet" >
+
+  
+    <link rel="stylesheet" href="file/helfuckingvetica.css" type="text/css"/>
+  
+
+  
+    <script type="text/javascript" src="file/sh_puppet.js"></script>
+  
+    <script type="text/javascript" src="file/centerdammit.js"></script>
+  
+
+  <script type="text/javascript">
+  $(function(){
+    setupPreso(false, './');
+  });
+  </script>
+</head>
+
+<body>
+
+
+<a tabindex="0" href="#search-engines" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="navmenu"><span class="ui-icon ui-icon-triangle-1-s"></span>slides</a>
+<div id="navigation" class="hidden"></div>
+
+<div id="help">
+  <table>
+    <tr><td class="key">space, &rarr;</td><td>next slide</td></tr>
+    <tr><td class="key">&larr;</td><td>previous slide</td></tr>
+    <tr><td class="key">d</td><td>debug mode</td></tr>
+    <tr><td class="key">## &lt;ret&gt;</td><td>go to slide #</td></tr>
+    <tr><td class="key">c</td><td>table of contents (vi)</td></tr>
+    <tr><td class="key">f</td><td>toggle footer</td></tr>
+    <tr><td class="key">r</td><td>reload slides</td></tr>
+    <tr><td class="key">z</td><td>toggle help (this)</td></tr>
+  </table>
+</div>
+
+<div id="preso">loading presentation...</div>
+<div id="footer">
+  <span id="slideInfo"></span>
+  <span id="debugInfo"></span>
+</div>
+
+<div id="slides" class="offscreen" style="display:none;">
+<div class="slide" data-transition="none"><div class="content bullets" ref="./slides/1">
+<h1>Why is configuration management software written in Ruby?</h1>
+
+<ul>
+<li><a href="http://rcrowley.org/talks/ruby-on-ales-2011/">http://rcrowley.org/talks/ruby-on-ales-2011/</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/2">
+<h1>Hi, I&#x2019;m Richard Crowley</h1>
+
+<ul>
+<li>Equal opportunity technology hater.</li>
+<li>DevStructure&#x2019;s operator and UNIX hacker.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/3">
+<h1>Puppet</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/4">
+<h1>Puppet</h1>
+
+<ul>
+<li>There once was a systems administrator named Luke who didn&#x2019;t want to use CFEngine anymore...</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/5">
+<h1>Puppet</h1>
+
+<ul>
+<li>Ruby won out over Python and Perl.</li>
+<li>The autoloader is the<br/>frequently cited reason.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/6">
+<h1>Puppet autoloader</h1>
+
+<ul>
+<li><code>glob</code> for source files.</li>
+<li>Each one registers itself<br/>using an internal DSL.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/7">
+<h1>Puppet internal DSL</h1>
+
+<pre class="sh_Ruby"><code>Puppet::Type.newtype(:package) do
+  # ...
+  def insync?
+    # ...
+  end
+  # ...
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/8">
+<h1>Internal DSLs</h1>
+
+<ul>
+<li>Give one kind of context<br/>while taking another away.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/9">
+<h1>Internal DSLs</h1>
+
+<pre class="sh_Ruby"><code>Puppet::Type.newtype(:package) do
+  # ...
+end</code></pre>
+
+<ul>
+<li>It&#x2019;s obvious this introduces a type.</li>
+<li>It&#x2019;s not obvious what Ruby code goes here.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/10">
+<h1>Internal DSLs</h1>
+
+<h2>These are questions I shouldn&#x2019;t have to ask:</h2>
+
+<ul>
+<li>Can I define classes, modules,<br/>and/or methods in this scope?</li>
+<li>What is the fully-qualified name of<br/>a constant defined in this scope?</li>
+<li>Can I <code>return</code> in this scope?</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/11">
+<h1>Puppet resources</h1>
+
+<pre class="sh_Puppet"><code>package { "ruby": ensure =&gt; installed }
+file { "/etc/sysctl.conf":
+    ensure =&gt; file,
+    group =&gt; "root",
+    mode =&gt; 0644,
+    owner =&gt; "root",
+    source =&gt; "puppet:///sysctl.conf",
+}</code></pre>
+
+<ul>
+<li>Orthogonal resources.</li>
+<li>Puppet makes its best-effort.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/12">
+<h1>Puppet logging</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/13">
+<h1>WTF?</h1>
+
+<pre><code>puppet agent --verbose
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/14">
+<h1>Seriously, WTF?</h1>
+
+<pre><code>puppet agent --verbose --debug --trace
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/15">
+<h1>Puppet logging</h1>
+
+<ul>
+<li>Uses syslog-appropriate levels.</li>
+<li>Color-coded if logging to a TTY.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/16">
+<h1>Chef</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/17">
+<h1>Chef versus Puppet</h1>
+
+<h2>This is not a religious war</h2>
+
+<ul>
+<li>Functionally similar.</li>
+<li>Philisophically different.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/18">
+<h1>Chef</h1>
+
+<ul>
+<li>External Ruby DSL.</li>
+<li>Internal Ruby Ruby.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/19">
+<h1>Chef resources</h1>
+
+<pre class="sh_Ruby"><code>package "ruby" do
+  action :install
+end
+cookbook_file "/etc/sysctl.conf" do
+  group "root"
+  mode 0644
+  owner "root"
+  source "sysctl.conf"
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/20">
+<h1>Chef insides</h1>
+
+<pre class="sh_Ruby"><code>require 'chef/resource'
+
+class Chef
+  class Resource
+    class Package &lt; Chef::Resource
+      # ...
+    end
+  end
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/21">
+<h1>External DSLs</h1>
+
+<h2>Homegrown grammar versus<br/>piggybacking on Ruby</h2>
+
+<ul>
+<li>Not better.  Not worse.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/22">
+<h1>Internal DSLs</h1>
+
+<h2>&#x201C;What scope is that?&#x201D; versus Ruby Ruby</h2>
+
+<ul>
+<li>This is not the place to get fancy.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/23">
+<h1>Whatever, I still like Puppet better</h1>
+
+<ul>
+<li>Let&#x2019;s drink beer and argue about it, though.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/24">
+<h1>Despite their differences, Puppet and Chef both codify common systems administration tasks</h1>
+
+<ul>
+<li>That sounds like how<br/>people used to use Perl.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/25">
+<h1>Ruby as a better Perl</h1>
+
+<ul>
+<li>First-class regular expressions like Perl.</li>
+<li>Backtick operator like Perl and shell.</li>
+<li>Relaxed parentheses like Perl.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/26">
+<h1>Ruby as a <em>better</em> Perl</h1>
+
+<ul>
+<li>Blocks are better than subroutine references.</li>
+<li>Real objects are better than fake objects.<br/>No more structs full of function pointers!</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/27">
+<h1>RubyGems == CPAN</h1>
+
+<ul>
+<li>No release management or feature freezes.</li>
+<li>Double-edged sword.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/28">
+<h1>RubyGems for<br/>people on-call</h1>
+
+<ul>
+<li>Regression testing.</li>
+<li>Semantic versioning.</li>
+<li>Slow-and-steady release cycle.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/29">
+<h1>RubyGems for<br/>people on-call</h1>
+
+<ul>
+<li>Stability first.</li>
+<li>No one wants to depend on a moving target.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/30">
+<h1>Rake</h1>
+
+<ul>
+<li>A better GNU <code>make</code>.</li>
+<li>External Ruby DSL.  Internal Ruby Ruby.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/31">
+<h1>Rake</h1>
+
+<pre class="sh_Ruby"><code>task :deploy do
+  sh "git push production master"
+end
+file "foo.o" =&gt; "foo.c" do |t|
+  sh "gcc -o foo.o foo.c"
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/32">
+<h1>Dependency programming</h1>
+
+<ul>
+<li>Start with a goal.</li>
+<li>Satisfy its prerequisites first, recursively.</li>
+<li>If a prerequisite cannot be satisfied, abort.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/33">
+<h1>Rake</h1>
+
+<ul>
+<li>Intended for interactive use.</li>
+<li>Logging isn&#x2019;t <em>as</em> necessary<br/>with fail-fast execution.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/34">
+<h1>Capistrano</h1>
+
+<h2><code>ssh</code>-in-a-<code>for</code>-loop meets Rake</h2>
+
+<ul>
+<li>Dependency-oriented but works<br/>on multiple hosts in parallel.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/35">
+<h1>Capistrano</h1>
+
+<pre><code>$ cap foo
+  * executing `foo'
+  * executing "echo foo &gt;&amp;1"
+    servers: ["rcrowley.org"]
+    [root@rcrowley.org] executing command
+ ** [out :: root@rcrowley.org] foo
+    command finished
+  * executing "echo foo &gt;&amp;2"
+    servers: ["rcrowley.org"]
+    [root@rcrowley.org] executing command
+*** [err :: root@rcrowley.org] foo
+    command finished
+$
+</code></pre>
+
+<ul>
+<li>Each host can fail or succeed independently.</li>
+<li>Everything&#x2019;s logged.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/36">
+<h1>The Marionette Collective</h1>
+
+<ul>
+<li>Orchestration via STOMP<br/>publish/subscribe rather than SSH.</li>
+<li>Scalable upgrade to <code>ssh</code>-in-a-<code>for</code>-loop.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/37">
+<h1>The Marionette Collective</h1>
+
+<ul>
+<li>General systems administration<br/>gone framework.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/38">
+<h1>The Marionette Collective</h1>
+
+<ul>
+<li>Lots of small tools:<br/><code>mc-ping</code>, <code>mc-find-hosts</code>, <code>mc-rpc</code>, and more.</li>
+<li>Compose these to form new programs.</li>
+<li><em>It&#x2019;s a UNIX system.  I know this.</em></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/39">
+<h1>From middleware<br/>to MCollective</h1>
+
+<ul>
+<li>Everything starts life as a &#x201C;script.&#x201D;</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/40">
+<h1>&#x201C;Scripts?&#x201D;</h1>
+
+<ul>
+<li>So trivial you don&#x2019;t need to test them.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/41">
+<h1>Idempotence</h1>
+
+<ul>
+<li>N &gt; 1 runs equivalent to N = 1 runs.</li>
+<li><code>PUT</code> not <code>POST</code>.</li>
+<li>Manage whole files.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/42">
+<h1>API design</h1>
+
+<ul>
+<li>Principle of least surprise.</li>
+<li>Namespaces.</li>
+<li>Look for generic solutions.<br/>Not too hard, though.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/43">
+<h1>Why even bother<br/>with Ruby?</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/44">
+<h1>Data structures programs versus UNIX programs</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/45">
+<h1>UNIX programs</h1>
+
+<ul>
+<li>Filesystem manipulation.</li>
+<li>System calls via GNU <code>coreutils</code>.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/46">
+<h1>Data structures programs</h1>
+
+<ul>
+<li>Need more than POSIX shell&#x2019;s<br/>scalar variables.</li>
+<li>Need more than Bash&#x2019;s one-dimensional indexed and associative arrays.</li>
+<li>Classes, methods, sockets,<br/>threads, events, etc.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/47">
+<h1>Ruby can do both!</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/48">
+<h1>UNIX programs in Ruby</h1>
+
+<ul>
+<li><code>File</code>, <code>Dir</code>, and <code>FileUtils</code></li>
+<li><code>Process</code></li>
+<li><code>Etc</code></li>
+<li>(Ruby editorializes too much.)</li>
+<li><a href="http://tomayko.com/writings/unicorn-is-unix">http://tomayko.com/writings/unicorn-is-unix</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/49">
+<h1>Data structures in Ruby</h1>
+
+<ul>
+<li>A hopefully obvious exercise<br/>left to the listener.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/50">
+<h1>Composable Ruby, too</h1>
+
+<ul>
+<li>It&#x2019;s still a UNIX system.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/51">
+<h1>Declare inter-file dependencies</h1>
+
+<ul>
+<li>Make it easy to use part of your package.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/52">
+<h1>Don&#x2019;t make me try this hard...</h1>
+
+<pre class="sh_Ruby"><code># Devise doesn't manage its own dependencies and the main
+# devise.rb is impossibly huge.
+require 'active_support/multibyte/chars'
+require 'restricted_login_validator'
+module ::Devise
+  ALL = [:database_authenticatable]
+  mattr_accessor :encryptor
+  @@encryptor = :sha1
+  mattr_accessor :pepper
+  @@pepper = "OH HAI"
+  mattr_accessor :stretches
+  @@stretches = 10
+  def self.friendly_token
+    ::ActiveSupport::SecureRandom.base64(15).tr("+/=", "-_ ").
+      strip.delete("\n")
+  end
+end
+require 'active_support/concern' #
+require 'warden'                 # Must be before devise/models.
+require 'devise/models'                          #
+require 'devise/models/database_authenticatable' # Must be before
+require 'devise/schema'                          # devise/orm/active_record.
+require 'devise/orm/active_record'
+require 'devise/encryptors/base'
+require 'devise/encryptors/sha1'</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/53">
+<h1>...just to do this</h1>
+
+<pre class="sh_Ruby"><code>require 'devise/orm/active_record'</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/54">
+<h1>Explicit is better<br/>than implicit</h1>
+
+<ul>
+<li>(Says <em>The Zen of Python</em>.)</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/55">
+<h1>Coupling</h1>
+
+<h2>From the perspective of <code>foo.rb</code></h2>
+
+<ul>
+<li>Don&#x2019;t trust that your dependencies are met.</li>
+<li>This <em>implicitly</em> couples you to the loader.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/56">
+<h1>Magic</h1>
+
+<ul>
+<li>The enemy of operable.</li>
+<li>Don&#x2019;t get cute: it&#x2019;s OK<br/>if your code looks like code.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/57">
+<h1>Patterns, anti-patterns, and philosophies</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/58">
+<h2>Pattern</h2>
+
+<h1>External DSLs</h1>
+
+<ul>
+<li>Brevity is a virtue.</li>
+<li>Require developer restraint.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/59">
+<h2>Anti-pattern</h2>
+
+<h1>Internal DSLs</h1>
+
+<ul>
+<li>Obscure the Ruby Ruby scope.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/60">
+<h2>Pattern</h2>
+
+<h1>Dependency programming</h1>
+
+<ul>
+<li>Powerful failure handling.</li>
+<li>Natural for interactive tasks.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/61">
+<h2>Pattern</h2>
+
+<h1>Idempotence</h1>
+
+<ul>
+<li>Never be scared to run it again.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/62">
+<h2>Anti-pattern</h2>
+
+<h1>Magic</h1>
+
+<ul>
+<li>Requires intimate knowledge<br/>to maintain and operate.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/63">
+<h2>Philosophy</h2>
+
+<h1>Explicit is better<br/>than implicit</h1>
+
+<ul>
+<li>Reduces coupling.</li>
+<li>Provides context.</li>
+<li>Promotes reuse.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/64">
+<h2>Philosophy</h2>
+
+<h1>Look for generic solutions</h1>
+
+<ul>
+<li>Not too hard, though.</li>
+<li>Strive to remove special cases.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/65">
+<h1>Thank you</h1>
+
+<ul>
+<li><a href="mailto:richard@devstructure.com">richard@devstructure.com</a> or <a href="http://twitter.com/rcrowley">@rcrowley</a></li>
+<li>P.S. Use DevStructure!</li>
+</ul>
+</div>
+</div>
+</div>
+
+</body>
+</html>

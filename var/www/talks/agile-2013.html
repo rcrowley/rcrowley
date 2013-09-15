@@ -1,0 +1,1348 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Developing Operability</title>
+    <meta charset='utf-8'>
+    <script src='/static/slides.js'></script>
+  </head>
+
+  <body style='display: none'>
+
+    <section class='slides layout-widescreen'>
+      
+      <article>
+        <h1>Developing Operability</h1>
+        
+        
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+
+          </div>
+        
+      </article>
+      
+  
+  
+      <article>
+      
+        <h3>Hi, I’m Richard</h3>
+        
+  
+  <p>
+    <a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a> or <a href="https://twitter.com/rcrowley" target="_blank">@rcrowley</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Developer and Operator</h3>
+        
+  
+  <p>
+    (probably not OCD)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Non-chronological résumé</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>OpenDNS circa 2008</h3>
+        
+  
+  <p>
+    Linux development environments
+<br>
+
+    No automation
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Flickr circa 2007</h3>
+        
+  
+  <p>
+    One development environment
+<br>
+
+    Lots of automation
+<br>
+
+    No tests
+<br>
+
+    Staging used production data
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>DevStructure circa 2010</h3>
+        
+  
+  <p>
+    Reduce the distance between development and production
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Betable</h3>
+        
+  
+  <p>
+    Gambling as a Service
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Betable</h3>
+        
+  
+  <p>
+    Heavily regulated
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Betable</h3>
+        
+  
+  <p>
+    Green field
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>DevOps</h3>
+        
+  
+  <p>
+    (or however you capitalize it)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Operability</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Traditional corporate structure</h3>
+        
+  
+  <p>
+    Dev : Ops :: BD : COO, some PMs
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Humans</h3>
+        
+  
+  <p>
+    Not good at multitasking
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Operators</h3>
+        
+  
+  <p>
+    “Ops guy” obscures the meaning
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Inoperable deals</h3>
+        
+  
+  <p>
+    Gift cards for Heroku Dynos
+<br>
+
+    at Wal-Mart
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Inoperable systems</h3>
+        
+  
+  <p>
+    Rube Goldberg machines
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Operable systems</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Scalability</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Straightforward capacity planning</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Maintainability</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Adaptability</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Visibility</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Orthogonal features</h3>
+        
+  
+  <p>
+    “Orthogonality makes it easier to understand what happens when things combine.” - <a href="http://golang.org/doc/faq" target="_blank">golang.org/doc/faq</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Stable, well-defined interfaces</h3>
+        
+  
+  <p>
+    No moving targets
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Operability</h3>
+        
+  
+  <p>
+    The degree to which software behaves unsurprisingly in surprising situations
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Operability at Betable</h3>
+        
+  
+  <p>
+    Hint: it starts in development
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Testing</h3>
+        
+  
+  <p>
+    Thousands
+<br>
+
+    Unit and integration
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Service-oriented architecture</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Node.js</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Micro-services?</h3>
+        
+  
+  <p>
+    At least <b>services</b> and not “services”
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Betable admin</h3>
+        
+  
+  <p>
+    Six services
+<br>
+
+    API-driven
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Library-oriented architecture</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Betable admin</h3>
+        
+  
+  <p>
+    <code>node-betable-admin</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Client libraries</h3>
+        
+  
+  <p>
+    <code>node-betable-accounting</code>
+<br>
+
+    <code>node-betable-cassandra</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Mocking</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Mock for speed</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Mock for simplicity</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Mock services</h3>
+        
+  
+  <p>
+    Except when testing their client libraries
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Mock libraries</h3>
+        
+  
+  <p>
+    Especially service client libraries
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Mock failures</h3>
+        
+  
+  <p>
+    Especially dependent service failures
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>make test</h3>
+        
+  
+  <p>
+    Predictable and standard command-line interface
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Continuous integration</h3>
+        
+  
+  <p>
+    Yep
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Versioning</h3>
+        
+  
+  <p>
+    Build numbers
+<br>
+
+    Git commit SHAs
+<br>
+
+    Semantic versions
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Packaging</h3>
+        
+  
+  <p>
+    <code>fpm</code> and <code>freight</code> make things easy
+<br>
+
+    Fat packages keep things orthogonal
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Missing link for audits</h3>
+        
+  
+  <p>
+    How do I know the package with a Git commit in its version actually contains that Git commit?
+<br>
+
+    Give up and deploy Git repositories
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Vendoring</h3>
+        
+  
+  <p>
+    The analogue to fat packages
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Considerations for compilers</h3>
+        
+  
+  <p>
+    Compilers everywhere!
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Security guy says “no compilers”</h3>
+        
+  
+  <p>
+    Compilers everywhere!
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>post-receive hooks</h3>
+        
+  
+  <p>
+    <code>mvn package</code>
+<br>
+
+    <code>restart betable-accounting</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>End-to-end audits</h3>
+        
+  
+  <p>
+    <code>master</code> to CI to staging to production
+<br>
+
+    Running process to source code to version
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Deploying</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Aside: deploy web pages</h3>
+        
+  
+  <p>
+    Composability
+<br>
+
+    Orthogonality
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Push versus pull</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Push</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Push via pull with Puppet and APT</h3>
+        
+  
+  <div class="code"><pre>package { &#34;betable-accounting&#34;:
+    ensure =&gt; latest,
+}</pre></div>
+  
+
+  
+  <p>
+    <code>puppet apply manifests/site.pp</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Push with Git</h3>
+        
+  
+  <p>
+    <code>git push git@prod01.betable.com:betable-accounting.git</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Humans</h3>
+        
+  
+  <p>
+    Can’t be bothered to <code>git pull</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Keeping up-to-date</h3>
+        
+  
+  <p>
+    But not too up-to-date
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Cowboy laptops</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Homogeneous environments</h3>
+        
+  
+  <p>
+    The important part of every engineer’s laptop should be identical
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Deploying to development</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Push versus pull</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Pull</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Pull with Puppet</h3>
+        
+  
+  <div class="code"><pre>git pull origin master
+puppet apply manifests/site.pp</pre></div>
+  
+
+  
+  <p>
+    <code>puppetme</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Linux versus Mac</h3>
+        
+  
+  <p>
+    Reduce the distance between development and production
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Real talk with Nick Forte</h3>
+        
+  
+  <p>
+    Mutiny brewin’
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Boxen</h3>
+        
+  
+  <p>
+    Don’t care to manage Spotify
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Not Boxen</h3>
+        
+  
+  <p>
+    Reduce the distance between development and production
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Idempotence</h3>
+        
+  
+  <p>
+    <code>puppetme</code> anytime, anywhere
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Dependency management</h3>
+        
+  
+  <p>
+    <code>package.json</code>
+<br>
+
+    <code>pom.xml</code>
+<br>
+
+    <code>bootstrap.sh</code> if all else fails
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Early integration testing</h3>
+        
+  
+  <p>
+    <code>integrate</code> anytime, anywhere
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Service supervision</h3>
+        
+  
+  <p>
+    You’re likely only working on one thing at a time
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>launchd</h3>
+        
+  
+  <p>
+    For what’s not under development
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>screen and tmux</h3>
+        
+  
+  <p>
+    For everything else
+<br>
+
+    If you do this in production, people will laugh at you
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Foreman</h3>
+        
+  
+  <p>
+    All your logs in one terminal
+<br>
+
+    This is both good and bad
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Pushing code</h3>
+        
+  
+  <p>
+    <code>git push origin master</code>
+<br>
+
+    Initiates Jenkins build, deploy to staging, and <code>integrate</code>
+<br>
+
+    Coworkers run <code>puppetme</code> at their leisure
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Staging and production</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Service supervision</h3>
+        
+  
+  <p>
+    You’re not going to watch them, are you?
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Restarting processes</h3>
+        
+  
+  <p>
+    <code>SIGTERM</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Upstart</h3>
+        
+  
+  <p>
+    Canonical’s <code>init(8)</code> replacement
+<br>
+
+    Direct parent supervision
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Zero-downtime restart</h3>
+        
+  
+  <p>
+    File descriptor inheritance
+<br>
+
+    <code>SCM_RIGHTS</code> and <code>unix(7)</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Caveats</h3>
+        
+  
+  <p>
+    Not typically compatible with direct parent supervision
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>systemd</h3>
+        
+  
+  <p>
+    WANT
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Graceful stop</h3>
+        
+  
+  <p>
+    Easier to achieve
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Load balancers</h3>
+        
+  
+  <p>
+    No one here has only one server, right?
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Load balancers</h3>
+        
+  
+  <p>
+    Manage upstream services
+<br>
+
+    Let upstream services manage themselves
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Serial deploys with retries</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>When is it safe to retry?</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Logging and monitoring</h3>
+        
+  
+  <p>
+    We get more out of logs than graphs
+<br>
+
+    We log full requests and responses
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Recap</h3>
+        
+  
+  <p>
+    Reduce the distance between development and production
+<br>
+
+    Be mindful of how you deploy
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>A word from my sponsors</h3>
+        
+  
+  <p>
+    <a href="mailto:jobs@betable.com" target="_blank">jobs@betable.com</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+
+      <article>
+        <h3>Thank you</h1>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+<p class="link"><a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a></p><p class="link"><a href="#ZgotmplZ" target="_blank"><a href="http://rcrowley.org/talks/agile-2013.html" target="_blank">rcrowley.org/talks/agile-2013.html</a></a></p><p class="link"><a href="http://twitter.com/rcrowley" target="_blank">@rcrowley</a></p>
+          </div>
+        
+      </article>
+
+  </body>
+  
+</html>

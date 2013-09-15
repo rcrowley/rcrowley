@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Help me decide what C code to write &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/09/16/help-me-decide-what-c-code-to-write">Help me decide what C code to write</a> <small>2007/09/16</small></h1>
+<p>The majority of my (awesomest ever) day job at <a href="http://flickr.com/">Flickr</a> is written in Javascript.&nbsp; I do write some C++ code for some of the trickier parts, but <code>wc</code> tells me more that only about a tenth of my code is C++.</p>
+<p>That tenth doesn't really do it for me, though.&nbsp; It isn't dirty and dangerous.&nbsp; Because of the Netscape Portable Runtime, it's actually rather tame.&nbsp; See, I spent college SEGFAULTing at least once a day.&nbsp; In my nearly three months at Flickr, I've managed to do so only twice.</p>
+<p>Fear not -- I have a way to get my fix.&nbsp; I'm intrigued by <a href="http://fuse.sourceforge.net/">FUSE</a> and started to think about the design of a Flickr filesystem.&nbsp; About 14 seconds after that I discovered Manish Rai Jain's <a href="http://manishrjain.googlepages.com/flickrfs">flickrfs</a> project.&nbsp; It is more complicated than I would have designed, but because of that it's incredibly powerful.&nbsp; Flickr isn't out as a possible project for a FUSE filesystem but I'd rather not step on his toes.&nbsp; Onward.</p>
+<p>The problem is, I'm short on imagination right now.&nbsp; I think the most powerful aspect of making non-filesystem data available as a filesystem is the huge set of possibilities that open up when you start chaining standard UNIX commands.</p>
+<p>Do any C-shy webdev types want anything else out of their filesystem?</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(2)</small></h1>
+<ol>
+	<li>
+		<p>opsdbfs
+thanks</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2007/09/19 9:20 am</p>
+	</li>
+
+	<li>
+		<p>HTMLfs ? Elements are directories, text nodes and attributes are files, javascript functions are executable scripts?</p>
+<p>Not practical at all, but it'd be fun. :-)</p>
+		<p>&mdash; <a href="http://www.yeti-factory.org">netshade</a> &mdash; 2007/09/21 7:37 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/566979c4c4cda4104ee5c5b6e30126e7?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

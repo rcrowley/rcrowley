@@ -1,0 +1,892 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title></title>
+
+  <link rel="stylesheet" href="./css/reset.css" type="text/css"/>
+  <link rel="stylesheet" href="./css/showoff.css" type="text/css"/>
+
+  <script type="text/javascript" src="./js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="./js/jquery.cycle.all.js"></script>
+	<script type="text/javascript" src="./js/jquery-print.js"></script>
+  <script type="text/javascript" src="./js/jquery.batchImageLoad.js"></script>
+
+  <script type="text/javascript" src="./js/jquery.doubletap-0.1.js"></script>
+
+  <script type="text/javascript" src="./js/fg.menu.js"></script>
+  <script type="text/javascript" src="./js/showoff.js"></script>
+  <script type="text/javascript" src="./js/jTypeWriter.js"> </script>
+  <script type="text/javascript" src="./js/sh_main.min.js"></script>
+  <script type="text/javascript" src="./js/core.js"></script>
+  <script type="text/javascript" src="./js/showoffcore.js"></script>
+
+  <link type="text/css" href="./css/fg.menu.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/theme/ui.all.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/sh_style.css" rel="stylesheet" >
+
+  
+    <link rel="stylesheet" href="file/helfuckingvetica.css" type="text/css"/>
+  
+
+  
+    <script type="text/javascript" src="file/centerdammit.js"></script>
+  
+
+  <script type="text/javascript">
+  $(function(){
+    setupPreso(false, '.');
+  });
+  </script>
+</head>
+
+<body>
+
+
+<a tabindex="0" href="#search-engines" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="navmenu"><span class="ui-icon ui-icon-triangle-1-s"></span>slides</a>
+<div id="navigation" class="hidden"></div>
+
+<div id="help">
+  <table>
+    <tr><td class="key">space, &rarr;</td><td>next slide</td></tr>
+    <tr><td class="key">&larr;</td><td>previous slide</td></tr>
+    <tr><td class="key">d</td><td>debug mode</td></tr>
+    <tr><td class="key">## &lt;ret&gt;</td><td>go to slide #</td></tr>
+    <tr><td class="key">c</td><td>table of contents (vi)</td></tr>
+    <tr><td class="key">f</td><td>toggle footer</td></tr>
+    <tr><td class="key">r</td><td>reload slides</td></tr>
+    <tr><td class="key">z</td><td>toggle help (this)</td></tr>
+  </table>
+</div>
+
+<div id="preso">loading presentation...</div>
+<div id="footer">
+  <span id="slideInfo"></span>
+  <span id="debugInfo"></span>
+</div>
+
+<div id="slides" class="offscreen" style="display:none;">
+<div class="slide" data-transition="none"><div class="content" ref="./slides/1">
+<h1>Securing and Extending Puppet for World Domination</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/2">
+<h1>Hi, I&#x2019;m Richard Crowley</h1>
+
+<ul>
+<li>Equal opportunity technology hater</li>
+<li>DevStructure&#x2019;s operator and UNIX hacker</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/3">
+<h1>Configuration management<br/>Cliff&#x2019;s Notes</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/4">
+<p class="notes">Your infrastructure is never an immutable black box.  It is one step in a long iteration.</p>
+
+<h1>Infrastructure is code</h1>
+
+<ul>
+<li>You can reason about code in ways you can&#x2019;t about a tarball or AMI.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/5">
+<p class="notes">Just as you don't have to think about capacitors to microwave your burrito, you don't have to think about the intermediate steps to know how you want your server to be.</p>
+
+<h1>Declare state,<br/>not process</h1>
+
+<ul>
+<li>More precise.  Less verbose.</li>
+<li>The state of a server is easier to unambiguously describe.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/6">
+<h1>Why manage configuration?</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/7">
+<p class="notes">Talk about choosing the right tool for the right job.  For example, scripting <code>./configure &amp;&amp; make &amp;&amp; make install</code> in Puppet is a good sign you should build a package.</p>
+
+<h1>An interlude on<br/>package management</h1>
+
+<ul>
+<li>Configuration management is the<br/>centralized authority<br/>to a package manager&#x2019;s<br/>local authority.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/8">
+<p class="notes"><code>~/bin/doit5</code> may never work again.  It's a good thing that the Puppet language is not itself Ruby but I'm not here to start a holy war.  Limits in configuration management serve the same purpose as in a templating language: they enforce separation of concerns.  In this case, the limits separate process from desired state.</p>
+
+<h1>Puppet, Chef,<br/>and <code>~/bin/doit5</code></h1>
+
+<ul>
+<li>Limits are good.</li>
+<li>Puppet and Chef are idempotent by default.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/9">
+<p class="notes">Puppet and Chef work basically the same way from this altitude.</p>
+
+<h1>Architecture</h1>
+
+<ul>
+<li>Master knows best.</li>
+<li>Agents phone home.</li>
+<li>Hostname matching.</li>
+<li>Resources.</li>
+<li>Agents make it so.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/10">
+<h1>Resources</h1>
+
+<p class="notes">Puppet and Chef again work the same way here.  The single difference is in the granularity of dependency declarations.  Puppet's are at the resource level.  Chef's are at the cookbook (module) level.</p>
+
+<h2>The smallest unit of configuration.</h2>
+
+<pre><code>package { "foo": ensure =&gt; "0.0.0" }
+
+file { "/etc/foo.conf":
+    content =&gt; template("foo.conf.erb"),
+    owner   =&gt; "foo",
+    mode    =&gt; "600",
+    ensure  =&gt; file,
+}
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/11">
+<p class="notes">Be wary of using <code>latest</code> on packages you don't build in-house.</p>
+
+<h1>Classes and definitions</h1>
+
+<h2>Compose resources in interesting ways.</h2>
+
+<pre><code>class bar {
+    exec { "apt-get update": }
+    package { "bar":
+        require =&gt; Exec["apt-get update"],
+        ensure  =&gt; latest,
+    }
+    file { "/etc/bar.conf":
+        content =&gt; template("bar.conf.erb"),
+        ensure  =&gt; file,
+    }
+}
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/12">
+<h1>A basic configuration<br/>for Puppet itself</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/13">
+<p class="notes">The defaults are good except for a few places that break filesystem standards, which I choose to fix.  <code>pluginsync</code> will be important later.  You can customize the master and agents separately using <code>[master]</code> and <code>[agent]</code> sections, INI-style.</p>
+
+<h1><code>/etc/puppet/puppet.conf</code></h1>
+
+<pre><code>[main]
+    logdir=/var/log/puppet
+    rundir=/var/run/puppet
+    ssldir=$vardir/ssl
+    pluginsync=true
+    server=puppetmaster.example.com
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/14">
+<p class="notes">This should exist on the master, too.  There's a minor memory hit to running <code>puppet agent</code> as a daemon but that makes a huge difference to DevStructure users with sometimes just 256 MB of RAM.  This cron calls <code>bash</code>, not <code>sh</code> to use <code>$RANDOM</code> which in effect prevents the thundering herd from taking down your Puppet master every half hour.  This is a good time to point out the obvious - that not all your servers will always be the same - plan accordingly.</p>
+
+<h1><code>/etc/cron.d/puppet</code></h1>
+
+<pre><code>PATH="/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Remove the line breaks.
+*/30 * * * * root bash -c '
+    sleep $(($RANDOM \% 1800));
+    puppet agent --certname=$(cat
+    /etc/puppet/certname)
+    --no-daemonize --onetime'
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/15">
+<h1>(R)TFM</h1>
+
+<ul>
+<li><code>puppet --genconfig</code></li>
+<li><a href="http://bit.ly/puppet-config-ref">http://bit.ly/puppet-config-ref</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/16">
+<h1>Hello, world!</h1>
+
+<ul>
+<li>Entire thing in <code>/etc/puppet</code></li>
+<li>Entrypoint is <code>manifests/site.pp</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/17">
+<h1>Hello, <code>manifests/site.pp</code>!</h1>
+
+<pre><code>import "nodes"
+
+Exec {
+    path =&gt; "/usr/sbin:/usr/bin:/sbin:/bin",
+}
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/18">
+<p class="notes">Node and class names may collide.  "default" is special so I use "base" as my most general class name.</p>
+
+<h1>Hello, <code>manifests/nodes.pp</code>!</h1>
+
+<pre><code>node default { include base }
+
+node www inherits default { include www }
+
+node 'staging.example.com' inherits www {}
+node /\.www\.example\.com$/ inherits www {}
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/19">
+<h1>Hello, <code>base</code>!</h1>
+
+<h2><code>modules/base/manifests/init.pp</code></h2>
+
+<pre><code>class base {
+    package {
+        "dnsutils": ensure =&gt; latest;
+        "psmisc": ensure =&gt; latest;
+        "strace": ensure =&gt; latest;
+        "sysstat": ensure =&gt; latest;
+        "telnet": ensure =&gt; latest;
+    }
+}
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/20">
+<h1>Hello, <code>www</code>!</h1>
+
+<h2><code>modules/www/manifests/init.pp</code></h2>
+
+<pre><code>class www {
+    package { "nginx":
+        ensure =&gt; "0.7.65-1ubuntu2",
+    }
+}
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/21">
+<h1>Get yours</h1>
+
+<ul>
+<li><a href="http://bit.ly/devstructure-puppet-agent">http://bit.ly/devstructure-puppet-agent</a></li>
+<li><a href="http://bit.ly/devstructure-puppet-master">http://bit.ly/devstructure-puppet-master</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/22">
+<h1>Security</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/23">
+<h1>SSL Cliff&#x2019;s Notes</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/24">
+<h1>SSL handshake</h1>
+
+<ul>
+<li>Server certificate authenticates<br/>server to client.</li>
+<li>Clients may verify a server&#x2019;s certificate against trusted certificate authority.</li>
+<li>Client and server compute matching<br/>secret keys.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/25">
+<h1>Client certificates</h1>
+
+<ul>
+<li>Client certificate authenticates<br/>client to server.</li>
+<li>Not used by browsers.</li>
+<li>Used by Puppet because you can&#x2019;t lie here.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/26">
+<h1>SSL in Puppet</h1>
+
+<ul>
+<li><code>/var/lib/puppet/ssl</code> on agents.</li>
+<li><code>puppet cert</code> on master.</li>
+<li><a href="http://bit.ly/puppet-security-ref">http://bit.ly/puppet-security-ref</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/27">
+<h1>A tour of secondary Puppet config files</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/28">
+<h1><code>autosign.conf</code></h1>
+
+<pre><code>foo.example.com
+*.www.example.com
+*
+</code></pre>
+
+<ul>
+<li>A bad idea when there are untrusted clients.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/29">
+<h1><code>auth.conf</code></h1>
+
+<pre><code>path ~ ^/catalog/([^/]+)$
+method find
+allow $1
+</code></pre>
+
+<ul>
+<li>Safe by default.  Easy to mistakenly open.</li>
+<li><a href="http://bit.ly/puppet-security-ref">http://bit.ly/puppet-security-ref</a></li>
+<li><a href="http://bit.ly/puppet-rest-ref">http://bit.ly/puppet-rest-ref</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/30">
+<h1><code>fileserver.conf</code></h1>
+
+<pre><code>[modulename]
+    path /foo/bar/baz
+    allow *
+</code></pre>
+
+<ul>
+<li>Usually certificates have to be signed.</li>
+<li><a href="http://bit.ly/puppet-fileserver-ref">http://bit.ly/puppet-fileserver-ref</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/31">
+<h1>Why to lie to Puppet</h1>
+
+<h2>Gather compromising information about other servers</h2>
+
+<ul>
+<li><code>iptables</code> rules.</li>
+<li>Database passwords.</li>
+<li>SSH private keys.</li>
+<li><code>/etc/passwd</code> entries.</li>
+<li>AWS credentials.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/32">
+<h1>How to lie to Puppet</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/33">
+<h1>How to lie to Puppet</h1>
+
+<ul>
+<li>Maybe they&#x2019;re <code>autosign</code>ing?</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/34">
+<h1>How to lie to Puppet</h1>
+
+<h2>Sneak through regex <code>node</code> definitions.</h2>
+
+<pre><code>[agent]
+    certname=foo.www.example.com
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/35">
+<h1>How to lie to Puppet</h1>
+
+<h2>Unmatched names fall back to <code>default</code>.</h2>
+
+<pre><code>[agent]
+    certname=adhadgsdhsfsdhxcb.example.com
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/36">
+<h1>How to lie to Puppet</h1>
+
+<h2><code>autosign</code> disabled?  Try social engineering.</h2>
+
+<pre><code>[agent]
+    certname=admin0.example.com
+    # certname=dev.example.com
+    # certname=test.example.com
+    # certname=corp.example.com
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/37">
+<h1>How to lie to Puppet</h1>
+
+<h2>With a signed certificate, snoop for other catalogs.</h2>
+
+<pre><code>export ssldir=/var/lib/puppet/ssl
+export server=puppetmaster.example.com
+
+curl --insecure \
+    --cert $ssldir/certs/$CERTNAME.pem \
+    --key $ssldir/private_keys/$CERTNAME.pem \
+    --cacert $ssldir/ca/ca_crt.pem \
+    https://$server:8140/$ENV/catalog/db1.example.com
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/38">
+<p class="notes">If you do have a signed certificate, you can snoop around using it, too.</p>
+
+<h1>How to lie to Puppet</h1>
+
+<h2>Snoop around an open file server,<br/>no certificates needed.</h2>
+
+<pre><code>export server=puppetmaster.example.com
+
+curl --insecure \
+    https://$server:8140/$ENV/file_content/$MODULE/$FILE
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/39">
+<h1>How to safely not care</h1>
+
+<ul>
+<li>Don&#x2019;t autosign anything, ever.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/40">
+<h1>How to safely not care</h1>
+
+<ul>
+<li><del>Don&#x2019;t autosign anything, ever.</del></li>
+<li>Understand and protect the network.</li>
+<li>Remove special cases.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/41">
+<h1>The network</h1>
+
+<ul>
+<li>Understand who can contact your<br/>Puppet master.</li>
+<li>Private networks may be shared.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/42">
+<h1><code>iptables</code></h1>
+
+<pre class="sh_sh"><code>iptables -P INPUT ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD ACCEPT
+
+iptables -F
+
+iptables -A INPUT -m conntrack \
+    --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+iptables -A INPUT -i eth1 -p tcp \
+    -s 10.47.0.0/16 --dport 8140 -j ACCEPT
+iptables -A INPUT -i eth1 -p udp \
+    -s 10.47.0.0/16 --dport 8140 -j ACCEPT
+
+iptables -A INPUT -i lo -j ACCEPT
+
+iptables -A INPUT -j DROP</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/43">
+<h1><code>stunnel</code></h1>
+
+<ul>
+<li>(Not specific to Puppet.)</li>
+<li>If it&#x2019;s on the Internet,<br/>it&#x2019;s either public or encrypted.</li>
+<li>Example: use <code>stunnel</code>(8)<br/>to make <code>$NoSQL</code> SSL-aware.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/44">
+<h1><code>stunnel</code> Upstart config</h1>
+
+<pre class="sh_sh"><code>description "stunnel-redis-client"
+start on runlevel [2345]
+stop on runlevel [!2345]
+respawn
+exec /usr/bin/stunnel -f -c -d localhost:6379 \
+    -r redis.example.com:6381
+
+description "stunnel-redis-server"
+start on runlevel [2345]
+stop on runlevel [!2345]
+respawn
+exec /usr/bin/stunnel -f -d 6381 -r localhost:6382</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/45">
+<h1>Special cases<br/>aren&#x2019;t that special</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/46">
+<p class="notes">Hostname-specific file paths can mitigate this risk.  Leak example: malicious server grabbing the database config or secrets file.</p>
+
+<h1>Use templates</h1>
+
+<pre>
+file { "/foo/bar/baz":
+    <del>source  =&gt; "puppet://foo/bar/baz",</del>
+    content =&gt; template("foo/bar/baz"),
+    ensure  =&gt; file,
+}
+</pre>
+
+
+<ul>
+<li>File and catalog serving use different ACLs.</li>
+<li>Template content is included in the catalog so they inherit the catalog&#x2019;s ACL.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/47">
+<h1>Use only the <code>default</code> node</h1>
+
+<ul>
+<li>Mitigate the consequences of<br/>successful <code>certname</code> speculation.</li>
+<li>Use <code>--config</code>, <code>--manifestdir</code>, or <code>--manifest</code> to run different masters listening<br/>on different interfaces/ports.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/48">
+<h1>Extending Puppet</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/49">
+<h1>Maybe don&#x2019;t</h1>
+
+<pre><code>$extlookup_datadir = "/etc/puppet/extdata"
+$extlookup_precedence = [
+    "%{fqdn}", "%{domain}", "base"]
+
+file { "/foo/bar/baz":
+    content =&gt; extlookup("foobarbaz"),
+    ensure  =&gt; file,
+}
+</code></pre>
+
+<ul>
+<li><code>extlookup</code> function can retrieve data from external CSV files.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/50">
+<h1>Then again, maybe<br/>extend Puppet</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/51">
+<h1>Where does<br/>your code run?</h1>
+
+<ul>
+<li>External node classifier runs on master.</li>
+<li>Plugins run on agents.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/52">
+<h1>Example task</h1>
+
+<ul>
+<li>Authorize an SSH key unique to each host.</li>
+<li>(This is by no means impossible in the Puppet language.)</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/53">
+<h1>External node classifier</h1>
+
+<ul>
+<li>Run your own code on the master.</li>
+<li>Make decisions based on<br/>more than just the hostname.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/54">
+<h1>Configuring an external node classifier</h1>
+
+<pre><code>[master]
+    external_nodes=/usr/local/bin/classifier
+    node_terminus=exec
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/55">
+<h1>Input</h1>
+
+<ul>
+<li>Hostname...</li>
+<li>...which maps to facts.</li>
+</ul>
+
+
+<br/>
+
+
+<br/>
+
+
+<pre>
+/usr/local/bin/classifier foo.example.com
+
+# Facts are available as YAML in
+# $vardir/yaml/facts/foo.example.com.yaml
+</pre>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/56">
+<h1>Facts?</h1>
+
+<h2>Key value pairs describing<br/>the server in question.</h2>
+
+<pre><code>--- !ruby/object:Puppet::Node::Facts
+  expiration: 2010-09-20 20:27:14.445807
+  name: &amp;id003 foo.example.com
+  values:
+    hardwaremodel: &amp;id002 x86_64
+    kernelrelease: 2.6.35.1-rscloud
+    selinux: "false"
+    sshrsakey: OH HAI
+</code></pre>
+
+<ul>
+<li>Lots more: <code>facter | less</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/57">
+<h1>Output</h1>
+
+<pre><code>---
+classes:
+  - base
+  - www
+environment: production
+parameters:
+  mail_server: mail.example.com
+</code></pre>
+
+<ul>
+<li>Classes, variables.  No resources.  YAML.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/58">
+<h1>Example external node classifier</h1>
+
+<pre class="sh_sh"><code>#!/bin/sh
+set -e
+TMP=$(mktemp -d "$1.XXXXXXXXXX")
+ssh-keygen -q -f "$TMP/id_rsa" -b 2048 -N ""
+zomg_post_to_the_api "$1" "$(cat "$TMP/id_rsa")"
+cat &lt;&lt;EOF
+---
+classes:
+  - ssh
+parameters:
+  public_key: $(cat "$TMP/id_rsa.pub")
+EOF</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/59">
+<h1>Example Puppet class</h1>
+
+<pre><code>class ssh {
+    file {
+        "/root/.ssh":
+            mode   =&gt; "700",
+            ensure =&gt; directory;
+        "/root/.ssh/authorized_keys":
+            content =&gt; "$public_key\n",
+            ensure  =&gt; file;
+    }
+}
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/60">
+<h1>Puppet plugins</h1>
+
+<ul>
+<li>Because sometimes Puppet won&#x2019;t let you.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/61">
+<h1>The easy way</h1>
+
+<ul>
+<li>&#x201C;It&#x2019;s just Ruby.&#x201D;</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/62">
+<h1>The orderly way</h1>
+
+<ul>
+<li>Gather the necessary data.</li>
+<li>Build a Puppet catalog complete with dependency declarations.</li>
+<li>Apply the catalog.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/63">
+<h1>Plugin file structure</h1>
+
+<pre>
+modules/ssh/
+    manifests/
+        <strong>init.pp</strong>
+    lib/puppet/
+        type/
+            <strong>keygen.rb</strong>
+        provider/<strong>keygen</strong>/
+            <strong>posix.rb</strong>
+</pre>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/64">
+<h1>Types versus providers</h1>
+
+<ul>
+<li>A <code>package</code> is a type.<br/><code>apt</code> is a provider of packages.</li>
+<li>Types parse and normalize arguments.<br/>Providers make it so.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/65">
+<h1>Manifest</h1>
+
+<pre><code>class ssh {
+    keygen { "name-it-whatever": }
+}
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/66">
+<h1>Type</h1>
+
+<pre class="sh_ruby"><code>require 'puppet/type'
+Puppet::Type.newtype(:keygen) do
+  @doc = "ssh-keygen example"
+  newparam(:whatever, :namevar =&gt; true) do
+    desc "Name it whatever."
+  end
+  ensurable do
+    self.defaultvalues
+    defaultto :present
+  end
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/67">
+<h1>Provider</h1>
+
+<pre class="sh_ruby"><code>require 'openssl'
+require 'puppet/resource'
+require 'puppet/resource/catalog'
+
+Puppet::Type.type(:keygen).
+  provide(:posix) do
+
+  desc "ssh-keygen example for POSIX"
+  defaultfor :operatingsystem =&gt; :debian
+
+  # Define exists?, create, and destroy.
+
+end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/68">
+<pre class="sh_ruby"><code>  def exists?
+    File.exists?(
+      "/root/.ssh/authorized_keys")
+  end
+
+  def destroy
+    Puppet.warning "No turning back."
+    raise NotImplementedError
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/69">
+<pre class="sh_ruby"><code>  def create
+    key = OpenSSL::PKey::RSA.generate(2048)
+    zomg_post_to_the_api \
+      Facter.value(:certname), key
+    catalog = Puppet::Resource::Catalog.new
+    catalog.create_resource(:file,
+      :path =&gt; "/root/.ssh",
+      :mode =&gt; "700",
+      :ensure =&gt; :directory
+    )
+    catalog.create_resource(:file,
+      :path =&gt; "/root/.ssh/authorized_keys",
+      :content =&gt; "#{key.public_key}\n",
+      :ensure =&gt; :file
+    )
+    catalog.apply
+  end</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/70">
+<h1>Which is right?<br/>Easy or orderly?</h1>
+
+<ul>
+<li>That&#x2019;s an exercise for the reader.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/71">
+<h1>Extending Puppet</h1>
+
+<h2>(One more thing.)</h2></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/72">
+<h1>Rack middleware</h1>
+
+<ul>
+<li>Puppet master is Rack application.</li>
+<li>Rack allows pre- and post- processing.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/73">
+<h1><code>config.ru</code></h1>
+
+<pre class="sh_ruby"><code>$0 = "master"
+ARGV &lt;&lt; "--rack"
+ARGV &lt;&lt; "--certname=#{
+  File.read("/etc/puppet/certname").chomp}"
+
+require 'puppet/application/master'
+
+# TODO Middleware.
+
+run Puppet::Application[:master].run</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/74">
+<h1>No-op middleware</h1>
+
+<pre class="sh_ruby"><code>require 'base64'
+require 'json'
+require 'rack/utils'
+require 'yaml'
+require 'zlib'
+
+class StuckInTheMiddleWithYou
+
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    # TODO Preprocessing.
+    status, headers, body = @app.call(env)
+    # TODO Postprocessing.
+    [status, headers, body]
+  end
+
+end
+
+use StuckInTheMiddleWithYou</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/75">
+<h1>Preprocessing</h1>
+
+<pre class="sh_ruby"><code>    params = Rack::Utils.parse_query(env["QUERY_STRING"], "&amp;")
+    facts = case params["facts_format"]
+    when "b64_zlib_yaml"
+      YAML.load(Zlib::Inflate.inflate(Base64.decode64(
+        Rack::Utils.unescape(params["facts"]))))
+    end
+
+    # Change facts.
+    if Puppet::Node::Facts === facts
+      facts.values["foo"] = "bar"
+    end
+
+    params["facts"] = case params["facts_format"]
+    when "b64_zlib_yaml"
+      Rack::Utils.escape(Base64.encode64(Zlib::Deflate.deflate(
+        YAML.dump(facts), Zlib::BEST_COMPRESSION)))
+    end if facts
+    env["QUERY_STRING"] = Rack::Utils.build_query(params)
+    env["REQUEST_URI"] =
+      "#{env["PATH_INFO"]}?#{env["QUERY_STRING"]}"</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/76">
+<h1>Postprocessing</h1>
+
+<pre class="sh_ruby"><code>    object = case headers["Content-Type"]
+    when /[\/-]pson$/ then JSON.parse(body.body.join)
+    when /[\/-]yaml$/ then YAML.load(body.body.join)
+    when "text/marshal" then Marshal.load(body.body.join)
+    else body.body.join
+    end
+
+    # Change catalog.
+    if Hash === object &amp;&amp; "Catalog" == object["document_type"]
+      object["data"]["resources"].unshift({
+        "exported" =&gt; false,
+        "title" =&gt; "apt-get update",
+        "parameters" =&gt; {"path"=&gt;"/usr/sbin:/usr/bin:/sbin:/bin"},
+        "type" =&gt; "Exec",
+      })
+    end
+
+    body = case headers["Content-Type"]
+    when /[\/-]pson$/ then [JSON.generate(object)]
+    when /[\/-]yaml$/ then [YAML.dump(object)]
+    when "text/marshal" then [Marshal.dump(object)]
+    else [object]
+    end
+    headers["Content-Length"] = Rack::Utils.bytesize(body.first)</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/77">
+<p class="notes">Mention this is a last resort and that I've fixed bugs in Puppet itself via this method.</p>
+
+<h1>Rack middleware</h1>
+
+<ul>
+<li>Drink responsibly.</li>
+<li><a href="http://gist.github.com/602922">http://gist.github.com/602922</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/78">
+<h1>Thank you</h1>
+
+<ul>
+<li><a href="mailto:richard@devstructure.com">richard@devstructure.com</a> or <a href="http://twitter.com/rcrowley">@rcrowley</a></li>
+<li><a href="http://rcrowley.org/talks/strange-loop-2010">http://rcrowley.org/talks/strange-loop-2010</a></li>
+<li>P.S. use DevStructure.</li>
+</ul>
+</div>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Please don't X-UA-Compatible me like that &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/01/22/please-dont-x-ua-compatible-me-like-that">Please don't X-UA-Compatible me like that</a> <small>2008/01/22</small></h1>
+<p>The echosphere is making quite a stink about Microsoft's proposed X-UA-Compatible header to explicitly match HTML pages to rendering engines.&nbsp; There are two possible outcomes, assuming Microsoft goes ahead and implements this HTTP disaster.&nbsp; More likely is that we will be roughly where we are now, with special cases to make IE do what we want and other browsers just working reasonably correctly by themselves.&nbsp; Less likely is that the Redmond dream will be realized and every browser will become a time capsule of rendering engines ready to happily consume whatever 1997 garbage you can throw at it.&nbsp; Oh yeah, if you add the header to all of those ancient pages.</p>
+<p>For maximum effect, X-UA-Compatible requires the support of the other browser vendors, otherwise it is just another Microsoft hack with a pretty mask on (read: no regular expressions).&nbsp; (<em>Aside: The ideal solution to problems like the old broken box model would have been to fix it immediately instead of six years later.&nbsp; I can't help but think that X-UA-Compatible would never have been proposed had that bug not persisted for so long.</em>)  In this best-case scenario the cynic in me still sees ignorant developers either omitting this header or setting it only for IE, leaving other browsers to do ..&nbsp; something.&nbsp; If the header is set for all of the major vendors (and we'll just assume that those major vendors will still be the only major vendors down the road) then I must admit, browser bloat is the biggest concern we have.&nbsp; I for one don't want my Firefox to get any bigger.&nbsp; Just imagine the new and exciting memory leaks!</p>
+<p>In the (I think) more likely case of Microsoft pushing ahead with this feature alone then developers have the slight advantage of being able to code to one version of IE instead of several, in addition to Firefox/Webkit/Opera.&nbsp; This may prove to be useful in fixing those sites that IE7 broke.&nbsp; But seriously, why haven't those already been fixed?</p>
+<p>Ultimately, it all comes down to what browsers do if that header isn't sent or they aren't paying attention to it at all.&nbsp; It sounds like Microsoft is content to leave everything its IE7 state forever unless told otherwise but I doubt anyone else will be keene on the idea.&nbsp; Microsoft is a much bigger fan of backwards-compatibility than Apple (think Classic Mode) or Mozilla (each new version of Firefox breaks all of my extensions) so I expect to see these others defaulting to their cutting-edge browser unless told to retard themselves.&nbsp; This most-important point of the whole feature is summed up best by Jeremy Keith, <big>"Unless you explicitly declare that you want IE8 to behave as IE8, it will behave as IE7."</big>  I'm a desktop software developer by day and wish I could say to Windows, "Make this app work just like an out-of-the-box Windows XP installation."  I can't because having such a ridiculous level of backwards-compatibility ultimately makes software too big and unwieldy &mdash; it hurts you in the long run.&nbsp; I hope, when framed in the desktop version that the insanity here shows through.</p>
+<p>My final thought on the matter is that the best thing Microsoft can do for the future is to push IE7 out to everyone.&nbsp; Like pulling off band-aids, it's best to do these things fast and deal with the consequences all together.&nbsp; Fixing the IE box model should not take seven years.&nbsp; Get it over with and move forward without the hacks.</p>
+<p><h4>Elsewhere:</h4>
+<ul>
+	<li><a href="http://alistapart.com/articles/fromswitchestotargets">A List Apart: Articles: From Switches to Targets: A Standardista's Journey</a></li>
+	<li><a href="http://www.quirksmode.org/blog/archives/2008/01/the_versioning.html">QuirksBlog: The versioning switch is not a browser detect</a></li>
+	<li><a href="http://adactio.com/journal/1402/">Adactio: Journal&mdash;Broken</a></li>
+	<li><a href="http://alistapart.com/articles/beyonddoctype">A List Apart: Articles: Beyond DOCTYPE: Web Standards, Forward Compatibility, and IE8</a></li>
+</ul></p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(6)</small></h1>
+<ol>
+	<li>
+		<p>Clever title, clever diction within the post aimed probably at me and like 4 other people, and content I wholeheartedly agree with. What more could a boy ask for?</p>
+		<p>&mdash; <a href="http://mihasya.com">Mihasya</a> &mdash; 2008/01/22 8:08 pm</p>
+	</li>
+
+	<li>
+		<p>After thinking for 5 minutes this morning, I've decided this is a (semi-)good thing.&nbsp; Many companies won't upgrade IE because it breaks internal apps.&nbsp; If they could put a little header in the app and then be able to upgrade IE to the latest version, that will be to everyone's benefit.</p>
+<p>What I don't like is the defaulting to IE7 behavior.&nbsp; They aren't the only ones making this choice though.&nbsp; Perl 5.10 works like Perl 5.8 unless you say "use 5.010" (or various variants on that theme).&nbsp; Perl learned a lot of lessons migrating from 5.8 to 5.10 and came to the same conclusion as Microsoft has about defaulting to an old version.&nbsp; This catering to the ignorant/lazy is unfortunate, but necessary.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/01/23 5:42 am</p>
+	</li>
+
+	<li>
+		<p>@David,</p>
+<p>There's a difference between the Perl case and the rendering engine case. With Perl, in essence, the implementation is the specification. Excluding various edge cases and bugs, if your code compiles in Perl 5.8 it is valid Perl code. I think the Perl monks have a much stronger argument -- they have a responsibility not to break old (valid) code with a new release. When they realized that this was limiting their ability to continue developing the language (after 5.8 was released) they solved the problem by adding a feature to the language (use 5.010).</p>
+<p>This has already happened in HTML land. We're already specifying which version of HTML we want to use with DOCTYPE headers, and the default behavior (like with Perl) is to use a historical rendering engine if no DOCTYPE is provided. The problem is that Microsoft keeps releasing new crappy browsers that don't properly implement the standards. The result is that there's a lot of code out there that claims to be XHTML 1.0 Strict (for example) but isn't because it has a bunch of hacks and workarounds for IE.</p>
+<p>The reality is, by implementing this tag browser vendors would be encouraging developers to code to browser implementation instead of coding to the various specifications.</p>
+		<p>&mdash; <a href="http://immike.net">Mike Malone</a> &mdash; 2008/01/23 3:26 pm</p>
+	</li>
+
+	<li>
+		<p>@Mike: I'm not sure how this encourages people to code to browser implementation any more than IE shipping with broken standards support encourages people to code to browser implementation.&nbsp; If you say you want to have A-grade support for IE, you end up coding in the end for their implementation.&nbsp; (I guess there's a difference with people who start and end in IE, which is what I would define as coding for browser implementation, but I don't see how this encourages that).</p>
+<p>I actually think this will decrease the complexity of hacking IE in some ways.&nbsp; Before this, when IE8 would be released, you'd have to have browser conditionals for people still on IE7 and conditionals for people on IE8.&nbsp; What this will allow is you leave the IE7 conditionals until IE8 is sufficiently adopted that you can switch from IE7 to IE8 conditionals.&nbsp; In the end, if I was still a web developer, this makes my life much, much easier (and if I'm a designer, I don't get calls from old clients when my forward-compatible, standards-compliant site breaks because IE8 introduced a new bug).</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/01/23 9:58 pm</p>
+	</li>
+
+	<li>
+		<p>btw. my true feelings on this issue is that I'm glad I now write code that just runs on an IBM Blue Gene, because that doesn't have all the same issues as the internet.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/01/23 10:03 pm</p>
+	</li>
+
+	<li>
+		<p>I agree with Mike. Why would you want to cater to different browser implementations, when there is specification written on how to write the code correctly?</p>
+<p>IE will slowly die out as people's scorn increases for Microsoft (I hope).</p>
+		<p>&mdash; <a href="http://www.andrewmager.com">Andrew Mager</a> &mdash; 2008/01/27 1:58 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/ecf2aca9b78c57889d71a24a7408225e?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Launching a localized XULRunner app &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/12/13/launching-a-localized-xulrunner-app">Launching a localized XULRunner app</a> <small>2007/12/13</small></h1>
+<p>The average XULRunner developer gets to choose at the beginning of any project whether to work with the 1.8 or 1.9 series.&nbsp; 1.8 gets you stability and heartache; 1.9 gets you trunk-y goodness and a sweet thread library.&nbsp; I'm of course simplifying things.</p>
+<p>Until yesterday the prospect of localizing XULRunner itself had not even crossed my mind.&nbsp; An error to be sure but one that was actually easily corrected.&nbsp; We at Flickr chose to work with the 1.9 branch to take advantage of the <a href="http://wiki.mozilla.org/XPCOM:nsIThreadManager">newly enjoyable thread library</a>.&nbsp; Working with these nightly builds was great as I was able to watch bugs die each time I pulled a new nightly.</p>
+<p>The trouble began when I started putting together final builds yesterday.&nbsp; Things like the Mozilla upgrade system, file picker dialog and standard OK/Cancel buttons were not localized because nightly builds come only in English.&nbsp; Bummer.&nbsp; <a href="http://lxr.mozilla.org/">LXR</a> came to my rescue, though.&nbsp; I was able to pull together my own localizations of XULRunner by scraping pieces from the Firefox 2 codebase.</p>
+<p>I am not sure what the lesson here is but with ample planning and testing, apps built on XULRunner trunk can be localized just like any other.&nbsp; It would be awesome if, in the future, trunk builds included the entire localization tree, which would allow my build process to just pick out the appropriate JAR file for each language (which is essentially what I do now).&nbsp; Look to the Flickr Uploadr source (more on that soon) for an example of how all this works.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(0)</small></h1>
+<ol>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/4306bd17b3c8b7da6e122ae5a66188f5?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Where's my car? &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/05/16/wheres-my-car">Where's my car?</a> <small>2008/05/16</small></h1>
+<p>I have a car and park on the street in San Francisco.&nbsp; This guarantees me a large quantity of parking tickets and hurried mornings racing the clock to move my car before the ticket arrives.&nbsp; No more!</p>
+<p><big><a href="http://car.rcrowley.org/">Where's my car?</a></big> keeps track of where your car is parked and sends email and SMS alerts when you need to move it for street cleaning.&nbsp; It works from your phone or web browser.&nbsp; It will save you money.</p>
+<p>Yes, this is San Francisco only right now.</p>
+<h2>This is magical, tell me more</h2>
+<p>The world is powered by screen scraping and this is no exception.&nbsp; I'm posting and scraping several pages in <a href="http://gispubweb.sfgov.org/website/sfviewer">San Francisco's GIS website</a>.&nbsp; It's a scary and ill-advised activity but it was worth it.</p>
+<p>Because the geoscraping is a pretty slow process, it is handled asynchronously.&nbsp; The first step is posting the address you enter, which is just a street number and street name, to SF GIS's "geocoder."  Whatever.&nbsp; I feel compelled to write it "geocoder" because the numbers returned are not even a little bit like latitude/longitude.&nbsp; Well, they're numbers but there end the similarities.</p>
+<p>After these magic numbers are found, I post again to scrape out the parking data, doing some assuming to remind the computer what side of the street you're on.&nbsp; The update form reminds you not to choose the corner address of any block because, despite my best efforts, SF GIS disobeys sometimes at the corner and returns parking data for the cross street.&nbsp; Sorry.</p>
+<p>The last step is deciding when the next street cleaning will take place, to setup email and SMS alerts.&nbsp; After much trial and error, I found all of the quirks in their expression of the street cleaning schedule and proceeded to walk around the calendar to find the next one.&nbsp; The algorithm goes like this: decide from the list of calendar days in the SF GIS text which comes next, then take that day and the time immediately following it to create a timestamp.</p>
+<h2>Timestamp?&nbsp; But you're only using the day part?</h2>
+<p>That's right but who knows what the future holds.&nbsp; Alerts one hour before might be nice and since I've already got a real timestamp, very easy.</p>
+<p>There are tons of other possibliities, too.&nbsp; From showing a map tile of your car's location for the spatially-challenged to a bona-fide API (mostly so I can play with OAuth from the provider side) for, you know, both of the things you can do on this site.</p>
+<p>PS: When you see street cleaning data that is inaccurate, please click the "Report as inaccurate" link.&nbsp; It emails me directly so I can go to the GIS and figure out what went wrong.&nbsp; I've not exhaustively tested it across the city.&nbsp; It does work well in the Marina and the Mission.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(6)</small></h1>
+<ol>
+	<li>
+		<p>That's awesome.&nbsp; Before I had a garage this definitely would have been a huge help.</p>
+<p>Why is the post tagged 'oauth'?</p>
+		<p>&mdash; <a href="http://www.wesabe.com">Marc Hedlund</a> &mdash; 2008/05/17 6:48 am</p>
+	</li>
+
+	<li>
+		<p>Dude, where's my car?</p>
+<p>Where's you car, dude?</p>
+		<p>&mdash; <a href="http://www.mylesgrant.com/">Myles</a> &mdash; 2008/05/17 6:55 am</p>
+	</li>
+
+	<li>
+		<p>@Marc: for the future.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/05/17 7:20 am</p>
+	</li>
+
+	<li>
+		<p>Brilliant.</p>
+		<p>&mdash; <a href="http://www.emerose.com">Sam Quigley</a> &mdash; 2008/05/17 1:08 pm</p>
+	</li>
+
+	<li>
+		<p>this is brilliant!&nbsp; almost makes me want to have a car again. can I invest?</p>
+		<p>&mdash; <a href="http://halletecco.wordpress.com">halle</a> &mdash; 2008/06/05 4:23 pm</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; Richard Crowley&#8217;s &#8220;Where&#8217;s My Car&#8221; Application [...]</p>
+		<p>&mdash; <a href="http://sarahcpr.com/2008/06/05/hyperlocal-iphone-app/">sarahcpr &raquo; Blog Archive &raquo; Hyperlocal iPhone App</a> &mdash; 2008/06/05 6:13 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/a5f873bc09e199202581ba4c6d97f6fd?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

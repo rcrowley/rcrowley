@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Federated Graphite &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://rcrowley.org/index.xml" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+
+<article>
+<header>
+	<time datetime="2012-08-03" pubdate>2012-08-03</time>
+	<h1>Federated Graphite</h1>
+</header>
+<p>Graphite is a nearly undocumented thing of sweetness.  We at Betable collect, store, and graph many tens of thousands of metrics and we quickly reached the limits of a single-instance Graphite infrastructure.  That&#8217;s OK, though, because Graphite does actually support some pretty reasonable federated architectures if you know where to look.  Consider this your treasure map.</p>
+
+<p>Aside: <a href="https://gist.github.com/2311507">https://gist.github.com/2311507</a> is how I build Debian packages for Graphite which I deploy via <a href="https://github.com/rcrowley/freight">Freight</a>.</p>
+
+<h2>Firewalls</h2>
+
+<p>You probably already have your firewalls configured to allow your entire infrastructure to send metrics to Graphite on port 2003.  Your Graphite almost-cluster is going to need a bit more permission to communicate with itself.</p>
+
+<p>Open ports 2014, 2114, and so on as you need between all Graphite nodes.  These are how the <code>carbon-relay.py</code> instance on each Graphite node will communicate with the <code>carbon-cache.py</code> instance(s) on each Graphite node.</p>
+
+<p>Also open the port on which the web app listens to other Graphite nodes.  This is how the web apps will communicate with the other web apps.</p>
+
+<h2><code>carbon-cache.py</code></h2>
+
+<p>Each <code>carbon-cache.py</code> instance should listen on a non-loopback interface and on a port that&#8217;s open to the <code>carbon-relay.py</code>s.  I have found two instances of <code>carbon-cache.py</code> per Graphite node to be advantageous on the Rackspace Cloud (YMMV).  Their pickle receivers listen on 2014 for instance <code>a</code> and 2114 for instance <code>b</code> on each Graphite node.</p>
+
+<p>Each <code>carbon-cache.py</code> instance must have a name unique with respect to all <code>carbon-cache.py</code> instances on all Graphite nodes.  For example: <code>1.2.3.4:2014:a</code>, <code>1.2.3.4:2114:b</code>, <code>5.6.7.8:2014:c</code>, <code>5.6.7.8:2114:d</code>.  This isn&#8217;t obvious from the documentation or even from reading the code, so keep this in mind.</p>
+
+<h2>Whisper databases</h2>
+
+<p>I started the migration from one Graphite node to two by <code>rsync</code>ing all Betable&#8217;s Whisper databases from the old node to the new node.</p>
+
+<pre><code>rsync -avz --exclude=carbon graphite-ops.betable.com:/var/lib/graphite/whisper /var/lib/graphite/</code></pre>
+
+<p>The original plan (which is executed below) was to go back later and &#8220;garbage collect&#8221; the Whisper databases that didn&#8217;t belong after the Graphite cluster was up-and-running.  If you&#8217;re feeling adventurous, you should use <code>whisper-clean.py</code> from <a href="https://gist.github.com/3153844">https://gist.github.com/3153844</a> to choose which Whisper databases to <code>rsync</code> and delete up-front because a Whisper database on the local filesystem will be preferred over querying a remote <code>carbon-cache</code> instance.</p>
+
+<h2><code>carbon-relay.py</code></h2>
+
+<p>Each Graphite node should run a single <code>carbon-relay.py</code> instance.  It should listen on 2003 and 2004 so your senders don't have to be reconfigured.</p>
+
+<p>List all <code>carbon-cache.py</code> instances on all Graphite nodes in <code>DESTINATIONS</code> in <code>carbon.conf</code>, each with its <code>PICKLE_RECEIVER_INTERFACE</code>, <code>PICKLE_RECEIVER_PORT</code>, and instance name.  Sort the instances by their name.  This is what allows metrics to arrive at any Graphite node and be routed to the right Whisper database.</p>
+
+<p>To use consistent hashing or not to use consistent hashing?  That&#8217;s your own problem.  I use consistent hashing because I have better things to do than balance a Graphite cluster by hand.</p>
+
+<p>With this configuration, Graphite&#8217;s write path is federated between two nodes.  Its read path, however, appears to be missing half its data.</p>
+
+<h2>Web app</h2>
+
+<p>Each Graphite node should run the web app, even if you don&#8217;t plan to use it directly.</p>
+
+<p>Each web app should list the <strong>local</strong> <code>carbon-cache.py</code> instances in <code>CARBONLINK_HOSTS</code> each with its <code>CACHE_QUERY_INTERFACE</code>, <code>CACHE_QUERY_PORT</code>, and instance name.  Sort the instances by their name as before so the consistent hash ring works properly.  If you&#8217;re not using consistent hashing, sort the instances by their name to appease my OCD.</p>
+
+<p>Each web app should list the other web apps in <code>CLUSTER_SERVERS</code>, each with its address and port.  If a web app lists itself in <code>CLUSTER_SERVERS</code>, it&#8217;s gonna have a bad time.</p>
+
+<h2>Garbage collection</h2>
+
+<p>Once you&#8217;re satisfied with your Graphite cluster, it&#8217;s time to collect the garbage left by <code>rsync</code>ing all those Whisper files around.  <code>whisper-clean.py</code> from <a href="https://gist.github.com/3153844">https://gist.github.com/3153844</a> does exactly that.</p>
+
+<p>(Of course, the usual disclaimers about how this deletes data but is only known to work for me apply so tread lightly.)</p>
+
+<p>On <code>1.2.3.4</code>:</p>
+
+<pre><code>DJANGO_SETTINGS_MODULE="graphite.settings" python whisper-clean.py 1.2.3.4:a 1.2.3.4:b -5.6.7.8:c -5.6.7.8:d</code></pre>
+
+<p>On <code>5.6.7.8</code>:</p>
+
+<pre><code>DJANGO_SETTINGS_MODULE="graphite.settings" python whisper-clean.py -1.2.3.4:a -1.2.3.4:b 5.6.7.8:c 5.6.7.8:d</code></pre>
+
+<p>If you happen to have been smarter than I was with your <code>rsync</code>ing, this step probably won&#8217;t be necessary.</p>
+
+<h2>Configuration management</h2>
+
+<p>None of this configuration is done by hand.  We use Puppet but Chef works just fine.  I highly recommend using <a href="http://docs.puppetlabs.com/guides/exported_resources.html">Exported Resources</a>, <a href="https://github.com/rcrowley/puppet-related_nodes"><code>puppet-related_nodes</code></a>, or <a href="http://wiki.opscode.com/display/chef/Search">Chef Search</a> to keep the Graphite cluster aware of itself.</p>
+
+<p>Betable&#8217;s Graphite cluster learns its topology from <code>related_nodes</code> queries like</p>
+
+<pre><code>$carbonlink_hosts = related_nodes(Graphite::Carbon::Cache, true)
+$cluster_servers = related_nodes(Package["graphite"])
+$destinations = related_nodes(Graphite::Carbon::Cache, true)</code></pre>
+
+<p>that pick up Graphite nodes and the <code>graphite::carbon::cache</code> resources declared with each <code>node</code> stanza.  These enforce that instance names (<code>a</code>, <code>b</code>, <code>c</code>, <code>d</code>, etc.) are unique across the cluster.  Each <code>graphite::carbon::cache</code> resource generates a SysV-init script and a <code>service</code> resource that runs a <code>carbon-cache.py</code> instance.</p>
+
+<p>The <code>carbon.conf</code> and <code>local_settings.py</code> templates Puppet uses are in <a href="https://gist.github.com/3248921">https://gist.github.com/3248921</a>.</p>
+</article>
+
+<footer class="site">
+
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://pinboard.in/u:rcrowley">Pinboard</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2013 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-20973978-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</body>
+</html>
+

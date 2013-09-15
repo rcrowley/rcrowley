@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>q, r, s, t &mdash; Richard Crowley&#8216;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8216;s blog" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8216;s blog</a></h1></header>
+<article>
+<header>
+	<time datetime="2010-05-10" pubdate>2010-05-10</time>
+	<h1>q, r, s, t</h1>
+</header>
+<p>This has happened to me several times and I have never been able to reason or Google an answer.&nbsp; <a href="http://twitter.com/?status=@rcrowley+">@rcrowley</a> on Twitter or email <a href="mailto:r@rcrowley.org">r@rcrowley.org</a> if you know.  (I will not be adding comments to this blog.)</p>
+<p>I was in <code>vim</code>(1) and pressed some key combination that likely involved escape or keys near it that caused the &#8216;1&#8217; key to print &#8216;q&#8217;, the &#8216;2&#8217; key to print &#8216;r&#8217;, and so on.&nbsp; The &#8216;0&#8217; key printed &#8216;p&#8217;.&nbsp; The printed character was preceded by a newline.&nbsp; The cursor was placed in front of both characters.&nbsp; <code>vim</code> was otherwise fully functional and the problem happened while the screen indicated I was in insert mode.</p>
+<p>This occurred on a remote server, where I was logged in via SSH running within <code>bash</code>(1), running within <a href="http://iterm.sourceforge.net/">iTerm</a>, on OS X 10.5.&nbsp; The problem persisted through exiting and re-running <code>vim</code>, exiting my login shell and re-connecting via SSH, and completely exiting iTerm.</p>
+<p>Further, <code>vim</code> run directly under OS X began displaying the same problem.&nbsp; <code>nano</code>(1) did not print any characters when number keys were pressed.&nbsp; OS X GUI applications and <code>bash</code> itself were never affected.&nbsp; <code>vim</code> and <code>nano</code> running within Terminal.app were never affected.</p>
+<p>A full OS X reboot restored normal behavior both locally and remotely.</p>
+<p>Does anyone know what key combination I pressed?&nbsp; Is this is a bug or expected behavior?&nbsp; If this is a bug, which layer is buggy?</p>
+<p><strong>Update 2010-05-17</strong>: It happened again today and by some miracle I only had to restart <code>vi</code> to get back to business.</p>
+</article>
+<footer class="site">
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2010 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

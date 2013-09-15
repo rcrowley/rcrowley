@@ -1,0 +1,13 @@
+{% block content %}
+<article>
+<header>
+	<time datetime="2011-09-21" pubdate>2011-09-21</time>
+	<h1>{% block title %}Monads without pretension{% endblock %}</h1>
+</header>
+<p>The Strange Loop conference this week took a slight detour from its usual celebration of programming languages no one uses to really highlight Lisp in all its abstract glory.&nbsp; Suddenly, Scala seemed like the most mainstream topic of discussion and monads were everywhere except within the understanding of most attendees.</p>
+<p>I read <a href="http://homepages.inf.ed.ac.uk/wadler/topics/monads.html#essence">The Essence of Functional Programming</a> for the second or third time on the plane and am not a professor or language author so I'd like to take a stab at explaining monads to folks accustomed to imperative programming languages.</p>
+<p>This is not an exhaustive discussion of monads.&nbsp; This is what I consider to be the prerequisite material that no one bothered to cover in their talks.&nbsp; These are the three monad laws implemented and tested in Python.</p>
+<script src="https://gist.github.com/1232809.js"> </script>
+<p>Such contrived code has no place in a real Python application but now with monads solved your only problem is homoiconic syntax.&nbsp; To take monads to the next level, reimplement <code>M</code>, <code>unitM</code>, and <code>bindM</code> to encapsulate side effects (such as the primitive logging above), propagate error messages and statistics (both as demonstrated in the paper), or perhaps automatically memoize <code>k</code>.</p>
+</article>
+{% endblock %}

@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Deploying Django with Puppet</title>
+
+  <link rel="stylesheet" href=".css/reset.css" type="text/css"/>
+  <link rel="stylesheet" href=".css/showoff.css" type="text/css"/>
+
+  <script type="text/javascript" src=".js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src=".js/jquery.cycle.all.js"></script>
+	<script type="text/javascript" src=".js/jquery-print.js"></script>
+  <script type="text/javascript" src=".js/jquery.batchImageLoad.js"></script>
+
+  <script type="text/javascript" src=".js/jquery.doubletap-0.1.js"></script>
+
+  <script type="text/javascript" src=".js/fg.menu.js"></script>
+  <script type="text/javascript" src=".js/showoff.js"></script>
+  <script type="text/javascript" src=".js/jTypeWriter.js"> </script>
+  <script type="text/javascript" src=".js/sh_main.min.js"></script>
+  <script type="text/javascript" src=".js/core.js"></script>
+  <script type="text/javascript" src=".js/showoffcore.js"></script>
+
+  <link type="text/css" href=".css/fg.menu.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href=".css/theme/ui.all.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href=".css/sh_style.css" rel="stylesheet" >
+
+  
+    <link rel="stylesheet" href="file/helfuckingvetica.css" type="text/css"/>
+  
+
+  
+    <script type="text/javascript" src="file/centerdammit.js"></script>
+  
+    <script type="text/javascript" src="file/sh_puppet.js"></script>
+  
+
+  <script type="text/javascript">
+  $(function(){
+    setupPreso(false, '.');
+  });
+  </script>
+</head>
+
+<body>
+
+
+<a tabindex="0" href="#search-engines" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="navmenu"><span class="ui-icon ui-icon-triangle-1-s"></span>slides</a>
+<div id="navigation" class="hidden"></div>
+
+<div id="help">
+  <table>
+    <tr><td class="key">space, &rarr;</td><td>next slide</td></tr>
+    <tr><td class="key">&larr;</td><td>previous slide</td></tr>
+    <tr><td class="key">d</td><td>debug mode</td></tr>
+    <tr><td class="key">## &lt;ret&gt;</td><td>go to slide #</td></tr>
+    <tr><td class="key">c</td><td>table of contents (vi)</td></tr>
+    <tr><td class="key">f</td><td>toggle footer</td></tr>
+    <tr><td class="key">r</td><td>reload slides</td></tr>
+    <tr><td class="key">z</td><td>toggle help (this)</td></tr>
+  </table>
+</div>
+
+<div id="preso">loading presentation...</div>
+<div id="footer">
+  <span id="slideInfo"></span>
+  <span id="debugInfo"></span>
+</div>
+
+<div id="slides" class="offscreen" style="display:none;">
+<div class="slide" data-transition="none"><div class="content bullets" ref="./slides/1">
+<h1>Deploying Django with Puppet</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/2">
+<h1>Hi, I&#x2019;m Richard Crowley</h1>
+
+<ul>
+<li>Equal opportunity technology hater.</li>
+<li>DevStructure&#x2019;s operator and UNIX hacker.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/3">
+<h1>Installing Puppet</h1>
+
+<pre class="sh_sh"><code>apt-get install build-essential \
+    ruby ruby-dev rubygems
+
+gem install puppet puppet-pip</code></pre>
+
+<ul>
+<li><a href="https://github.com/rcrowley/puppet-pip">https://github.com/rcrowley/puppet-pip</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/4">
+<h1>But first, resources</h1>
+
+<ul>
+<li>The smallest unit of configuration.</li>
+<li>Have a <em>type</em>, a <em>name</em>, and <em>parameters</em>.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/5">
+<p class="notes">Even in Ubuntu Maverick, <code>pip</code> is out-of-date (0.7.2).</p>
+
+<h1>Bootstrap a Python environment</h1>
+
+<pre class="sh_puppet"><code>stage { "pre": before =&gt; Stage["main"] }
+class python {
+    package {
+        "build-essential": ensure =&gt; latest;
+        "python": ensure =&gt; "2.6.6-2ubuntu1";
+        "python-dev": ensure =&gt; "2.6.6-2ubuntu1";
+        "python-setuptools": ensure =&gt; installed;
+    }
+    exec { "easy_install pip":
+        path =&gt; "/usr/local/bin:/usr/bin:/bin",
+        refreshonly =&gt; true,
+        require =&gt; Package["python-setuptools"],
+        subscribe =&gt; Package["python-setuptools"],
+    }
+}
+class { "python": stage =&gt; "pre" }</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/6">
+<h1>Declare dependencies</h1>
+
+<pre class="sh_puppet"><code>package {
+    "django":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+    "mysql-python":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/7">
+<h1>A bug!</h1>
+
+<pre class="sh_puppet"><code>package {
+    "django":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+    "mysql-python":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/8">
+<h1>Declare <em>all</em> dependencies</h1>
+
+<pre class="sh_puppet"><code>package {
+    "django":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+    "libmysqlclient-dev":
+        ensure =&gt; "5.1.49-1ubuntu8.1";
+    "mysql-python":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/9">
+<h1>Nondeterminism!</h1>
+
+<pre class="sh_puppet"><code>package {
+    "django":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+    "libmysqlclient-dev":
+        ensure =&gt; "5.1.49-1ubuntu8.1";
+    "mysql-python":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/10">
+<h1>Declare interdependencies</h1>
+
+<pre class="sh_puppet"><code>package {
+    "django":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip;
+    "libmysqlclient-dev":
+        ensure =&gt; "5.1.49-1ubuntu8.1";
+    "mysql-python":
+        ensure =&gt; "1.2.3",
+        provider =&gt; pip,
+        require =&gt;
+            Package["libmysqlclient-dev"];
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/11">
+<h1>Why all the fuss?</h1>
+
+<ul>
+<li>Python packages are ignorant of<br/>lower-level dependencies.</li>
+<li>For example, <code>libmysqlclient-dev</code>.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/12">
+<h1>&#x201C;Deploy&#x201D; to dev</h1>
+
+<pre class="sh_sh"><code># As root!
+
+export GEMS="/var/lib/gems/1.8/gems"
+export RUBYLIB=$GEMS/"puppet-pip-0.0.1/lib"
+
+puppet apply deps.pp</code></pre>
+
+<ul>
+<li>You are developing on Linux, aren&#x2019;t you?</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/13">
+<h1>Deploy!</h1>
+
+<ul>
+<li>(For real.)</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/14">
+<h1>First, we&#x2019;ll need Fabric</h1>
+
+<pre class="sh_puppet"><code>package { "fabric":
+    ensure =&gt; "0.9.3",
+    provider =&gt; pip,
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/15">
+<h1>Deploy!</h1>
+
+<pre class="sh_python"><code>from fabric.api import *
+
+env.hosts = ['example.com']
+
+def puppet():
+    put('deps.pp', 'deps.pp')
+    sudo('RUBYLIB={0} puppet apply {1} deps.pp'.format(
+        '/var/lib/gems/1.8/gems/puppet-pip-0.0.1/lib',
+        '--templatedir=.',
+    ))</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/16">
+<h1>Deploy!</h1>
+
+<ul>
+<li><code>fab puppet</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/17">
+<h1>If dev is like production...</h1>
+
+<ul>
+<li>More can be automated.</li>
+<li>Less can vary.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/18">
+<h1>If you specify exact version numbers...</h1>
+
+<ul>
+<li>You won&#x2019;t suffer at the hands of someone else&#x2019;s lousy QA.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/19">
+<h1>Iterate</h1>
+
+<pre class="sh_puppet"><code>package { "south":
+    ensure =&gt; "0.7.2",
+    provider =&gt; pip,
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/20">
+<h1>Iterate</h1>
+
+<ul>
+<li><code>puppet apply deps.pp</code></li>
+<li><code>fab puppet</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/21">
+<h1>If make changes to the environment incrementally...</h1>
+
+<ul>
+<li>Failures will have a more obvious cause.</li>
+<li>Application features won't be blocked by environmental changes.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/22">
+<h1>We need a grown up server</h1>
+
+<pre class="sh_puppet"><code>package {
+    "apache2-mpm-worker":
+        ensure =&gt; "2.2.16-1ubuntu3";
+    "libapache2-mod-wsgi":
+        ensure =&gt; "3.2-2";
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/23">
+<h1>Config files</h1>
+
+<pre class="sh_puppet"><code>file {
+    "/etc/apache2/sites-available/mysite":
+        content =&gt; template("mysite.erb"),
+        ensure =&gt; file,
+        require =&gt; Package["apache2-mpm-worker"];
+    "/etc/apache2/sites-enabled/001-mysite":
+        ensure =&gt; "/etc/apache2/sites-available/mysite",
+        require =&gt; Package["apache2-mpm-worker"];
+    "/etc/apache2/sites-enabled/000-default":
+        ensure =&gt; absent,
+        require =&gt; Package["apache2-mpm-worker"];
+    "/usr/local/share/wsgi/mysite/mysite.wsgi":
+        content =&gt; template("mysite.wsgi"),
+        ensure =&gt; file;
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/24">
+<h1><code>mysite.erb</code></h1>
+
+<pre><code>&lt;VirtualHost *:80&gt;
+    DocumentRoot /usr/local/share/wsgi/mysite/media
+    Alias /media /usr/local/share/wsgi/mysite/media
+    WSGIScriptAlias / /usr/local/share/wsgi/mysite/mysite.wsgi
+    WSGIDaemonProcess mysite processes=2
+    WSGIProcessGroup mysite
+&lt;/VirtualHost&gt;
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/25">
+<h1><code>mysite.erb</code> with one process per core</h1>
+
+<pre><code>&lt;VirtualHost *:80&gt;
+    DocumentRoot /usr/local/share/wsgi/mysite/media
+    Alias /media /usr/local/share/wsgi/mysite/media
+    WSGIScriptAlias / /usr/local/share/wsgi/mysite/mysite.wsgi
+    WSGIDaemonProcess mysite processes=&lt;%= processorcount %&gt;
+    WSGIProcessGroup mysite
+&lt;/VirtualHost&gt;
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/26">
+<h1><code>mysite.wsgi</code></h1>
+
+<pre class="sh_python"><code>import os
+import sys.path
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+sys.path.append('/usr/local/share/wsgi')
+
+import django.core.handlers.wsgi
+application = django.core.handlers.wsgi.WSGIHandler()</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/27">
+<h1>Does <code>mysite.wsgi</code> really belong in Puppet?</h1>
+
+<ul>
+<li>Environment versus application.</li>
+<li>Relatively stable versus wild and crazy.</li>
+<li>Push versus pull.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/28">
+<h1>Danger: my opinion</h1>
+
+<ul>
+<li>Environment: pull packages, web server config, DNS, and monitoring from Puppet.</li>
+<li>Application: push code, including <code>mysite.wsgi</code>, with Fabric.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/29">
+<h1>Automatically reload changes</h1>
+
+<pre class="sh_puppet"><code>service { "apache2":
+    enable =&gt; true,
+    ensure =&gt; running,
+    require =&gt; Package["apache2-mpm-worker"],
+    subscribe =&gt; [
+        Package[
+            "apache2-mpm-worker",
+            "libapache2-mod-wsgi"],
+        File[
+            "/etc/apache2/sites-available/mysite",
+            "/etc/apache2/sites-enabled/001-mysite",
+            "/etc/apache2/sites-enabled/000-default",
+            "/usr/local/share/wsgi/mysite/mysite.wsgi"]],
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/30">
+<h1>Apache for all</h1>
+
+<ul>
+<li><code>puppet apply --templatedir=. deps.pp</code></li>
+<li><code>fab puppet</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/31">
+<h1>Puppet master and agents</h1>
+
+<ul>
+<li>Master knows best.</li>
+<li>Agents pull their configuration.</li>
+<li>Resources can be exported to other nodes.</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/32">
+<h1><code>manifests/nodes.pp</code></h1>
+
+<pre class="sh_puppet"><code>node "example.com" {
+    include python
+    include mysite
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/33">
+<h1><code>modules/python/manifests/init.pp</code></h1>
+
+<pre class="sh_puppet"><code>stage { "pre": before =&gt; Stage["main"] }
+class python {
+    package {
+        "build-essential": ensure =&gt; latest;
+        "python": ensure =&gt; "2.6.6-2ubuntu1";
+        "python-dev": ensure =&gt; "2.6.6-2ubuntu1";
+        "python-setuptools": ensure =&gt; installed;
+    }
+    exec { "easy_install pip":
+        path =&gt; "/usr/local/bin:/usr/bin:/bin",
+        refreshonly =&gt; true,
+        require =&gt; Package["python-setuptools"],
+        subscribe =&gt; Package["python-setuptools"],
+    }
+}
+class { "python": stage =&gt; "pre" }</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/34">
+<h1><code>modules/mysite/manifests/init.pp</code></h1>
+
+<pre class="sh_puppet"><code>class mysite {
+    include python
+    package {
+        "django":
+            ensure =&gt; "1.2.3",
+            provider =&gt; pip;
+        # Et cetera.
+    }
+    file {
+        # Prefix template paths with the module name.
+        "/etc/apache2/sites-available/mysite":
+            content =&gt; template("mysite/mysite.erb"),
+            ensure =&gt; file,
+            require =&gt; Package["apache2-mpm-worker"];
+        # Et cetera.
+    }
+    service {
+        "apache2": # As above.
+    }
+    # Other resources as you like.
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/35">
+<h1>Thank you</h1>
+
+<ul>
+<li><p><a href="https://gist.github.com/701221">https://gist.github.com/701221</a></p></li>
+<li><p><a href="mailto:richard@devstructure.com">richard@devstructure.com</a> or <a href="http://twitter.com/rcrowley">@rcrowley</a></p></li>
+<li>P.S. use DevStructure.</li>
+</ul>
+</div>
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Appendix: Crash Course in Go</title>
+    <meta charset='utf-8'>
+    <script src='/static/slides.js'></script>
+  </head>
+
+  <body style='display: none'>
+
+    <section class='slides layout-widescreen'>
+      
+      <article>
+        <h1>Appendix: Crash Course in Go</h1>
+        
+        
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+
+          </div>
+        
+      </article>
+      
+  
+  
+      <article>
+      
+        <h3>Go</h3>
+        
+  
+  <p>
+    Always google it as “golang”
+<br>
+
+    Approaching four years old
+<br>
+
+    Thompson, Pike, Cox, Griesemer
+<br>
+
+    Statically typed
+<br>
+
+    Not classically object-oriented
+<br>
+
+    CSP primitives as syntax
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>CSP</h3>
+        
+  
+  <p>
+    Tony Hoare’s <i>Communicating Sequential Processes</i> in CACM volume 21 issue 8
+<br>
+
+    “Do not communicate by sharing memory; instead, share memory by communicating.”
+<br>
+
+    Useful for connection handling, critical sections, and pooled operations
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Channels</h3>
+        
+  
+  <div class="code"><pre>ch := make(chan int, 1) // buffer length of 1
+ch &lt;- 47 // send
+&lt;-ch // receive</pre></div>
+  
+
+  
+  <p>
+    Buffered or unbuffered
+<br>
+
+    Concurrent send and receive operations
+<br>
+
+    <a href="http://rcrowley.org/2013/04/19/golang-ack-test.html" target="_blank">Faster than mutexes</a>
+<br>
+
+    Buffered channels can easily be misused and introduce data-loss risks
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Goroutines</h3>
+        
+  
+  <div class="code"><pre>in := make(chan int)
+out := make(chan int)
+
+go func() {
+    prev := 0
+    for {
+        next := &lt;-in
+        out &lt;- prev &#43; next
+        prev = next
+    }
+}()</pre></div>
+  
+
+  
+  <p>
+    Inexpensive green threads
+<br>
+
+    Semi-cooperatively scheduled
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Structs</h3>
+        
+  
+  <div class="code"><pre>type Table struct {
+    ID             string
+    GameID         string
+    RoundID        string
+    Players        []Player
+    NextTransition time.Time
+    // ...
+}</pre></div>
+  
+
+  
+  <p>
+    Structs are types
+<br>
+
+    Zero or more named and typed members
+<br>
+
+    Structs can embed other structs
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Methods</h3>
+        
+  
+  <div class="code"><pre>func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
+    t := &amp;Table{
+        ID: ct.TableID,
+        // ...
+    }
+    if err := ac.Store(t.ID, t); nil != err {
+        return nil, err
+    }
+    return t, nil
+}</pre></div>
+  
+
+  
+  <p>
+    Method receiver may be any Go type
+<br>
+
+    Zero or more typed return values
+<br>
+
+    Embedded structs embed methods, too
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Interfaces</h3>
+        
+  
+  <div class="code"><pre>type ObjectStore interface {
+    Load(string, interface{}) error
+    LoadExcl(string, interface{}) (sync.Locker, error)
+    Store(string, interface{}) error
+    StoreExcl(string, interface{}, sync.Locker) error
+}</pre></div>
+  
+
+  
+  <p>
+    Interfaces are also types
+<br>
+
+    Zero or more method signatures
+<br>
+
+    Types that implement all methods implement the interface implicitly
+<br>
+
+    <code>if foo, ok := i.(Foo); ok {}</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Tags and reflection</h3>
+        
+  
+  <div class="code"><pre>type Table struct {
+    ID     string `bson:&#34;i&#34; index:&#34;-&#34; ring:&#34;-&#34;`
+    GameID string `bson:&#34;g&#34; index:&#34;GameID_TableID&#34;`
+    // ...
+}</pre></div>
+  
+
+  
+  <p>
+    Distribution keys, secondary indexes, and serialized names are declared via tags
+<br>
+
+    <code>reflect</code> can introspect everything
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Meanwhile, back at the ranch...</h3>
+        
+  
+  <p>
+    <a href="http://rcrowley.org/talks/surge-2013.html" target="_blank">rcrowley.org/talks/surge-2013.html</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+
+      <article>
+        <h3>Thank you</h1>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+<p class="link"><a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a></p><p class="link"><a href="#ZgotmplZ" target="_blank"><a href="http://rcrowley.org/talks/surge-2013-golang.html" target="_blank">rcrowley.org/talks/surge-2013-golang.html</a></a></p><p class="link"><a href="http://twitter.com/rcrowley" target="_blank">@rcrowley</a></p>
+          </div>
+        
+      </article>
+
+  </body>
+  
+</html>

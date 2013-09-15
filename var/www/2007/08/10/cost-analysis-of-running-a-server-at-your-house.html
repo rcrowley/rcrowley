@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cost analysis of running a server at your house &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/08/10/cost-analysis-of-running-a-server-at-your-house">Cost analysis of running a server at your house</a> <small>2007/08/10</small></h1>
+<p>I have always been a big fan of running my own server to have complete control over pretty much everything.&nbsp; I like having the power to break everything, sometimes just so I can put it back together.&nbsp; But is this economically sensible?</p>
+<p>Last month, PG&amp;E charged me $0.1143 per kilowatt-hour for electricity.&nbsp; My machine has a 400 watt power supply, but by best estimates it draws about 50 watts just sitting around serving web traffic.&nbsp; Running all day, every day, this will cost me about <strong>$4.11</strong> for the 36 kilowatt-hours burned.&nbsp; Junk change.&nbsp; Services from <a href="http://www.mediatemple.net/webhosting/dv/">(mt)</a>, <a href="http://www.joyent.com/accelerator">TextDrive</a> and <a href="http://www.amazon.com/b/ref=sc_fe_l_2/104-9245494-2513557?ie=UTF8&amp;node=201590011&amp;no=3435361&amp;me=A36L942TSJ2AJA">Amazon</a> run $50, $45 and $72 per month respectively.</p>
+<p>I could say case-closed right here and now but let's make this interesting.&nbsp; I made a notable omission in my comparison above -- bandwidth.&nbsp; I have the distinct displeasure of being a Comcast customer and theoretically have 768Kbps upload speed.&nbsp; Checking with Speakeasy, I actually have 1526Kbps upload to San Francisco and 1518Kbps upload to New York City.&nbsp; Sweet!&nbsp; Whether you believe this as little as I do is unimportant -- it's a far cry from the 100Mb+ connection available to every self-respecting datacenter.</p>
+<p>Right now the homepage of this site is 22KB (and is by far the most visited page on the site).&nbsp; Nevermind the poor visitor-engagement, this means that at my current upload bandwidth I can serve 8.625 requests per second.&nbsp; This is downright poor compared to the 568 requests per second theoretically possible on a 100Mb connection.&nbsp; At the moment though, all that extra capacity will just go to waste.</p>
+<p>Of course, what would be the fun in hosting a website in an environment with stable power?&nbsp; PG&amp;E sometimes cuts the power just to keep me on my toes or keep me from waking up for work, but how much does this really cost me?&nbsp; I don't make any money from any of my sites (not even AdSense), but if I did, here's what I'd consider.&nbsp; For every hour a site is down, you lose some amount of money.&nbsp; If that amount times the number of hours of downtime per month is greater than the cost of reliable hosting, maybe the reliable hosting is worthwhile.&nbsp; However, even reliable hosting goes down sometimes, so you can't count all of your downtime at home against the price difference.</p>
+<p>Whew.&nbsp; So now with a little qualification, I can still sleep comfortably with my server fans running and my would-be hosting money in my pocket. I need a lot more traffic and a lot more income before I spring for root-access on a box in a datacenter.</p>
+<p><em>It should be mentioned that I serve this site from a TextDrive shared acount because I destroy my server so often that a simple Wordpress install does well to stay away.</em></p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(35)</small></h1>
+<ol>
+	<li>
+		<p>You're assuming costs of maintenance, storage, upgrades are sunk -- which they are until the next time you have to upgrade or do a major update, such as replace a hard drive.&nbsp; The full costs -- total cost of ownership -- I'm guessing is much higher.&nbsp; And if you are looking to monetize (AdSense, e.g.), then your current server may be better utilized doing something else.&nbsp; That opportunity cost is something to consider as well.</p>
+<p>Not that I think about these things or anything ;)</p>
+		<p>&mdash; Jason &mdash; 2007/08/10 10:48 am</p>
+	</li>
+
+	<li>
+		<p>Nice article Richard. I used to have a rack of servers in my basement when I lived with my parents..&nbsp; those were the days. Plenty of space and free electricity - I picked up some old SGI, IBM, and Compaq hardware on EBay and had servers running everything from Irix to AIX to FreeBSD. At any given time half of them would be broken, but it didn't matter!</p>
+<p>These days I have a dev box at home, but run all my "production" sites (the ones that actually serve real traffic) from a dedicated (physical, not virtual) server. Deciding on a colocation vs. self-hosting vs. dedicated wasn't easy, but I think for my purposes the dedicated route was the most cost effective. The one thing you're missing in your cost analysis is the price of the server itself. To self-host you have a high upfront cost for hardware ($1000 to $1500, at least, for a decent server). With dedicated hosting you pay monthly for the server _and_ the hosting. In some situations, the money you save by not purchasing a server up-front can more than offset the additional monthly costs of a dedicated hosting solution.</p>
+<p>The ideal solution for a smallish site, in my opinion, is to find some friends to share a dedicated box with. You can get a 100mb/s box with 2GB RAM and a sufficiently fast processor for around $100/mo (or less) from EV1Servers/ThePlanet. If you have three or four people sharing the box, that's around $25 to $33/mo each. The hard part is finding two or three people you trust who are in a similar situation.</p>
+		<p>&mdash; <a href="http://immike.net">Mike Malone</a> &mdash; 2007/08/10 11:43 am</p>
+	</li>
+
+	<li>
+		<p>You're both right that the cost of the machine is a big deal.&nbsp; Jason's right that the costs are sunk until something breaks.&nbsp; I could argue the hardware costs are sunk permanently because I'd probably keep a Linux box around anyway.&nbsp; Or we could start splitting hairs to determine how much of the hardware cost is due to server traffic.&nbsp; Any way you slice it, you're both right that hardware costs should play into the calculation anyway.</p>
+		<p>&mdash; <a href="http://richarddcrowley.org/">Richard Crowley</a> &mdash; 2007/08/10 12:27 pm</p>
+	</li>
+
+	<li>
+		<p>As others have said, you pay for the hosting and the server each month with a dedicated solution. You don't have to worry about maintenance, broken SAS hard drives which get expensive and all of that. An EC2 instance will run you a bit more than $72/month - that's only considering "$0.10 per instance-hour consumed", not data storage, transfer, etc. So maybe $75/month. ;-)</p>
+<p>As for your main machine, you're right about it not consuming the full 400W. I have no idea what your box is like but 400W * average PSU efficiency of 70% is about 280 max Watts, but at nearly idle load you would use about 10W/stick of RAM, 10-15W/hard drive, ~30W for an idling CPU, 5-10W for fans or something like that. My roommate has a watt meter he plugins into his setup and his massive gaming computer only sucks about 250W at load.</p>
+		<p>&mdash; <a href="http://paulstamatiou.com">Paul Stamatiou</a> &mdash; 2007/08/10 12:59 pm</p>
+	</li>
+
+	<li>
+		<p>Just to throw out what I'm using right now, slicehost.com , is cheaper than those other solutions at $20/month and I'm fairly happy with it thus far.&nbsp; At least happy enough that I'll probably keep paying even after I stop using Google's free wireless as my internet and actually have real internet again.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David</a> &mdash; 2007/08/10 4:32 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/ba3a69d05bfefab063380f79d7f220be?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

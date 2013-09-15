@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dependency management for grown ups &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+<article>
+<header>
+	<time datetime="2010-09-27" pubdate>2010-09-27</time>
+	<h1>Dependency management for grown ups</h1>
+</header>
+<p>Sprouting a package manager seems to be a rite of passage for programming languages.&nbsp; Perl has CPAN.&nbsp; PHP has PEAR and PECL.&nbsp; Python has <code>setuptools</code>/<code>distribute</code> and PyPI.&nbsp; Ruby has RubyGems.&nbsp; Node.js has <code>npm</code>.&nbsp; Go has <code>goinstall</code>.&nbsp; Haskell has Cabal.&nbsp; I&#8217;m sure there are more but I&#8217;m tired of searching and I made my point.</p>
+<p>They each bring to the table a subtly different command-line grammar, novel new rules for dependency resolution (&#8220;<code>~&gt;</code>&#8221;, for example) and a new set of repositories to fail.&nbsp; Different grammars are annoyances.&nbsp; RubyGems&#8217; &#8220;~<code>&gt;</code>&#8221; syntax is ugly but important (it allows a version greater-than or equal-to the specified version but only within the same minor series).&nbsp; The new repositories are, for better and worse, unsupervised by the Debian maintainers or any equivalent body.</p>
+<p>The fatal flaw in every single case is the systemic inability of each of these package managers to fully describe the dependencies of their packages.&nbsp; The <code>nokogiri</code> gem is a a typical representative case through no fault of its own.&nbsp; It depends on <code>libxslt1-dev</code> and <code>libxml2-dev</code> and to complicate matters further, those are the Debian/Ubuntu names for packages known as <code>libxslt-devel</code> and <code>libxml2-devel</code> in the Red Hat world.</p>
+<p>I will not be endorsing a utopian future in which Debian and Red Hat have unified their package naming scheme such that RubyGems could programmatically specify and satisfy these dependencies in a portable manner.&nbsp; I will also not be rallying everyone to create Debian packages and RPMs, run <code>apt</code> and <code>yum</code> repositories, and generally do everything twice.&nbsp; Finally, I realize it would be a waste of breath calling everyone to standardize on one package format and manager.</p>
+<p>A new tool appears to be the only pragmatic way forward and others seem to agree.&nbsp; The curious thing is the recent introduction of several promising contenders that each fall short for exactly the same reason.&nbsp; Ruby&#8217;s Bundler and RVM as well as Python&#8217;s <code>pip</code>/<code>virtualenv</code> all isolate sets of packages and generate dependency lists from their isolated installations.</p>
+<p>A bundle, an RVM gemset, and a <code>pip</code>/<code>virtualenv</code> <code>requirements.txt</code> file are each an incomplete list of dependencies, plagued by the same systemic inability to fully describe dependencies that plague the package managers on which they&#8217;re based.&nbsp; What makes these better than the language&#8217;s package format?&nbsp; <a id="foot-1-src" href="#foot-1" class="foot">[1]</a></p>
+<p>The answer is invariably the installation isolation they can each provide.&nbsp; Isolation begets precision and precision enables confident, rapid deployment.&nbsp; In all of these cases, the isolation is sabotaged by the underlying package manager and fails to provide complete isolation for a set of dependencies.&nbsp; You really want isolated environments on the same box?&nbsp; UNIX has had a way to do this since 1979.&nbsp; It&#8217;s called <code>chroot</code>(2).&nbsp; <a id="foot-2-src" href="#foot-2" class="foot">[2]</a></p>
+<p>The pragmatic new tool isn&#8217;t Bundler, RVM, <code>pip</code>/<code>virtualenv</code>, or anything else with language-blinders on.&nbsp; It&#8217;s configuration management.&nbsp; This is a natural, responsible extension of your <code>Gemfile</code>, <code>.gems</code> or <code>requirements.txt</code> with the added bonus of completeness.&nbsp; It can take the form of a well-written shell script, a Puppet manifest, a Chef recipe, or the equivalent in your configuration management tool of choice.&nbsp; All that really matters is that you maintain it.</p>
+<p>Typical configuration management comes in client-server architectures but that&#8217;s not necessary to dip your toe in.&nbsp; Both Puppet and Chef support a standalone mode where manifests/recipes are read from a local file.</p>
+<p>Take for example the following Puppet manifest which implements the Nokogiri example from above for CentOS and Ubuntu.&nbsp; Other operating systems can be added easily or the whole thing can be trimmed down if you only use one.&nbsp; For greatest predictability, versions should be specified rather than left to <code>latest</code>.</p>
+<pre>
+$build = $operatingsystem? {
+&nbsp; &nbsp; "centos" =&gt; ["autoconf", "automake", "gcc", "glibc-devel"],
+&nbsp; &nbsp; "ubuntu" =&gt; "build-essential",
+}
+$xml = $operatingsystem ? {
+&nbsp; &nbsp; "centos" =&gt; "libxml-devel",
+&nbsp; &nbsp; "ubuntu" =&gt; "libxml2-dev",
+}
+$xslt = $operatingsystem ? {
+&nbsp; &nbsp; "centos" =&gt; "libxslt-devel",
+&nbsp; &nbsp; "ubuntu" =&gt; "libxslt1-dev",
+}
+package {
+&nbsp; &nbsp; $build:
+&nbsp; &nbsp; &nbsp; &nbsp; ensure =&gt; latest;
+&nbsp; &nbsp; "ruby":
+&nbsp; &nbsp; &nbsp; &nbsp; ensure =&gt; latest;
+&nbsp; &nbsp; "ruby-dev":
+&nbsp; &nbsp; &nbsp; &nbsp; ensure&nbsp; =&gt; latest,
+&nbsp; &nbsp; &nbsp; &nbsp; require =&gt; Package[$build];
+&nbsp; &nbsp; "rubygems":
+&nbsp; &nbsp; &nbsp; &nbsp; ensure&nbsp; =&gt; latest,
+&nbsp; &nbsp; &nbsp; &nbsp; require =&gt; Package["ruby-dev"];
+&nbsp; &nbsp; $xml:
+&nbsp; &nbsp; &nbsp; &nbsp; ensure =&gt; latest;
+&nbsp; &nbsp; $xslt:
+&nbsp; &nbsp; &nbsp; &nbsp; ensure =&gt; latest;
+&nbsp; &nbsp; "nokogiri":
+&nbsp; &nbsp; &nbsp; &nbsp; ensure&nbsp;  =&gt; latest,
+&nbsp; &nbsp; &nbsp; &nbsp; provider =&gt; gem,
+&nbsp; &nbsp; &nbsp; &nbsp; require&nbsp; =&gt; Package["rubygems", $xml, $xslt];
+}
+</pre>
+<p>Run the file with <code>puppet apply example.pp</code>.</p>
+<h2>The bottom line</h2>
+<p>The language-specific choices out there provide incomplete dependency management and false sense of isolation.&nbsp; Complete dependency management can be had through Puppet, Chef, or any other configuration management software.&nbsp; Complete isolation can be had through virtualization, <code>chroot</code>(2) or <code>cgroups</code> on newer kernels, or by using <a href="http://devstructure.com/">DevStructure</a>.</p>
+<p>Language-specific package managers may be here to stay but that&#8217;s no reason to let complete dependency management slip away.&nbsp; Learn about configuration management.&nbsp; Your deploys will thank you.</p>
+<p><em>Disclosure: I&#8217;m one of the founders of DevStructure.</em></p>
+<aside>
+<ol>
+	<li id="foot-1">I should mention that I appreciate Bundler pretending to move RubyGems&#8217; run time dependency resolution back to install time where it belongs.&nbsp; <a href="#foot-1-src" class="foot">&#8617;</a></li>
+	<li id="foot-2"><a href="http://man.cx/chroot(2)"><code>chroot</code>(2)</a> is the basic mechanism behind DevStructure&#8217;s <a href="http://docs.devstructure.com/sandboxes">sandboxes</a>.&nbsp; <a href="#foot-2-src" class="foot">&#8617;</a></li>
+</ol>
+</aside>
+</article>
+<footer class="site">
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2010 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

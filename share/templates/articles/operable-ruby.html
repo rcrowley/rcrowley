@@ -1,0 +1,70 @@
+{% block content %}
+<article>
+<header>
+	<time datetime="2011-03-28" pubdate>2011-03-28</time>
+	<h1>{% block title %}Operable Ruby{% endblock %}</h1>
+</header>
+
+<p>Ruby today is a moving target.&nbsp; The reference implementation is releasing rapidly on several branches and at least three alternatives to MRI are in wide use.&nbsp; The RubyGems package manager is releasing nearly every week and the dizzying array of variously compatible gems are releasing whenever they feel like it.&nbsp; Exciting times, to be sure, but also an operator&#8217;s nightmare.&nbsp; At every level of this dependency tree, robust packaging brings order to the chaos.&nbsp; Given that, it surprises me to read folks recommending <a href="http://rvm.beginrescueend.com/">RVM</a> for production use.</p>
+
+<p>An operable production environment relies on packages to account for most files on the system.&nbsp; Think of it as a paper trail: <code>dpkg-query -S <em>pathname</em></code> will tell you the package that owns a particular file.&nbsp; With the mapping of package names to sets of pathnames, packages become uninstallable.&nbsp; Naturally, anything that can be uninstalled entirely can be upgraded.&nbsp; Do you trust that shell script to measure up?</p>
+
+<p>Hopefully we&#8217;ve settled that packages are not optional in production.&nbsp; By my philosophy, development systems should faithfully mimic production systems in every affordable way, so I extend the policy to my development virtual machines, too.&nbsp; Reliable development environments are just as important to me as reliable production environments.</p>
+
+<p>There&#8217;s been an interesting <a href="https://groups.google.com/forum/#!topic/devops-toolchain/bslnhqrTT7M">discussion</a> on the <a href="https://groups.google.com/group/devops-toolchain">devops-toolchain mailing list</a> this week about how best to package the Ruby environment.&nbsp; Unsurprisingly, RVM came up as well as several better options.&nbsp; I&#8217;d like to offer executable proof that building packages from arbitrary Ruby versions is easy.</p>
+
+<p>The remainder of this article will walk through building up a shell script that uses <a href="http://rcrowley.github.com/debra/"><code>debra</code>(1)</a> to package arbitrary versions of Ruby for Debian-based Linux distributions.</p>
+
+<p>We&#8217;re building a system package here: the prefix is <code>/usr</code> and the files should be owned by <code>root</code>.&nbsp; It isn&#8217;t <code>debra</code>&#8217;s business who owns the files in the package, so we will run the entire build process as root to ensure this is true.</p>
+
+<p>First things first, the version numbers we&#8217;re using:</p>
+
+<pre>VERSION="1.9.2"
+PATCH="180"
+DPKG_BUILD_ARCH="$(dpkg --print-architecture)"</pre>
+
+<p>Note well that <code>set -e</code> should really appear in every single shell script you write so they will exit on failure.</p>
+
+<pre>set -e</pre>
+
+<p>Next, use <a href="http://rcrowley.github.com/debra/debra-create.1.html"><code>debra-create</code>(1)</a> to start building up a Debian package in a temporary directory.&nbsp; The first argument to all <code>debra</code> commands is the directory being used for the build.&nbsp; This block uses one of my favorite shell scripting idioms: using <code>mktemp</code>(1) to create a temporary directory and <code>trap</code> to clean up on <code>EXIT</code> (using <a href="http://rcrowley.github.com/debra/debra-destroy.1.html"><code>debra-destroy</code>(1)</a> in this case).</p>
+
+<pre>DESTDIR="$(mktemp -d)"
+debra create "$DESTDIR"
+trap "debra destroy \"$DESTDIR\"" EXIT</pre>
+
+<p>The extensions we&#8217;re going to enable in the Ruby build require a few development libraries:</p>
+
+<pre>apt-get -y install libssl-dev libreadline5-dev zlib1g-dev</pre>
+
+<p>Now for the meat of the Ruby build.&nbsp; Using <a href="http://rcrowley.github.com/debra/debra-sourceinstall.1.html"><code>debra-sourceinstall</code>(1)</a> makes this very easy.&nbsp; It downloads, unpacks, and builds from the tarball given by the second argument.&nbsp; <code>-b</code> provides a &#8220;bootstrapping&#8221; command that is run immediately after unpacking to setup the extensions we want to enable.&nbsp; <code>-p</code> relays its argument as <code>--prefix</code> to the <code>./configure</code> program and <code>-f</code> provides other arbitrary arguments to <code>./configure</code>.&nbsp; After configuring, <a href="http://rcrowley.github.com/debra/sourceinstall.1.html"><code>sourceinstall</code>(1)</a> runs <code>make</code> and <code>make install</code> to install the package in <code>DESTDIR</code>.</p>
+
+<pre>debra sourceinstall "$DESTDIR" \
+	"ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-$VERSION-p$PATCH.tar.gz" \
+	-b"sh -c 'echo fcntl\\\nopenssl\\\nreadline\\\nzlib &gt;ext/Setup'" \
+	-p/usr -f"--program-suffix=-$VERSION"</pre>
+
+<p>(See <a href="http://rcrowley.github.com/debra/sourceinstall.1.html"><code>sourceinstall</code>(1)</a> for more options affecting the build process.)</p>
+
+<p>The last artifact a Debian package needs is a control file for version and dependency metadata.&nbsp; Other metadata like the MD5 sum of each file are handled automatically by <code>debra</code>.</p>
+
+<pre>cat &gt;$DESTDIR/DEBIAN/control &lt;&lt;EOF
+Package: ruby-$VERSION
+Version: $VERSION-p$PATCH
+Section: devel
+Priority: optional
+Essential: no
+Architecture: $DPKG_BUILD_ARCH
+Depends: libc6, libssl0.9.8, libreadline5, zlib1g
+Maintainer: Richard Crowley &lt;r@rcrowley.org&gt;
+Description: Ruby $VERSION.
+EOF</pre>
+
+<p>With that, we can build the package in a file that follows the Debian convention of <code><em>package</em>_<em>version</em>_<em>architecture</em>.deb</code>.</p>
+
+<pre>debra build "$DESTDIR" "ruby-${VERSION}_${VERSION}-p${PATCH}_${DPKG_BUILD_ARCH}.deb"</pre>
+
+<p>This package is useful in development and production, can be uninstalled or upgraded with ease, coexists peacefully with the system&#8217;s Ruby plus other Rubies built this way, and isn&#8217;t gated by anyone else&#8217;s feature freezes or patch schedules.&nbsp; This whole example is available at <a href="https://gist.github.com/891447">https://gist.github.com/891447</a>.</p>
+
+</article>
+{% endblock %}

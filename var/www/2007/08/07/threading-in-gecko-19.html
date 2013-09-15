@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Threading in Gecko 1.9 &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/08/07/threading-in-gecko-19">Threading in Gecko 1.9</a> <small>2007/08/07</small></h1>
+<p>Things change quickly in Internet-land, and between versions 1.8 and 1.9, the Gecko SDK received a major upgrade to its thread library.  What once took multiple XPCOM objects, more than few hacks and a prayer for good measure can now be done in a single Javascript file with minimal interference from the world of C++ beneath.</p>
+<p>Here is a sample of how one might spin an event off onto a background thread acting as a job queue.  The execution is fairly straightforward: a background thread is created; the UI dispatches events onto this background thread; the job on the thread dispatches an event back to the UI thread when it is finished.</p>
+<p>Before we start, let's define the objects used to cross the thread boundary.  They must be XPCOM objects (but can be implemented in pure Javascript and don't even need to live in the <code>components/</code> directory) and must implement the <code>nsIRunnable</code> interface.  This interface requires that <code>QueryInterface</code> respond positively to <code>nsIRunnable</code> and that a <code>run()</code> function be defined.</p>
+<pre>var Foo = function(id) {
+	this.id = id;
+};
+Foo.prototype = {
+	run: function() {
+		try {
+
+			// Do some work, for now just print something
+			Components.utils.reportError('This is where the background work happens.');
+
+			// Callback to the main thread
+			main.dispatch(new FooCallback(this.id, 'SUCCESS'),
+				background.DISPATCH_NORMAL);
+
+		} catch (err) {
+			Components.utils.reportError(err);
+		}
+	},
+	QueryInterface: function(iid) {
+		if (iid.equals(Ci.nsIRunnable) || iid.equals(Ci.nsISupports)) {
+			return this;
+		}
+		throw Components.results.NS_ERROR_NO_INTERFACE;
+	}
+};
+var FooCallback = function(id, result) {
+	this.id = id;
+	this.result = result;
+};
+FooCallback.prototype = {
+	run: function() {
+		try {
+
+			// This is where we can work with the main thread after the job
+			alert('id: ' + id + ', result: ' + result);
+
+		} catch (err) {
+			Components.utils.reportError(err);
+		}
+	},
+	QueryInterface: function(iid) {
+		if (iid.equals(Ci.nsIRunnable) || iid.equals(Ci.nsISupports)) {
+			return this;
+		}
+		throw Components.results.NS_ERROR_NO_INTERFACE;
+	}
+};</pre>
+<p>Here is the code we need to actually use these objects to spawn a background thread and dispatch a job to it.  The callback will end up on the main thread's event queue.</p>
+<pre>background = Cc['@mozilla.org/thread-manager;1'].getService().newThread(0);
+main = Cc['@mozilla.org/thread-manager;1'].getService().mainThread;
+background.dispatch(new Foo(id), background.DISPATCH_NORMAL);</pre>
+<p>The first two lines here should be executed on application startup and will leave thread references in <code>main</code> and <code>background</code>.  The third line actually puts a job on the background queue.  This can be called anywhere and will likely be used inside a loop to push a lot of compute-intensive work onto the background thread, allowing the UI thread to remain responsive.</p>
+<p>A note about the <code>id</code> passed to the thread objects: this is not strictly necessary, but I find it very convenient to have the option of tracking individual jobs through the event queue.  The <code>id</code> is especially useful when you're using the callback to update a certain element of the UI with the result of the job.  Then in the callback it's as simple as <code>document.getElementById(this.id)</code>.</p>
+<p>Apologies for the bits-and-pieces examples.  I'm ripping this out of unreleased code so I don't have time to create a demo app for each one.  I recommend starting with <a href="http://starkravingfinkle.org/blog/2006/07/mozilla-platform-getting-started-with-xulrunner/">Mark Finkle's hello world</a>.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(119)</small></h1>
+<ol>
+	<li>
+		<p>Thanks a lot,</p>
+<p>that really helped a lot.</p>
+<p>Martin</p>
+		<p>&mdash; <a href="http://vimperator.mozdev.org">Martin S.</a> &mdash; 2007/09/24 6:13 pm</p>
+	</li>
+
+	<li>
+		<p>thanks richard for this input.</p>
+<p>i have used your code and wrapped it into classes, and everything was working fine with the 1.9b2.</p>
+<p>since then, same code crashes. i've filed a bug to bugzilla here: https://bugzilla.mozilla.org/show_bug.cgi?id=413671 in which i think you might be interested.</p>
+<p>one of the commenters states that 'you may not use xul windows to create javascript objects which you then pass to other threads'.</p>
+<p>..any clues or comments appreciated :)</p>
+<p>cheers,</p>
+<p>r.</p>
+		<p>&mdash; Roberto Ostinelli &mdash; 2008/02/11 3:23 am</p>
+	</li>
+
+	<li>
+		<p>hi,</p>
+<p>Need to know that it will not work with lower version of Gecko or not?</p>
+<p>I am working with Gecko 1.8.1.3_0000000000</p>
+<p>My application is desktop application. I am using xul for UI and I need to use threading in that (javascript)</p>
+<p>I tried the code and it will giving error for creating instance of thread manager itself. ( might be because its in firefox 3)</p>
+<p>So If you know any solution for that, then pls let me know.</p>
+<p>Thanks</p>
+		<p>&mdash; Krishna &mdash; 2008/03/11 1:46 am</p>
+	</li>
+
+	<li>
+		<p>Hello,</p>
+<p>thank you for explaining. I followed the steps and it works. But when I put an expression like </p>
+<p>var i=new Date().getTime();  </p>
+<p>in the background thread, Firefox 3 beta 5 freezes. It also happens with loop. What might be the reason for that? Even I can not find a sleep method in the new Thread API. How can one let a thread sleep for a while in Gecko 1.9 ?</p>
+<p>Best regards
+ninjafette</p>
+		<p>&mdash; ninjafette &mdash; 2008/04/26 9:55 am</p>
+	</li>
+
+	<li>
+		<p>Good point, ninjaffette. I'm also looking for a Thread.sleep function.. does not seem to be there. Very annoying..</p>
+		<p>&mdash; Arjan &mdash; 2008/06/21 7:47 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/3cee99130a09bd1ead7ccfec4ec615e9?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Develop and deploy on the same box with Capistrano &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/07/22/develop-and-deploy-on-the-same-box-with-capistrano">Develop and deploy on the same box with Capistrano</a> <small>2007/07/22</small></h1>
+<p>You're crazy if you're not deploying Rails apps with <a href="http://manuals.rubyonrails.com/read/book/17">Capistrano</a>.&nbsp; This tool makes it dead-simple to push your latest Subversion to your production server, run database migrations and restart your server all in one simple command.&nbsp; Plus with extra tasks like <code>cold_deploy</code>, getting a new box added to the pool is a snap.&nbsp; One problem, though &mdash; this tool was designed with real environments in mind, and my one-box setup for development and production doesn't quite fit in.&nbsp; If you're in the same boat, fear not, I have a solution.</p>
+<p>The root of this problem is the assumption that your development and production server environments are identical.&nbsp; But when deploying to <code>localhost</code>, using the same <code>mongrel_cluster.yml</code> is just not an option, since you need to use separate ports for your development and production versions.</p>
+<p>We need to user two different <code>mongrel_cluster.yml</code> files, one for production and one for development.&nbsp; We can leave the development version out of Subversion and create the production version over again on each deploy.&nbsp; But how do we deal with actually restarting the server?</p>
+<p>It turns out Capistrano creates a directory structure that supports this directly, since the <code>*.pid</code> files in the <code>log/</code> directory are symlinked into place and persist between deployments.&nbsp; So it seems like we can just create the config file and restart the server, right?</p>
+<p>Wrong.&nbsp; <code>deploy.rb</code>'s <code>run</code> command doesn't quite work like your average, everyday shell script.&nbsp; To help it out, I created a shell script that handles the server restart.&nbsp; The shell script allows me to change directories into the application directory and set the <code>PATH</code> variable so <code>mongrel_rails</code> can be found.</p>
+<p>Putting it all together, here is <code>config/deploy.rb</code>:</p>
+<pre>set :application, 'halvesies'
+set :repository, 'protocol://repository/url'
+
+role :web, 'localhost'
+role :app, 'localhost'
+role :db, 'localhost'
+
+set :deploy_to, '/path/to/production/app'
+
+task :restart, :roles =&gt; [:web, :app, :db] do
+    run "#{deploy_to}/current/config/restart.sh"
+end</pre>
+<p>And here is <code>config/restart.sh</code>:</p>
+<pre>#!/bin/sh
+cd /path/to/production/app/current
+export PATH="$PATH:/var/lib/gems/1.8/bin"
+mongrel_rails cluster::configure -e production -p 11001 -a 127.0.0.1 -N 3
+mongrel_rails cluster::restart
+cd -</pre>
+<p>And after all of this, you still deploy your site by just running <code>cap deploy</code>.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(1)</small></h1>
+<ol>
+	<li>
+		<p>[...&nbsp; Crowley has some useful advice regarding how to develop and deploy on the same box with [...]</p>
+		<p>&mdash; <a href="http://www.railsdeployment.com/2007/08/02/deploying-locally/">Rails Deployment &raquo; Blog Archive &raquo; Deploying Locally</a> &mdash; 2007/08/02 1:49 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/aa7b6513fee634556bb12b2e8f53251e?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

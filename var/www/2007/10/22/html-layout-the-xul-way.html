@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HTML layout the XUL way &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/10/22/html-layout-the-xul-way">HTML layout the XUL way</a> <small>2007/10/22</small></h1>
+<p>Layout with HTML and CSS sucks.  I was one of the people that clung to tables longer than the average bear (if bears could write PHP) because they actually work.  My designerish friends guilted me into diving full-on into semantic HTML served with a hack-fest of CSS.</p>
+<p>There's got to be a better way.</p>
+<p>I started this evening looking into using a XUL-style layout on a regular website.  To my surprise, 35% of my visitors are on IE.  WTF, really?  So my first solution (follows) won't work too well.  If IE was something like 10%, I wouldn't hesitate to screw them and go Firefox-only.  37Signals mention something about not trying to be everything to everyone to promote simplicity and I think catering to that 90% would certainly promote simple code.  And since I know how a lot of JavaScript nerds feel about using non-standard HTML attributes, I had <a href="http://jquery.com/">jQuery</a> add the necessary bits after the fact.</p>
+<pre>&lt;style type="text/css"&gt;
+.hbox, .vbox {
+    display: -moz-box;
+}
+.foo {
+    width: 200px;
+    margin: 0 10px 10px 0;
+    padding: 10px;
+    background: black;
+    color: white;
+}
+hr {
+    margin: 0 0 10px 0;
+}
+&lt;/style&gt;
+&lt;script type="text/javascript" src="jquery-1.2.1.pack.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+$(document).ready(function() {
+    $('.vbox').attr('orient', 'vertical');
+});
+&lt;/script&gt;</pre>
+<p>But as I said, I don't want to screw all of those IE users.  So onward to a better solution, using the same nice markup:</p>
+<pre>&lt;div class="hbox"&gt;
+    &lt;div class="foo"&gt;foo&lt;/div&gt;
+    &lt;div class="vbox"&gt;
+        &lt;div class="foo"&gt;asdf&lt;/div&gt;
+        &lt;div class="foo"&gt;qwerty&lt;/div&gt;
+        &lt;div class="foo"&gt;hooah&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="foo"&gt;bar&lt;/div&gt;
+&lt;/div&gt;
+&lt;hr /&gt;
+&lt;div class="vbox"&gt;
+    &lt;div class="foo"&gt;foo&lt;/div&gt;
+    &lt;div class="hbox"&gt;
+        &lt;div class="foo"&gt;asdf&lt;/div&gt;
+        &lt;div class="foo"&gt;qwerty&lt;/div&gt;
+        &lt;div class="foo"&gt;hooah&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="foo"&gt;bar&lt;/div&gt;
+&lt;/div&gt;</pre>
+<p>This time, a bit more must be left to JavaScript to keep the older browsers up to date.  Because nesting a bunch of boxes in boxes in boxes is just going to happen (otherwise what's the point?), I had to resort to the <code>&gt;</code> CSS selector, which has less than stellar support.  So jQuery to the rescue again.  Here's my current CSS/JS.  Don't have IE, so this only theoretically works there.  Anyone want to verify?</p>
+<pre>&lt;style type="text/css"&gt;
+.hbox {
+    border: 1px solid blue;
+}
+.hbox &gt; div {
+    float: left;
+}
+.hbox br {
+    clear: both;
+}
+.vbox {
+    border: 1px solid red;
+}
+.vbox &gt; div {
+    float: none;
+}
+.foo {
+    width: 200px;
+    margin: 0 10px 10px 0;
+    padding: 10px;
+    background: black;
+    color: white;
+}
+hr {
+    margin: 0 0 10px 0;
+}
+&lt;/style&gt;
+&lt;script type="text/javascript" src="jquery-1.2.1.pack.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+$(document).ready(function() {
+    $('.hbox').append('&lt;br /&gt;');
+    $('.hbox &gt; div').css({
+        float: 'left'
+    });
+    $('.vbox &gt; div').css({
+        float: 'none'
+    });
+});
+&lt;/script&gt;</pre>
+<p>Demo: <a href="http://rcrowley.org/work/xul.html">http://rcrowley.org/work/xul.html</a></p>
+<p><strong>Update:</strong> I'm experimenting with ways to duplicate the <code>flex="1"</code> attribute of XUL boxes.  Will post soon.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(0)</small></h1>
+<ol>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/8a6efee571c031ae19440d7eaa761171?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

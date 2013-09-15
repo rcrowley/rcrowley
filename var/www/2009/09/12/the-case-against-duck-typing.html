@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The case against duck typing &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2009/09/12/the-case-against-duck-typing">The case against duck typing</a> <small>2009/09/12</small></h1>
+<p>It&#8217;s a common enough argument to bear documenting once and for
+all.&nbsp; Rubytards and cheese shoppers (that is, Python programmers)
+always gang up on me because they love ducks.&nbsp; I&#8217;d rather the
+ducks stay out of my type checking, that&#8217;s all.</p>
+
+<p>Take this (contrived, as Mike Malone loves to point out) example of
+what can go wrong with duck typing.&nbsp; Your revenue-generating web
+app deals in kittens and dollars so you have classes called
+<code>Kitten</code> and <code>CreditCard</code>, both of which have
+a method used to stringify them:</p>
+
+<pre>class Kitten(object):
+&nbsp; &nbsp; # ...
+&nbsp; &nbsp; def __unicode__(self):
+&nbsp; &nbsp; &nbsp; &nbsp; return """&lt;img src="%s" /&gt;""" % self.src</pre>
+
+<pre>class CreditCard(object):
+&nbsp; &nbsp; # ...
+&nbsp; &nbsp; def __unicode__(self):
+&nbsp; &nbsp; &nbsp; &nbsp; return "XXXX-XXXX-XXXX-%s" % self.cc[-4:]</pre>
+
+<p>If some HTML template requires merely something stringifiable, a
+<code>CreditCard</code> will do just as well as a <code>Kitten</code>.&nbsp;
+To prevent mishaps, the caller must first check the type of the potential
+kitten or the <code>Kitten</code> and <code>CreditCard</code> classes must
+be made different species of duck.&nbsp; While the latter is certainly
+cleaner from the caller&#8217;s perspective, it (pathologically) results
+in every method of the <code>Kitten</code> class being prefixed
+"<code>kitten_</code>" to avoid calling a goose a duck.</p>
+
+<p>Of course, this example was invented for the express purpose of making
+duck typing look awkward and dangerous.&nbsp; Long before it gets to that
+point, I think it crosses into confusion.&nbsp; Looking at a method
+signature written in any popular dynamic language gives the caller no
+instruction beyond (maybe) the number of parameters expected.&nbsp; If
+you&#8217;re lucky, the names of the parameters shed some light.&nbsp;
+Perhaps someone&#8217;s gone all Javadoc and written out comments that
+explain what the hell&#8217;s going on.</p>
+
+<p>I am not an advocate of regressing back to statically typed languages
+for all programming (though it&#8217;s well-known I&#8217;m a big C++
+fan).&nbsp; I want <em>declared typing</em>.&nbsp; Methods should
+state what they accept in such a way that the compiler can enforce this
+on our behalf.&nbsp; PHP 5 introduced type hinting
+<a id="f-12-1-src" href="#f-12-1" class="footnote">[1]</a> as a
+half-assed way to accomplish this.&nbsp; For objects and arrays (but
+not integers, floats and strings), PHP can automatically raise
+&#8220;catchable&#8221; <a id="f-12-2-src" href="#f-12-2" class="footnote">[2]</a> fatal
+errors when types don't match up as you intended.</p>
+
+<p>While PHP&#8217;s solution is half useless for not working on
+primitives and half again because you can&#8217;t deal with the error
+and move on, the heart is in the right place.&nbsp; Declared typing is
+for the programmer using the API your code creates.&nbsp; A compiler
+saying unambiguously that you passed a <code>Sailboat</code> when you
+should have passed a <code>Bulldozer</code> is delightfully useful when
+compared to curious &#8220;method not found&#8221; errors.&nbsp; Worse
+still is the subtly incorrect behavior introduced when somebody
+quacks.</p>
+
+<p>In a nutshell, I wish for the clarity I get from reading statically
+typed code with the power of dynamically typed languages.</p>
+
+
+<ol class="footnote">
+	<li id="f-12-1"><a href="http://us2.php.net/manual/en/language.oop5.typehinting.php">http://us2.php.net/manual/en/language.oop5.typehinting.php</a> <a href="#f-12-1-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-12-2"><a href="http://bugs.php.net/bug.php?id=41948">http://bugs.php.net/bug.php?id=41948</a> <a href="#f-12-2-src" class="footnote-src">&#8617;</a></li>
+</ol>
+
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/4792591f9fc90744d79501fc9a5947f0?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

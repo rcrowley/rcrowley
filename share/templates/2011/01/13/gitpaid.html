@@ -1,0 +1,44 @@
+{% block content %}
+<article>
+<header>
+	<time datetime="2011-01-13" pubdate>2011-01-13</time>
+	<h1>{% block title %}Git Paid, the programmer&#8217;s time tracker{% endblock %}</h1>
+</header>
+<p>As part of an effort to learn hands-on about DevStructure&#8217;s potential customers, I&#8217;ve started working with small companies helping with their Puppet infrastructure and general operational polish.&nbsp; It became quickly clear to me that tracking my time in TextMate was a losing proposition so I took a late evening to whip up Git Paid.</p>
+<p>Git Paid includes three programs.&nbsp; <a href="http://rcrowley.github.com/gitpaid/gpbegin.1.html"><code>gpbegin</code>(1)</a> and <a href="http://rcrowley.github.com/gitpaid/gpend.1.html"><code>gpend</code>(1)</a> mark the beginning and end of a work session by making commits to a Git repository.&nbsp; By default, this repository is <code>~/.gitpaid</code> but it can be overridden by the <code>GITPAID_REPO</code> environment variable or the <code>-r</code> option.&nbsp; Likewise the default branch is <code>master</code> but it can be overridden by the <code>GITPAID_BRANCH</code> environment variable or the <code>-b</code> option.</p>
+<p><a href="http://rcrowley.github.com/gitpaid/gpinvoice.1.html"><code>gpinvoice</code>(1)</a> tabulates the time spent in all work sessions and generates a nice work summary, which includes all the commit messages given to <code>gpbegin</code>(1) and <code>gpend</code>(1) with the <code>-m</code> option.&nbsp; It respects that not all hours are billable so the <code>-t</code> option to <code>gpend</code>(1) will cause <code>gpinvoice</code>(1) to count an arbitrary amount of time for that session.&nbsp; For example:</p>
+<pre>
+$ gpbegin -b client-name
+$ ...
+$ gpend -b client-name -m "Shaved the yak."
+$ gpbegin -b client-name
+$ gpend -b client-name -t 1:45 -m "Faked the time."
+$ gpinvoice -b client-name
+# Invoice
+
+Thu Jan  6 18:27:32 UTC 2011
+from client-name branch of /home/vagrant/.gitpaid
+
+## Work log
+
+Began: Thu, 6 Jan 2011 16:17:29 +0000
+
+&gt; Shaved the yak.
+
+Ended: Thu, 6 Jan 2011 17:47:42 +0000
+Billed time: 1:30
+
+Began: Thu, 6 Jan 2011 18:27:23 +0000
+
+&gt; Faked the time.
+
+Ended: Thu, 6 Jan 2011 18:27:25 +0000
+Billed time (adjusted): 1:45
+
+## Summary
+
+Total billed time: 3:15
+</pre>
+<p><big><a href="https://github.com/rcrowley/gitpaid">Git Paid on GitHub</a></big></p>
+</article>
+{% endblock %}

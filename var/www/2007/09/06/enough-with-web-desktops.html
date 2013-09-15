@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Enough with web desktops &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/09/06/enough-with-web-desktops">Enough with web desktops</a> <small>2007/09/06</small></h1>
+<p>For reference, here's what sent me over the edge: <a href="http://feeds.feedburner.com/~r/ajaxian/~3/152975424/ext-20-scrolling-tabs-anchor-layout-the-web-desktop-and-more">Ext 2.0: Scrolling Tabs, Anchor Layout, the Web Desktop, and more (Ajaxian)</a></p>
+<p>I might break up with the Internet if I keep seeing so much misguided effort spent on making a website behave like a whole operating system.&nbsp; Because I think I'm dealing with some rather thick skulls, I'll put this simply: stop.&nbsp; Now.</p>
+<p>An arguably great feature of web apps is that they're more two-dimensional than three-dimensional.&nbsp; It promotes focus.&nbsp; It discourages repeated seizure-inducing Expos&eacute; usage.&nbsp; While I'm on the topic, I can't wait for someone to do Expos&eacute; in Javascript.&nbsp; That's exactly what we need.&nbsp; (It'll give me something to write about, at least.)</p>
+<p>I'd like to propose a couple of rules that will kill stupid stuff like web desktops, all the while promoting smart use of Javascript wizardry.</p>
+<ul>
+	<li>If any two things can partially overlap, you're fired.</li>
+	<li>If any drag &amp; drop events don't result in database writes, get out.</li>
+	<li>If your website looks like Microsoft Windows, you've stepped over the line.</li>
+</ul>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(6)</small></h1>
+<ol>
+	<li>
+		<p>Don't you know, the ultimate thin client just has enough software to run firefox.&nbsp; Then you won't need an amazing computer, you can just do all your work using that web desktop as your home page.&nbsp; The best part is when you open up that browser on your web desktop man.&nbsp; You're looking at web sites through a browser inside your browser.&nbsp; Ridiculous man.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2007/09/07 3:14 am</p>
+	</li>
+
+	<li>
+		<p>David: That was the idea behind Parakey platform right?</p>
+		<p>&mdash; <a href="http://www.youtilize.com">Dimitry</a> &mdash; 2007/09/07 11:57 am</p>
+	</li>
+
+	<li>
+		<p>I didn't really follow Parakey, like I looked at stuff one day and it seemed pretty secretive.&nbsp; Then a while later I heard they were being bought by Facebook.&nbsp; That said, I think that was a lot of the gist of it, but it also went into Google Gears territory of basically everything still runs in the "browser", but you have an offline sync and still run things when you are disconnected from the network.&nbsp; I would argue this goes beyond the web desktop and stuff is more connected to your individual computer which can disconnect from the network while the web desktop/thin client model relies on being connected to function.&nbsp; (I want to make the distinction based on whether you have to install an extension to firefox to make it function, but then I'm defining things by what functionality a browser decides to include in its core, which is silly).&nbsp; (Actually, the real distinction maybe should be on whether the server keeps state with your computer without syncing, I would define a web desktop as always keeping sync).</p>
+<p>Really, I have to see parakey to comment more.&nbsp; I just went to their website more and they talk about things like cd burning applications, and I really want to know what they think is superior about what they want to do versus apt-getting nautilus.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2007/09/07 7:04 pm</p>
+	</li>
+
+	<li>
+		<p>Hmm, I dunno.&nbsp; I am writing an app right now in which drag and drop events only result in a DB write when you click "Save" :P I guess I'm fired.</p>
+		<p>&mdash; <a href="http://mihasya.com">Mike Panchenko</a> &mdash; 2007/09/09 3:18 pm</p>
+	</li>
+
+	<li>
+		<p>@Mike: That's fair.&nbsp; What I was trying to discourage was arbitrary, pointless and confusing moving-around of parts of the UI.</p>
+		<p>&mdash; <a href="http://richarddcrowley.org/">Richard Crowley</a> &mdash; 2007/09/09 7:00 pm</p>
+	</li>
+
+	<li>
+		<p>this is like asking people to care more about plastic in the oceans than Paris Hilton.&nbsp; show your take on the perfect UI and then Ext to 100 project managers, i have a good idea which one they are gonna say "ooooh , i want that" for; particularly if you are building an intranet web app.</p>
+<p>to a lot of end users everything on a computer should work the same.&nbsp; if they see a web version of data they have seen in excel, they want the web version to work the same way (sort it, filter it, resize it, move it to the side, minimize it, use a tab to show another version, etc.&nbsp;  they mix and match to their heart's content.&nbsp; they make these wishes a business requirement.&nbsp; they get some funding, hire some developers.&nbsp; next thing you know you have Ext.</p>
+<p>admittedly it can be kinda fun to build that stuff. does that make it right? doubt it. </p>
+<p>* users love when things can overlap, particularly mac users, the more confusing it becomes the happier they seem to be
+* users love to drag&amp;drop things without anyone knowing (i.e. playing), if they don't tell you to save it they did not mean it
+* users request what they know, and get really unhappy when they don't get it</p>
+<p>programmers are not noted for their creativity when it comes to ui, so for most it is easier to follow the end users desire ("make it look like windows") than come up with an appropriate/novel solution.&nbsp; since ui specialist and designers are considered luxury items on most budgets i don't see that changing anytime soon, and things like GWT are not helping matters.</p>
+		<p>&mdash; alek &mdash; 2007/09/27 12:00 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/8a16ec049fc120d5fd6f7410b3c7d73f?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

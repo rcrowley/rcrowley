@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JSONRequest amendment &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/09/23/jsonrequest-amendment">JSONRequest amendment</a> <small>2007/09/23</small></h1>
+<p><a href="http://www.json.org/JSONRequest.html">JSONRequest</a> was born from Crockford's head more than a year ago, but only this month has it really gotten interesting.  Collin Jackson has released a <a href="http://crypto.stanford.edu/jsonrequest/">Firefox extension</a> implementing the JSONRequest spec.  I was naturally compelled to play with it.</p>
+<p>JSONRequest is a proposed new standard that could replace XMLHttpRequest and shed the crippling "same domain policy" that makes it a pain to consume outside APIs in Javascript.  It's secure enough for cross-site-scripting for a couple of reasons.  I'm lazy, so here are Crockford's words:</p>
+<ol>
+	<li><code>JSONRequest</code> does not send or receive cookies or passwords in HTTP headers. This avoids false authorization situations. Knowing the name of a site does not grant the ability to use its browser credentials.</li>
+	<li><code>JSONRequest</code> works only with JSON text. The <code>JSONRequest</code> cannot be used to access legacy data or documents or scripts. This avoids attacks on internal websites which assume that access is sufficient authorization. A request will fail if the response is not perfectly UTF-8 encoded. Suboptimal aliases and surrogates will fail. A request will fail if the response is not      strictly in JSON format. A request will fail if the server does not respond to <code>POST</code> with a JSON payload.</li>
+	<li>Reponses will be rejected unless they contain a <code>JSONRequest</code> content type. This makes it impossible to use JSONRequest to obtain data from insecure legacy servers.</li>
+	<li><code>JSONRequest</code> reveals very little error information. In some cases, the goal of a miscreant is to access the information that can be obtained from an error message. <code>JSONRequest</code> does not return this information to the requesting script. It may provide the information to the user through a log or other mechanism, but not in a form that the script can ordinarily access.</li>
+	<li><code>JSONRequest</code> accumulates random delays before acting on new requests      when previous requests have failed. This is to frustrate timing analysis attacks and denial of service attacks.</li>
+</ol>
+<p>From this list, #1 and #3 make the most difference.  Without sending cookies, it will be very difficult to send requests impersonating a logged-in user.  By requiring the <code>application/jsonrequest</code> content type <em>on the response</em>, the standard requires that the API provider take action to allow <code>JSONRequest</code>s.  This leaves no excuse for lazy API providers who don't make their API secure.</p>
+<p>As for other security holes, I've been poking around a bit against the Flickr API.  I had to steal an API key, the shared secret for that key <em>and</em> a user's token that came from that API key before I could do anything nasty.  Now, since getting these three pieces of information gives you free reign even without JSONRequest, I don't see much of a threat here.</p>
+<p>As a bit of an aside, OAuth seems to work very much like the Flickr API and so JSONRequest will be equally innocuous for OAuth users.</p>
+<h2>OK, finally the amendment part</h2>
+<p>Requiring that all POST requests be sent as well-formed JSON data severely limits JSONRequest's ability to take web apps to the next level.  The inability to send traditional POST payloads isn't such a big deal, but the inability to send multipart POSTs for file uploads is tragic.</p>
+<p>Of course, it isn't as easy as just lifting the JSON-only restriction on POST payloads.  As <a href="http://immike.net/">Mike</a> pointed out to me last night, old sites using GET variables to handle authentication (PHPSESSID anyone?) are pretty much sitting ducks.  But there's always another way.</p>
+<p>Allowing traditional or multipart POSTs without some prior setup can be hazardous.  Although these will always return an error to the caller, on the server side they may be successful which could really muck up your databases.  The solution is simply to require a successful JSON POST immediately prior to accepting the multipart request as a way for the server to say "yes, I want that multipart POST."  In pseudocode, something like this:</p>
+<pre>JSONRequest.post_multipart = function(url, send, done, timeout) {
+  JSONRequest.post(url, {'multipart': 1}, function(requestNumber, value, exception) {
+    if (value) {
+      // Here we would take params passed to post_multipart and actually
+      // send the multipart request.  The result of that would be passed
+      // to the function the called passed in the done param.  The
+      // intermediate JSON POST is essentially invisible.
+    } else {
+      console.log(exception.message);
+    }
+  }
+};</pre>
+<p>With this we will finally have hack-free file uploads in addition to safe cross site scripting.  Even Microsoft can't say no to implementing that.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(0)</small></h1>
+<ol>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/58a9ea3fff8e9e13a4bd5ca521d5f1bd?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Debra &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+<article>
+<header>
+	<time datetime="2010-05-11" pubdate>2010-05-11</time>
+	<h1>Debra</h1>
+</header>
+<p>Yesterday, Noah Campbell started a discussion about <code>autoconf</code>(1) on the <a href="http://groups.google.com/group/devops-toolchain">devops-toolchain</a> mailing list and his <a href="http://groups.google.com/group/devops-toolchain/browse_thread/thread/c11836a096616fdb#msg_607cb824d9b84fac">followup</a> caught my attention:</p>
+<blockquote>
+<p>I have a makefile and an rpm spec files that I'd like to generate on behalf of the user provide some very simple input, i.e. a name, etc.</p>
+<p>Think of it as a quick way to generate the necessary scaffolding to build and package a project.&nbsp; I think autoconf does this, but I'm not experienced with that tool chain and I'm looking for a few pointers on how to start.</p>
+</blockquote>
+<p>Here&#8217;s my <a href="http://groups.google.com/group/devops-toolchain/browse_thread/thread/c11836a096616fdb#msg_40b06b3dee35b15f">response</a>:</p>
+<blockquote>
+<p>Apologies that this is built on Debian packages and you're after RPMs but your problem seems so similar that it gave me the final push to open-source Debra: https://github.com/devstructure/debra</p>
+<p>I use debra-makefile(1) (along with manskeleton(1) from http://github.com/rcrowley/manskeleton but that's tangential) when starting any new project and the generated Makefile to build Debian packages far more easily than with dpkg-deb(1) alone.</p>
+<p>GNU autoconf alone leaves you with source packages, which can be the right way to go but proper packages give tools like Puppet the ability to only install/upgrade what is actually missing/out-of-date.</p>
+<p>Part of the motivation for building this tool was to attempt to standardize on our system's package management, avoiding RubyGems and the like wherever possible.&nbsp; If it doesn't help you directly, I hope you can steal anything that's useful.</p>
+<p>Rich</p>
+</blockquote>
+<p>Debra is a tool I wrote to build Debian packages, my preferred method of distributing code these days.&nbsp; It contains a set of tools that roughly add up to a bridge between Makefiles and Debian packages.&nbsp; The manual pages are available online:</p>
+<ul>
+	<li><a href="http://rcrowley.github.com/debra/"><code>debra</code>(1)</a></li>
+	<li><a href="http://rcrowley.github.com/debra/debra-create.1.html"><code>debra-create</code>(1)</a></li>
+	<li><a href="http://rcrowley.github.com/debra/debra-sourceinstall.1.html"><code>debra-sourceinstall</code>(1)</a></li>
+	<li><a href="http://rcrowley.github.com/debra/debra-build.1.html"><code>debra-build</code>(1)</a></li>
+	<li><a href="http://rcrowley.github.com/debra/debra-destroy.1.html"><code>debra-destroy</code>(1)</a></li>
+	<li><a href="http://rcrowley.github.com/debra/debra-makefile.1.html"><code>debra-makefile</code>(1)</a></li>
+	<li><a href="http://rcrowley.github.com/debra/sourceinstall.1.html"><code>sourceinstall</code>(1)</a></li>
+</ul>
+<p>If you&#8217;re using Puppet, Chef, or something similar for configuration management, I highly recommend packaging your software.&nbsp; Package managers make configuration management smarter and generally save themselves quite a bit of work.&nbsp; Beyond that, I have become a big fan of pushing as much as possible into the <em>system</em> package manager and out of the isolated hands of RubyGems and the like.</p>
+<p>Last but not least, code: <a href="https://github.com/rcrowley/debra">https://github.com/rcrowley/debra</a>.</p>
+</article>
+<footer class="site">
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2010 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 # Extra search pathnames.
-for BINDIR in "$HOME/bin" "/opt/local/bin" /var/lib/gems/*/bin
+for BINDIR in "$HOME/local/bin" "$HOME/bin" "/opt/local/bin" /var/lib/gems/*/bin
 do
 	[ -d "$BINDIR" ] || continue
-	expr "$PATH" : ".*$BINDIR" >/dev/null && continue
+	expr "$PATH" : ".*$BINDIR" >"/dev/null" && continue
 	export PATH="$BINDIR:$PATH"
 done

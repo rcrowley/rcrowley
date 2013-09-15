@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PownceFS &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/03/22/powncefs">PownceFS</a> <small>2008/03/22</small></h1>
+<p>The magical code push finally happened!&nbsp; Time to send PownceFS into the Internet.&nbsp; PownceFS is a <a href="http://fuse.sourceforge.net/">Fuse filesystem</a> that mounts your friends' files from <a href="http://pownce.com/">Pownce</a> as a local filesystem.&nbsp; Given a mountpoint, it fakes a directory for each of your friends and puts all the files they've uploaded inside.&nbsp; Files are cached locally for a while so you can repeatedly access things without spending your life waiting on yet another API call.</p>
+<h2>I can <code>ls -l</code> Mike Malone now!</h2>
+<pre>rcrowley@banzai:~/powncefs$ ./powncefs.py mnt
+rcrowley@banzai:~/powncefs$ ls -l mnt/
+total 0
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 ajvchuk
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 andreiz
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 Andrew
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 chaddickerson
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 cowsandmilk
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 eston
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 evilcindy
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 flawedartist
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 halletecco
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 iamcal
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 ianloic
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 karaemurphy
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 katherinerose1224
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 katiejane
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 laughingsquid
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 leahculver
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 mmalone
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 philfreo
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 phil_halley
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 rcrowley
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 tychay
+dr-xr-xr-x 2 rcrowley users 0 1969-12-31 16:00 waferbaby
+rcrowley@banzai:~/powncefs$ ls -l mnt/mmalone/
+total 41429
+-r--r--r-- 1 rcrowley users    59381 1969-12-31 16:00 loveletter.jpg
+-r--r--r-- 1 rcrowley users   291326 1969-12-31 16:00 mule.png
+-r--r--r-- 1 rcrowley users     3830 1969-12-31 16:00 powncer.zip
+-r--r--r-- 1 rcrowley users    75202 1969-12-31 16:00 sxsw_badge.jpg
+-r--r--r-- 1 rcrowley users 41992791 1969-12-31 16:00 TWiT0134H.mp3
+rcrowley@banzai:~/powncefs$ fusermount -u mnt
+rcrowley@banzai:~/powncefs$</pre>
+<h2>How can I get some, too?</h2>
+<p>On Linux it's simply a matter of installing Fuse, python-fuse and the Python OAuth library.</p>
+<pre>$ sudo apt-get install python-fuse
+$ cd /usr/lib/python2.5/site-packages/
+$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth</pre>
+<p>On a Mac I think it's pretty easy but my Python's wonky.&nbsp; Methinks the dependencies work themselves out &mdash; can someone verify?</p>
+<pre>$ sudo port install fuse-bindings-python
+$ cd &lt;wherever the hell Python is&gt;
+$ sudo svn co http://oauth.googlecode.com/svn/code/python/oauth</pre>
+<p><del><big><a href="http://rcrowley.org/work/powncefs-0.1.tar.bz2">powncefs-0.1.tar.bz2</a></big> or <a href="http://svn.rcrowley.org/svn/powncefs/">http://svn.rcrowley.org/svn/powncefs/</a></del> <big><a href="http://github.com/rcrowley/powncefs/tree/master">PownceFS on GitHub</a></big></p>
+<h2>Nerd out with me</h2>
+<p>The "architecture" (if you can really call something with 2 files an architecture) goes something like this: when you run the script a <code>PownceFS</code> object is created.&nbsp; The first thing it does is authenticate with Pownce and pull down your friends list to create it's directory structure.&nbsp; Whenever necessary it makes an additional API call to Pownce to fetch the list of files for a particular user (say, if you <code>ls</code> their directory).&nbsp; API calls and files are cached for 45 minutes (safely under the one hour TTL of the S3 URLs returned by the API).</p>
+<p>The root of the filesystem is a <code>PownceFS.Base</code> object that contains a dictionary of usernames to <code>PownceFS.User</code> objects.&nbsp; Each <code>PownceFS.User</code> contains a dictionary of filenames to <code>PownceFS.File</code> objects (look, Ma, inheritance!).</p>
+<p>The main <code>PownceFS</code> object implements system call equivalents like <code>getattr</code> and <code>readdir</code> but defers the thinking to the tree of <code>PownceFS.Base</code> and friends.&nbsp; Each of those objects has a <code>getattr</code> function handling all of the filesystem bookkeeping, <code>get</code> and <code>put</code> methods for manipulating children and a <code>fetch</code> method for performing any API calls that need to happen.&nbsp; <code>PownceFS.File</code>s have an additional <code>read</code> method that reads the locally-cached copy of its file.</p>
+<p>The point of that long-winded explanation is that the "architecture" is useful for absolutely any web service that might be a useful filesystem.&nbsp; The api.py file handles all of the OAuth-y stuff and leaves powncefs.py fairly generic.&nbsp; Hack!</p>
+<p>Again, <del><a href="http://svn.rcrowley.org/svn/powncefs/">http://svn.rcrowley.org/svn/powncefs/</a></del> <big><a href="http://github.com/rcrowley/powncefs/tree/master">PownceFS on GitHub</a></big>.</p>
+<h2>Future plans</h2>
+<p>The most obvious enhancement is to allow file uploads, which I'm planning on adding soon.&nbsp; Otherwise I need to find a few minutes to loop the API calls to return more than 100 files for those Power Users.&nbsp; Details, details.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(27)</small></h1>
+<ol>
+	<li>
+		<p>Neat addition.</p>
+<p>So if you make a nice GUI version of this, is it similar to the DropBox concept? (http://www.getdropbox.com/). Because that could be pretty lucrative for Pownce.</p>
+<p>Unfortunately command line fun won't capture the masses.</p>
+		<p>&mdash; <a href="http://www.arthero.com">Dimitry</a> &mdash; 2008/03/22 1:20 pm</p>
+	</li>
+
+	<li>
+		<p>The beauty is that I wouldn't have to "make a nice GUI," because it'd just work.&nbsp; Right now it's like a read-only folder in Finder.&nbsp; Soon it'll be a read-write folder in Finder.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/03/22 1:56 pm</p>
+	</li>
+
+	<li>
+		<p>Now if only I could get it to work in OS X :(</p>
+<p>Damn fink.</p>
+		<p>&mdash; <a href="http://immike.net">Mike Malone</a> &mdash; 2008/03/22 11:17 pm</p>
+	</li>
+
+	<li>
+		<p>Plus++.</p>
+<p>This is rad ..&nbsp; I love how the "REST is like a filesystem" connection is starting to sprout legs.</p>
+		<p>&mdash; <a href="http://mike.teczno.com">Michal Migurski</a> &mdash; 2008/03/22 11:18 pm</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; PownceFS, the Pownce File System. Per-buddy subdirectories containing their uploaded files. [...]</p>
+		<p>&mdash; <a href="http://www.hendrikmans.com/2008/03/23/powncefs/">Hendrik Mans &raquo; PownceFS</a> &mdash; 2008/03/23 3:22 am</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; PownceFS — Richard Crowley’s blog Richard pownceFS mountolasa (tags: fuse pownce api python web programming social macfuse richardcrowley filesystem) [...]</p>
+		<p>&mdash; <a href="http://kobak.org/2008/03/23/links-for-2008-03-23/">links for 2008-03-23@kobak pont org</a> &mdash; 2008/03/23 2:19 pm</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; Richard Crowley&#8217;s blog. I found there three cool hacks, specially the last two. The first is PownceFS and implementation of your Pownce friends archives as a filesystem. Systems like this and like [...]</p>
+		<p>&mdash; <a href="http://alcidesfonseca.com/blog/334">Alcides Fonseca - Geekish Links</a> &mdash; 2008/03/23 3:35 pm</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; PownceFS Uses FUSE to set up a directory with all the files your friends have uploaded on Pownce. Nifty. Also OAuth, which is showing up all over these days. (tags: fuse oauth pownce python) [...]</p>
+		<p>&mdash; <a href="http://socialmob.net/2008/03/links-for-2008-03-24/">links for 2008-03-24 | SOCIALMOB</a> &mdash; 2008/03/23 4:35 pm</p>
+	</li>
+
+	<li>
+		<p>I might have to cave in and try this Pownce thing..&nbsp; this looks sexy. Does this mean I can have easier access to your porn stash?</p>
+		<p>&mdash; <a href="http://mihasya.com">Mike Panchenko</a> &mdash; 2008/03/23 8:45 pm</p>
+	</li>
+
+	<li>
+		<p>Hey Richard, I gave installing PownceFS on a fairly clean 10.5 setup and documented it on my blog.&nbsp; I was able to get past the MacPorts problems (there were problems first w/ my having a prior  MacFUSE installation, then w/ libfuse's lack of CF linking) and got far enough to get past any fatal errors, but haven't been able to actually list or read files.</p>
+		<p>&mdash; <a href="http://randomfoo.net/">leonard</a> &mdash; 2008/03/24 1:38 am</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; PownceFS (Richard Crowley) [...]</p>
+		<p>&mdash; <a href="http://www.alvinashcraft.com/2008/03/24/dew-drop-march-22-2008-2/">Dew Drop - March 22, 2008 | Alvin Ashcraft's Morning Dew</a> &mdash; 2008/03/24 4:08 am</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; (Source: PownceFS — Richard Crowley’s blog) [...]</p>
+		<p>&mdash; <a href="http://cdevroe.com/links/powncefs/">PownceFS by Richard Crowley | Hi, I&#8217;m Colin Devroe.</a> &mdash; 2008/03/24 5:36 am</p>
+	</li>
+
+	<li>
+		<p>That is way too rad.&nbsp; I have this working in ubuntu, I'll have to try OS X when I get home.</p>
+		<p>&mdash; <a href="http://shifteleven.com">K. Adam Christensen</a> &mdash; 2008/03/24 9:19 am</p>
+	</li>
+
+	<li>
+		<p>Err, just to note you also need python-json installed</p>
+		<p>&mdash; Xipietotec &mdash; 2008/03/24 5:33 pm</p>
+	</li>
+
+	<li>
+		<p>Richard, this is awesome. I so want this but I'm not quite there yet. Blame it on my linux ignorance..</p>
+<p>I'm using Ubuntu gutsy. I'm sooo close.</p>
+<p>I added svn, python-fuse and python-json. </p>
+<p>Now I got a permission error. I tried using sudo and got it to run on /mnt withtout the permission error. Now that folder is kind of screwed. I've  been using Linux for a while, but this mountpoint stuff is throwing me off.</p>
+<p>Here's a sample. Any ubuntu folks have comments?</p>
+<p>mrjabba@ionia:~/dev/python/powncefs/trunk$ sudo python ./powncefs.py /mnt
+fuse: mountpoint is not empty
+fuse: if you are sure this is safe, use the 'nonempty' mount option
+Traceback (most recent call last):
+  File "./powncefs.py", line 324, in 
+    main()
+  File "./powncefs.py", line 321, in main
+    fs.main()
+  File "./powncefs.py", line 275, in main
+    return Fuse.main(self, *a, **kw)
+  File "/usr/lib/python2.5/site-packages/fuse.py", line 713, in main
+    main(**d)
+fuse.FuseError: filesystem initialization failed
+mrjabba@ionia:~/dev/python/powncefs/trunk$ </p>
+<p>I'll blog this and work on it in time :-)
+Also, I'm kind of new to Python as well.</p>
+<p>K</p>
+		<p>&mdash; <a href="http://mrjabba.blogspot.com/">Kevin H</a> &mdash; 2008/03/25 4:38 pm</p>
+	</li>
+
+	<li>
+		<p>@Kevin: may I suggest getting rid of that slash in front of mnt?&nbsp; In Richard's example, he's in a folder just off his home directory called ~/powncefs.&nbsp; He then mounts the Fuse filesystem into a directory called mnt, so it is located at ~/powncefs/mnt.&nbsp; What you're doing is trying to put it in /mnt , which isn't a good idea.&nbsp; If you put it in something like /mnt/powncefs, that might be acceptable, but still not a good idea.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/03/25 5:40 pm</p>
+	</li>
+
+	<li>
+		<p>Also, I should note that powncefs has the +x bit when it's checked out, so you don't need that python, and when you put it in a directory you control instead of one that is owned by root, you don't need to do sudo.&nbsp; And you don't need to be sudo to look at it in things like your file browser.&nbsp; Just don't put it in /mnt is essentially what all that means...</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/03/25 5:43 pm</p>
+	</li>
+
+	<li>
+		<p>What DHall said.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/03/25 7:49 pm</p>
+	</li>
+
+	<li>
+		<p>Um add a "Comments" link to the bottom of your posts. I'm far too lazy to scroll back up to the top of the page to click on the title - and you know this!</p>
+		<p>&mdash; <a href="http://mihasya.com">Mike Panchenko</a> &mdash; 2008/03/26 6:30 am</p>
+	</li>
+
+	<li>
+		<p>Thanks for the help guys. I obviously misread the docs the 1st time.
+So, you're just creating a folder. I thought "mnt" was significant.</p>
+<p>OK. Got it. However, I had to modify my permissions on fuse and fusermount.
+I followed the advice on the FUSE FAQ:
+http://fuse.sourceforge.net/wiki/index.php/FAQ</p>
+<p>I ran it again and it worked. My friend's folders show up now. Wow. This is so cool.</p>
+<p>Thanks SO much!</p>
+<p>Kevin</p>
+		<p>&mdash; <a href="http://mrjabba.blogspot.com/">Kevin H</a> &mdash; 2008/03/27 5:03 pm</p>
+	</li>
+
+	<li>
+		<p>I managed to run powncefs and mount properly.</p>
+<p>but...</p>
+<p>ls: cannot open directory .&nbsp; Invalid argument</p>
+<p>Is the error I get when trying to enter the mounted directory.
+Why is that?</p>
+		<p>&mdash; some dude &mdash; 2008/04/03 7:34 am</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; pownce, powncefs, python Well, the first version of PownceFS didn&#8217;t turn out as well as I had hoped. After I put it out in the world, Leonard ran with it [...]</p>
+		<p>&mdash; <a href="http://rcrowley.org/2008/06/04/powncefs-round-two/">PownceFS, round two &mdash; Richard Crowley’s blog</a> &mdash; 2008/06/04 10:03 pm</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; PownceFS - Fuse filesystem for Pownce files. [...]</p>
+		<p>&mdash; <a href="http://techidea.wordpress.com/2008/06/07/where-i-can-get-desktop-client-of-powncecom/">Where I Can Get Desktop Client Of Pownce.com? &laquo; TECH IDEA</a> &mdash; 2008/06/07 4:22 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/3e4da8ab21c52524d71fd4fc25b9568e?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Node.js at Betable</title>
+
+  <meta name="viewport" content="width=device-width"/>
+
+  <link rel="stylesheet" href="./css/reset.css" type="text/css"/>
+  <link rel="stylesheet" href="./css/showoff.css" type="text/css"/>
+
+  <script type="text/javascript" src="./js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="./js/jquery.cycle.all.js"></script>
+	<script type="text/javascript" src="./js/jquery-print.js"></script>
+  <script type="text/javascript" src="./js/jquery.batchImageLoad.js"></script>
+
+  <script type="text/javascript" src="./js/jquery.doubletap-0.1.js"></script>
+
+  <script type="text/javascript" src="./js/fg.menu.js"></script>
+  <script type="text/javascript" src="./js/showoff.js"></script>
+  <script type="text/javascript" src="./js/jTypeWriter.js"> </script>
+  <script type="text/javascript" src="./js/sh_main.min.js"></script>
+  <script type="text/javascript" src="./js/core.js"></script>
+  <script type="text/javascript" src="./js/showoffcore.js"></script>
+  <script type="text/javascript" src="./js/coffee-script.js"></script>
+
+  <link type="text/css" href="./css/fg.menu.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/theme/ui.all.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/sh_style.css" rel="stylesheet" >
+
+  
+    <link rel="stylesheet" href="file/helfuckingvetica.css" type="text/css"/>
+  
+
+  
+    <script type="text/javascript" src="file/centerdammit.js"></script>
+  
+
+  <script type="text/javascript">
+  $(function(){
+      setupPreso(false, './');
+  });
+  </script>
+
+</head>
+
+<body>
+
+<a tabindex="0" href="#search-engines" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="navmenu"><span class="ui-icon ui-icon-triangle-1-s"></span>slides</a>
+<div id="navigation" class="hidden"></div>
+
+<div id="help">
+  <table>
+    <tr><td class="key">z, ?</td><td>toggle help (this)</td></tr>
+    <tr><td class="key">space, &rarr;</td><td>next slide</td></tr>
+    <tr><td class="key">shift-space, &larr;</td><td>previous slide</td></tr>
+    <tr><td class="key">d</td><td>toggle debug mode</td></tr>
+    <tr><td class="key">## &lt;ret&gt;</td><td>go to slide #</td></tr>
+    <tr><td class="key">c, t</td><td>table of contents (vi)</td></tr>
+    <tr><td class="key">f</td><td>toggle footer</td></tr>
+    <tr><td class="key">r</td><td>reload slides</td></tr>
+    <tr><td class="key">n</td><td>toggle notes</td></tr>
+    <tr><td class="key">p</td><td>run preshow</td></tr>
+  </table>
+</div>
+
+<div class="buttonNav">
+  <input type="submit" onClick="prevStep();" value="prev"/>
+  <input type="submit" onClick="nextStep();" value="next"/>
+</div>
+
+<div id="preso">loading presentation...</div>
+<div id="footer">
+  <span id="slideInfo"></span>
+  <span id="debugInfo"></span>
+  <span id="notesInfo"></span>
+</div>
+
+<div id="slides" class="offscreen" style="display:none;">
+<div class="slide" data-transition="none"><div class="content bullets" ref="./slides/1">
+<h1>Node.js at Betable</h1>
+
+<ul>
+<li>How do I production?</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/2">
+<h1>Hi, I&#x2019;m Richard Crowley</h1>
+
+<ul>
+<li>Equal-opportunity technology hater</li>
+<li>Head of operations at Betable</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/3">
+<h1>Betable</h1>
+
+<ul>
+<li>Only platform that allows any developer to offer real-money gaming in their apps</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/4">
+<h1>Node.js because</h1>
+
+<ul>
+<li>V8 is <em>fast</em></li>
+<li>Expresses network services<br/>reasonably well</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/5">
+<h1>Node.js despite</h1>
+
+<ul>
+<li>Callback hell</li>
+<li>Promise hell</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/6">
+<h1>Pre-production</h1></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/7">
+<h1>Debian packages</h1>
+
+<ul>
+<li>Deploy by running Puppet</li>
+<li>Easy to vendor dependencies</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/8">
+<h1>Debian packaging tools</h1>
+
+<ul>
+<li><code>fpm</code><br/><small><a href="https://github.com/jordansissel/fpm">github.com/jordansissel/fpm</a></small></li>
+<li><code>freight</code><br/><small><a href="https://github.com/rcrowley/freight">github.com/rcrowley/freight</a></small></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/9">
+<h1>Git</h1>
+
+<ul>
+<li>Lingua franca for our engineers</li>
+<li>Basis in cryptographic hashes is really convenient for auditability</li>
+<li><code>master</code> is always deployable</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/10">
+<h1><code>git push origin master</code></h1>
+
+<ul>
+<li>...to <code>git.ops.betable.com</code></li>
+<li><code>post-receive</code> pokes Jenkins</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/11">
+<h1>Jenkins</h1>
+
+<ul>
+<li>We do not use the Git plugin</li>
+<li>&#x201C;Execute shell&#x201D; build step</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/12">
+<h1>Jenkins for Node.js</h1>
+
+<ul>
+<li>Clone, if necessary</li>
+<li>Checkout the commit to build</li>
+<li><code>NODE_ENV="test" npm install</code></li>
+<li><code>make test</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/13">
+<h1>Jenkins for Node.js</h1>
+
+<pre class="sh_sh"><code>git rm ".gitignore"
+
+find * -type f |
+git hash-object --stdin-paths -w
+
+git add "."</code></pre>
+
+<ul>
+<li>Vendor <code>node_modules</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/14">
+<h1>Jenkins for Node.js</h1>
+
+<pre class="sh_sh"><code>git write-tree
+
+git commit-tree "$TREE" \
+-p "$BRANCH_PARENT" -p "$CI_PARENT"
+
+git update-ref \
+"refs/heads/ci-$BRANCH-latest" \
+"$COMMIT"
+
+git reset --hard
+
+git push --force "origin" \
+"$COMMIT:refs/heads/ci-$BRANCH-latest" \
+"$COMMIT:refs/tags/build-$BUILD_NUMBER"</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/15">
+<h1><code>deploy <em>service</em> to staging</code></h1>
+
+<ul>
+<li>The last thing Jenkins does</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/16">
+<h1><code>deploy</code></h1>
+
+<ul>
+<li><code>flock</code>(1) to serialize deploys</li>
+<li>Broadcast deploys to Campfire,<br/>Graphite, <code>rsyslog</code>, and a mailing list</li>
+<li>Then deploys using Git</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/17">
+<h1>Git, again</h1>
+
+<pre class="sh_sh"><code>git update-ref \
+"refs/heads/$BRANCH" "$SHA"
+
+git push --force \
+"git@$HOST:$APPLICATION.git" "$BRANCH"</code></pre>
+
+<ul>
+<li>Fast-forwards <code>staging-latest</code> to<br/><code>ci-master-latest</code> for staging</li>
+<li>Fast-forwards <code>production-latest</code> to<br/><code>staging-latest</code> for production</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/18">
+<h1><code>post-receive</code></h1>
+
+<ul>
+<li>Checks out the pushed commit</li>
+<li>Runs <code>hooks/post-receive</code></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/19">
+<h1><code>hooks/post-receive</code></h1>
+
+<ul>
+<li>Manage static files</li>
+<li>Manage load balancer membership</li>
+<li>Restart Upstart service(s)</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/20">
+<h1>Upstart</h1>
+
+<ul>
+<li>Canonical&#x2019;s SysV init replacement</li>
+<li>Meh</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/21">
+<h1>Upstart because</h1>
+
+<ul>
+<li>Direct parent supervision restarts processes that exit unexpectedly</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/22">
+<p class="notes">Zero-downtime deploys using SCM_RIGHTS from unix(7) still works</p>
+
+<h1>Upstart despite</h1>
+
+<ul>
+<li>Zero-downtime deploys using file descriptor inheritance are impossible</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/23">
+<pre class="sh_sh"><code>description "betable-id"
+start on runlevel [2345]
+stop on runlevel [!2345]
+respawn
+setuid betable-id
+setgid betable-id
+chdir /usr/local/lib/node_modules/betable-id
+env GRAPHITE_HOST="10.47.108.9"
+env GRAPHITE_PORT="2003"
+env NODE_ENV="staging"
+env NODE_PORT="8020"
+env NSCA="10.47.108.9"
+env STATSD_HOST="10.47.108.9"
+env STATSD_PORT="8125"
+env STATSD_PREFIX="betable-id"
+script
+    set -e
+    rm -f "/tmp/betable-id.log"
+    mkfifo "/tmp/betable-id.log"
+    (logger -t"betable-id" &lt;"/tmp/betable-id.log" &amp;)
+    exec &gt;"/tmp/betable-id.log" 2&gt;"/tmp/betable-id.log"
+    rm "/tmp/betable-id.log"
+    exec node "bin/betable-id"
+end script</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/24">
+<h1>Local Nginx</h1>
+
+<ul>
+<li>Terminates TLS connections</li>
+<li>Routes based on <code>Host</code> headers to <code>node</code> processes listening on 127.0.0.1</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/25">
+<h1>Non-local Nginx<br/>load balancer</h1>
+
+<ul>
+<li>Terminates TLS connections</li>
+<li>Adds <code>X-Forwarded-For</code> header</li>
+<li>Balances load on upstream nodes</li>
+<li>TLS to upstream nodes, too</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/26">
+<h1>Load balancer retries</h1>
+
+<pre><code>location / {
+  error_page 500 502 503 = @https-retry;
+  proxy_intercept_errors on;
+  proxy_next_upstream off;
+  proxy_pass http://https-upstream;
+}
+
+location @https-retry {
+  proxy_intercept_errors off;
+  proxy_next_upstream off;
+  proxy_pass http://https-upstream;
+  proxy_set_header X-Betable-Retry yes;
+}
+</code></pre>
+
+<ul>
+<li>Exactly once to contain cascading failures</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/27">
+<h1>Everything logs everything</h1>
+
+<ul>
+<li>Request identifier for a poor-man&#x2019;s Dapper</li>
+<li>Human-readable and machine-parsable</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/28">
+<pre><code>Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; POST /games/REDACTED/bet?access_token=REDACTED HTTP/1.1
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; Host: games.internal.betable.com
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; Connection: close
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Betable-Client-Id: REDACTED
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Betable-Request-Id: ccbYQHB1xzwqWkjvyKV5i9
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; Authorization: Basic REDACTED (client_id: betable)
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; Content-Type: application/json; charset=utf8
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Betable-Access-Token: REDACTED
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Betable-User-Id: REDACTED
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Forwarded-For: 31.222.179.165
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; Content-Length: 129
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; {
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;     "currency": "GBP",
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;     "economy": "sandbox",
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;     "paylines": [
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;         [
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;             1,
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;             1,
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;             1
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;         ]
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;     ],
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;     "wager": "0.01",
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt;     "player_ledger": "REDACTED"
+Feb 13 06:26:26 prod02 betable-games: ccbYQHB1xzwqWkjvyKV5i9 &gt; }
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/29">
+<pre><code>ccbYQHB1xzwqWkjvyKV5i9 &gt; POST /games/REDACTED/bet?access_token=REDACTED HTTP/1.1
+ccbYQHB1xzwqWkjvyKV5i9 &gt; Host: games.internal.betable.com
+ccbYQHB1xzwqWkjvyKV5i9 &gt; Connection: close
+ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Betable-Client-Id: REDACTED
+ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Betable-Request-Id: ccbYQHB1xzwqWkjvyKV5i9
+ccbYQHB1xzwqWkjvyKV5i9 &gt; Authorization: Basic REDACTED (client_id: betable)
+ccbYQHB1xzwqWkjvyKV5i9 &gt; Content-Type: application/json; charset=utf8
+ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Betable-Access-Token: REDACTED
+ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Betable-User-Id: REDACTED
+ccbYQHB1xzwqWkjvyKV5i9 &gt; X-Forwarded-For: 31.222.179.165
+ccbYQHB1xzwqWkjvyKV5i9 &gt; Content-Length: 129
+ccbYQHB1xzwqWkjvyKV5i9 &gt;
+ccbYQHB1xzwqWkjvyKV5i9 &gt; {
+ccbYQHB1xzwqWkjvyKV5i9 &gt;     "currency": "GBP",
+ccbYQHB1xzwqWkjvyKV5i9 &gt;     "economy": "sandbox",
+ccbYQHB1xzwqWkjvyKV5i9 &gt;     "paylines": [
+ccbYQHB1xzwqWkjvyKV5i9 &gt;         [
+ccbYQHB1xzwqWkjvyKV5i9 &gt;             1,
+ccbYQHB1xzwqWkjvyKV5i9 &gt;             1,
+ccbYQHB1xzwqWkjvyKV5i9 &gt;             1
+ccbYQHB1xzwqWkjvyKV5i9 &gt;         ]
+ccbYQHB1xzwqWkjvyKV5i9 &gt;     ],
+ccbYQHB1xzwqWkjvyKV5i9 &gt;     "wager": "0.01",
+ccbYQHB1xzwqWkjvyKV5i9 &gt;     "player_ledger": "REDACTED"
+ccbYQHB1xzwqWkjvyKV5i9 &gt; }
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/30">
+<pre><code>&gt; POST /games/REDACTED/bet?access_token=REDACTED HTTP/1.1
+&gt; Host: games.internal.betable.com
+&gt; Connection: close
+&gt; X-Betable-Client-Id: REDACTED
+&gt; X-Betable-Request-Id: ccbYQHB1xzwqWkjvyKV5i9
+&gt; Authorization: Basic REDACTED (client_id: betable)
+&gt; Content-Type: application/json; charset=utf8
+&gt; X-Betable-Access-Token: REDACTED
+&gt; X-Betable-User-Id: REDACTED
+&gt; X-Forwarded-For: 31.222.179.165
+&gt; Content-Length: 129
+&gt;
+&gt; {
+&gt;     "currency": "GBP",
+&gt;     "economy": "sandbox",
+&gt;     "paylines": [
+&gt;         [
+&gt;             1,
+&gt;             1,
+&gt;             1
+&gt;         ]
+&gt;     ],
+&gt;     "wager": "0.01",
+&gt;     "player_ledger": "REDACTED"
+&gt; }
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/31">
+<pre><code>&lt; HTTP/1.1 201 Created
+&lt;
+&lt; {
+&lt;     "window": [
+&lt;         [
+&lt;             "smalls",
+&lt;             "smalls",
+&lt;             "smalls"
+&lt;         ],
+&lt;         [
+&lt;             "biggie",
+&lt;             "biggie",
+&lt;             "smalls"
+&lt;         ],
+&lt;         [
+&lt;             "smalls",
+&lt;             "smalls",
+&lt;             "smalls"
+&lt;         ]
+&lt;     ],
+&lt;     "outcomes": [
+&lt;         {
+&lt;             "outcome": "lose",
+&lt;             "payline": [
+&lt;                 1,
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets smaller" ref="./slides/32">
+<pre><code>&lt;                 1,
+&lt;                 1
+&lt;             ],
+&lt;             "symbols": [
+&lt;                 "biggie",
+&lt;                 "biggie",
+&lt;                 "smalls"
+&lt;             ],
+&lt;             "payout": "0.00",
+&lt;             "credits": {},
+&lt;             "progressives": {}
+&lt;         }
+&lt;     ],
+&lt;     "stops": [
+&lt;         1,
+&lt;         2,
+&lt;         1
+&lt;     ],
+&lt;     "payout": "0.00",
+&lt;     "credits": {},
+&lt;     "progressives": {},
+&lt;     "currency": "GBP"
+&lt; }
+  164ms
+</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets small" ref="./slides/33">
+<h1><code>logger</code> Connect middleware</h1>
+
+<pre class="sh_javascript"><code>function logger(request, response, next) {
+    var chunks = []
+      , end = response.end
+      , write = response.write
+    response.write = function (chunk) {
+        chunks.push(chunk)
+        write.apply(response, arguments)
+    }
+    response.end = function (chunk) {
+        end.apply(response, arguments)
+        var log = []
+
+        // ...
+
+        process.stdout.write(log.join('\n'))
+    }
+}</code></pre></div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/34">
+<h1><code>logger</code> Connect middleware</h1>
+
+<ul>
+<li>Prefix lines with request identifier</li>
+<li>Redact sensitive information</li>
+<li>Stringify request and response bodies</li>
+<li>Time to first byte</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/35">
+<h1>Upstart, again</h1>
+
+<ul>
+<li><code>node</code> standard output and standard error<br/>redirected to a named pipe</li>
+<li><code>logger</code>(1) standard input<br/>redirected from the named pipe</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/36">
+<h1><code>rsyslog</code>(8)</h1>
+
+<ul>
+<li>Forward log entries to <code>log.ops.betable.com</code></li>
+<li>We use the reliable transport called RELP</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/37">
+<h1>Near-realtime log processing</h1>
+
+<ul>
+<li>Call attention to HTTP 500 responses</li>
+<li>Extract and forward metrics to Graphite</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/38">
+<h1>Logstash</h1>
+
+<ul>
+<li>Removed because ElasticSearch<br/>is a mess operationally</li>
+<li>Would like it back</li>
+<li>Will not be using native ElasticSearch clients or RabbitMQ when we bring it back</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/39">
+<h1><code>statsd</code></h1>
+
+<ul>
+<li>Additional metrics come from the code</li>
+<li>Finer-grained metrics are possible with context available in the code</li>
+<li><code>statsd</code> aggregates datagrams into Graphite</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/40">
+<h1>Puppet</h1>
+
+<ul>
+<li>Configuration management</li>
+<li>Peer discovery</li>
+<li>Emergent firewall rules</li>
+<li>Deployed via Git, too</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/41">
+<h1>All the things</h1>
+
+<ul>
+<li>Git<br/>Jenkins<br/>Upstart<br/>Nginx<br/><code>logger</code>(1)<br/><code>rsyslog</code>(8)<br/>Logstash<br/><code>statsd</code><br/>Graphite<br/>Puppet</li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/42">
+<h1>You know you want to work at Betable</h1>
+
+<ul>
+<li>Almost as much as you knew<br/>this slide was coming</li>
+<li><a href="mailto:richard@betable.com">richard@betable.com</a></li>
+</ul>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="./slides/43">
+<h1>Thank you</h1>
+
+<ul>
+<li><a href="http://rcrowley.org/talks/nodejs-2013-02-19/">rcrowley.org/talks/nodejs-2013-02-19/</a></li>
+<li><a href="mailto:r@rcrowley.org">r@rcrowley.org</a> or <a href="https://twitter.com/rcrowley">@rcrowley</a></li>
+</ul>
+</div>
+</div></div>
+
+</body>
+</html>

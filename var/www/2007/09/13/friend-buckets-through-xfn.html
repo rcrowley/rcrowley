@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Friend buckets through XFN &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/09/13/friend-buckets-through-xfn">Friend buckets through XFN</a> <small>2007/09/13</small></h1>
+<p>Social network portability will be great but managing the particulars will be a nightmare with the tools currently available.&nbsp; Some think <a href="http://gmpg.org/xfn">XFN</a> will tame the madness, but they're crazy.&nbsp; It isn't flexible enough.&nbsp; XFN doesn't cover the entire spectrum of relations that people can have -- having hardcoded values pretty much destroys any hope there.</p>
+<p>We need something like <code>rel="tag:drunkenfratparty"</code> that differentiates college friends from code-monkey friends (<code>rel="tag:nerdery"</code>).&nbsp;  Your bestest friends would be <code>rel="tag:*"</code>.&nbsp; But <code>rel="friend met"</code> is just too vague.</p>
+<p>Most obviously, this is a way to get at information like Facebook's Friend Details.&nbsp; More importantly, this is how we prevent our excessive friend list on one network from polluting something more intimate.&nbsp; The Facebook Friend Details options, being controlled by the company rather than the users, will ultimately act like hardcoded values that everyone knows and recognizes (<code>rel="tag:we_hooked_up"</code> anyone?).&nbsp; But if I could tag friends "danville" or "cyclist" or "musician" then I could maybe get someone useful.</p>
+<p>The goal here of course is to enter information once and have it propagate as more social sites crop up.&nbsp; When I'm joining the hot new social network for drummers I can include my friends elsewhere tagged "musician" and end up with exactly who I want.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(1)</small></h1>
+<ol>
+	<li>
+		<p>Question...
+So, a semi-competing way of representing relationships is FOAF
+It is worse than than xfn because all it has is foaf:knows to represent a relationship and then you have info about the person in a foaf:Person.
+Now the thing that may make foaf better is that it is an xml representation (well, xhtml is xml too, but lets ignore that).&nbsp; So, can you add a "rel" namespace and in that foaf:People you have a "rel:tag" with a value of drummer (or multiple "rel:tag"s)?
+(If you need an example of a fairly extensive foaf file, livejournal has a pretty big FOAF of me.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2007/09/20 6:45 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/57c3fd9acf689242fcca944f3556ced2?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

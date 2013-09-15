@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bugfix for nsIStringBundle &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/08/08/bugfix-for-nsistringbundle">Bugfix for nsIStringBundle</a> <small>2007/08/08</small></h1>
+<p>XULRunner provides a nice way to localize apps through the use of custom document-type declarations (<code>*.dtd</code> files) and <code>*.properties</code> files used from within your Javascripts (more info on ).&nbsp; The markup below brings one of these "string bundles" into the app:</p>
+<pre>&lt;stringbundleset&gt;
+	&lt;stringbundle id="locale" src="chrome://app/locale/main.properties" /&gt;
+&lt;/stringbundleset&gt;</pre>
+<p>Then just one line of Javascript brings it from the XUL world into the Javascript world.&nbsp; The string bundle element itself contains methods <code>getString</code> and <code>getFormattedString</code> that will bring localized content into your Javascript.</p>
+<pre>var locale = document.getElementById('locale');
+locale.getString('foo');
+locale.getFormattedString('bar', [asdf, qwerty]);</pre>
+<p>But <code>getFormattedString</code> doesn't work right in XULRunner 1.9a7.&nbsp; It substitutes only the first character of the string (in my experience).&nbsp; Here is a transparent Javascript-only fix:</p>
+<pre>var locale = document.getElementById('locale');
+
+// Now hack locale.getFormattedString to work like it should
+locale.getFormattedString = function(id, args) {
+	var str = locale.getString(id);
+	var ii = args.length;
+	for (var i = 0; i &lt; ii; ++i) {
+		var regex = new RegExp('%' + (i + 1) + '\$[ds]');
+		str = str.replace(regex, args[i]);
+	}
+	return str;
+};</pre>
+<p>This properly takes care of the replacement of each element in <code>args</code>.&nbsp; In the example above where the variables <code>asdf</code> and <code>qwerty</code> were passed, the contents of <code>asdf</code> would replace <code>%1$s</code> and the contents of <code>qwerty</code> would replace <code>%2$s</code>.&nbsp; Note the numbering of the placeholders differing from normal array indexing.&nbsp; Also note that for semantic reasons, a <code>d</code> can be used in the placeholder to denote a number, but no special case is necessary in Javascript.&nbsp; Happy localizing!</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(3)</small></h1>
+<ol>
+	<li>
+		<p>Searched for a fix with a problem I had with getFormattedString and this post. Thanks for the idea. If I may, I would suggesst adding the 'g' and 'i' flags in your instantiation of the RegExp as well as escaping the '$' sign:</p>
+<p>var locale = document.getElementById('locale');</p>
+<p>// Now hack locale.getFormattedString to work like it should
+locale.getFormattedString = function(id, args) {
+	var str = locale.getString(id);
+	var ii = args.length;
+	for (var i = 0; i </p>
+		<p>&mdash; <a href="http://www.newtraxtech.com">Bruno</a> &mdash; 2007/10/12 10:06 am</p>
+	</li>
+
+	<li>
+		<p>..&nbsp; comment body appears to have been cut, here's the line in question :
+var regex = new RegExp('%' + (i + 1) + '\\$[ds]','gi');</p>
+		<p>&mdash; <a href="http://www.newtraxtech.com">Bruno</a> &mdash; 2007/10/12 10:08 am</p>
+	</li>
+
+	<li>
+		<p>This bug fix isn't necessary if you use %S (uppercase S) in the localized string.&nbsp; This is documented in http://developer.mozilla.org/en/docs/XUL:Method:getFormattedString</p>
+		<p>&mdash; <a href="http://aecreations.mozdev.org/">Alex</a> &mdash; 2007/11/06 3:29 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/5e55df010178c6fba77498a71fe83453?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

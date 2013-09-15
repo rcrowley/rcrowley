@@ -1,0 +1,10 @@
+body, h1, h2, div, p, li {
+	color: #222;
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+}
+
+body, div.slide, div#preso { background: #fefefe; }
+
+h1, h2 { font-weight: bold; }
+
+a:visited { color: #00e; }

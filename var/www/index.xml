@@ -1,0 +1,309 @@
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom"><atom:title type="html">Richard Crowley&amp;#8217;s blog</atom:title><atom:link href="http://rcrowley.org/index.xml" rel="self" /><atom:link href="http://rcrowley.org/" rel="alternate" /><id>http://rcrowley.org/index.xml</id><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:entry><atom:title type="html">talks/surge-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/surge-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/surge-2013.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/surge-2013.html"&gt;http://rcrowley.org/talks/surge-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/puppetconf-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/puppetconf-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/puppetconf-2013.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/puppetconf-2013.html"&gt;http://rcrowley.org/talks/puppetconf-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/agile-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/agile-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/agile-2013.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/agile-2013.html"&gt;http://rcrowley.org/talks/agile-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Graceful stopping in Go
+</atom:title><atom:link href="http://rcrowley.org/articles/golang-graceful-stop.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/golang-graceful-stop.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2013-04-27" pubdate&gt;2013-04-27&lt;/time&gt;
+	&lt;h1&gt;Graceful stopping in Go&lt;/h1&gt;
+&lt;/header&gt;
+&lt;p&gt;It&amp;#8217;s rude to deploy early and often if deploys interrupt user requests so we build our Go services at Betable to stop gracefully without interrupting anyone.&amp;nbsp; The idea is to stop listening, presumably so a new process can take over, and let all open connections respond to any in-progress requests before finally stopping service.&amp;nbsp; Incidentally, we use &lt;a href="https://github.com/rcrowley/goagain"&gt;&lt;code&gt;goagain&lt;/code&gt;&lt;/a&gt; to restart without even stopping listening but that&amp;#8217;s beyond the scope of this article.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;main.main&lt;/code&gt; does four things: listens, makes a &lt;code&gt;Service&lt;/code&gt; and sends it into the background, blocks until signaled, and afterwards stops the service gracefully.&amp;nbsp; Listening and signal handling are right out of the standard library playbook except that, to my great annoyance, you need a &lt;code&gt;*net.TCPListener&lt;/code&gt; or &lt;code&gt;*net.TCPConn&lt;/code&gt; and not merely a &lt;code&gt;net.Listener&lt;/code&gt; or &lt;code&gt;net.Conn&lt;/code&gt; to call &lt;code&gt;SetDeadline&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;service.Serve(listener)&lt;/code&gt; accepts connections and handles each one of them in its own goroutine.&amp;nbsp; It sets a deadline so &lt;code&gt;listener.AcceptTCP()&lt;/code&gt; doesn&amp;#8217;t block forever and between successive iterations checks to see if it should stop listening.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;service.serve(conn)&lt;/code&gt; reads and writes and likewise does so on a deadline.&amp;nbsp; It sets a deadline so &lt;code&gt;conn.Read(buf)&lt;/code&gt; doesn&amp;#8217;t block forever and between writing a response and reading the next request or after the &lt;code&gt;conn.Read(buf)&lt;/code&gt; deadline checks to see if it should close the connection.&lt;/p&gt;
+&lt;p&gt;The various goroutines decide to close connections and listeners if the service&amp;#8217;s channel receives a value which, because nothing ever sends on this channel, is only possible after &lt;code&gt;service.Stop()&lt;/code&gt; has closed the channel.&amp;nbsp; Recall the built-in &lt;a href="http://golang.org/ref/spec#Close"&gt;&lt;code&gt;close&lt;/code&gt;&lt;/a&gt; function that causes channels to forevermore receive the zero-value of the channel&amp;#8217;s element type.&lt;/p&gt;
+&lt;p&gt;The final piece of the puzzle is waiting for all goroutines to die which is implemented via the standard library&amp;#8217;s &lt;code&gt;sync.WaitGroup&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://gist.github.com/rcrowley/5474430"&gt;https://gist.github.com/rcrowley/5474430&lt;/a&gt; has it all:&lt;/p&gt;
+&lt;script src="https://gist.github.com/rcrowley/5474430.js"&gt;&lt;/script&gt;
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">Go acknowledgement test
+</atom:title><atom:link href="http://rcrowley.org/2013/04/19/golang-ack-test.html" rel="alternate" /><atom:id>http://rcrowley.org/2013/04/19/golang-ack-test.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2013-04-19" pubdate&gt;2013-04-19&lt;/time&gt;
+	&lt;h1&gt;Go acknowledgement test&lt;/h1&gt;
+&lt;/header&gt;
+&lt;p&gt;I have been writing a lot of Go lately at &lt;a href="https://betable.com"&gt;Betable&lt;/a&gt; and the channels of channels pattern comes up so often that I broken down and benchmarked it.&amp;nbsp; I&amp;#8217;m publishig this more widely at the insistence of Paul Hammond who would agree that this is yet another of the many and persistent reminders that Rob Pike is smarter than I am.&lt;/p&gt;
+&lt;p&gt;In summary, it is faster to allocate a one-time-use channel for a goroutine to acknowledge a request than to use a &lt;code&gt;sync.Mutex&lt;/code&gt;.&lt;p&gt;
+&lt;script src="https://gist.github.com/rcrowley/5423530.js"&gt;&lt;/script&gt;
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/nodejs-2013-02-19/</atom:title><atom:link href="http://rcrowley.org/talks/nodejs-2013-02-19/" rel="alternate" /><atom:id>http://rcrowley.org/talks/nodejs-2013-02-19/</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/nodejs-2013-02-19/"&gt;http://rcrowley.org/talks/nodejs-2013-02-19/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Federated Graphite
+</atom:title><atom:link href="http://rcrowley.org/articles/federated-graphite.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/federated-graphite.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2012-08-03" pubdate&gt;2012-08-03&lt;/time&gt;
+	&lt;h1&gt;Federated Graphite&lt;/h1&gt;
+&lt;/header&gt;
+&lt;p&gt;Graphite is a nearly undocumented thing of sweetness.  We at Betable collect, store, and graph many tens of thousands of metrics and we quickly reached the limits of a single-instance Graphite infrastructure.  That&amp;#8217;s OK, though, because Graphite does actually support some pretty reasonable federated architectures if you know where to look.  Consider this your treasure map.&lt;/p&gt;
+
+&lt;p&gt;Aside: &lt;a href="https://gist.github.com/2311507"&gt;https://gist.github.com/2311507&lt;/a&gt; is how I build Debian packages for Graphite which I deploy via &lt;a href="https://github.com/rcrowley/freight"&gt;Freight&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Firewalls&lt;/h2&gt;
+
+&lt;p&gt;You probably already have your firewalls configured to allow your entire infrastructure to send metrics to Graphite on port 2003.  Your Graphite almost-cluster is going to need a bit more permission to communicate with itself.&lt;/p&gt;
+
+&lt;p&gt;Open ports 2014, 2114, and so on as you need between all Graphite nodes.  These are how the &lt;code&gt;carbon-relay.py&lt;/code&gt; instance on each Graphite node will communicate with the &lt;code&gt;carbon-cache.py&lt;/code&gt; instance(s) on each Graphite node.&lt;/p&gt;
+
+&lt;p&gt;Also open the port on which the web app listens to other Graphite nodes.  This is how the web apps will communicate with the other web apps.&lt;/p&gt;
+
+&lt;h2&gt;&lt;code&gt;carbon-cache.py&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;Each &lt;code&gt;carbon-cache.py&lt;/code&gt; instance should listen on a non-loopback interface and on a port that&amp;#8217;s open to the &lt;code&gt;carbon-relay.py&lt;/code&gt;s.  I have found two instances of &lt;code&gt;carbon-cache.py&lt;/code&gt; per Graphite node to be advantageous on the Rackspace Cloud (YMMV).  Their pickle receivers listen on 2014 for instance &lt;code&gt;a&lt;/code&gt; and 2114 for instance &lt;code&gt;b&lt;/code&gt; on each Graphite node.&lt;/p&gt;
+
+&lt;p&gt;Each &lt;code&gt;carbon-cache.py&lt;/code&gt; instance must have a name unique with respect to all &lt;code&gt;carbon-cache.py&lt;/code&gt; instances on all Graphite nodes.  For example: &lt;code&gt;1.2.3.4:2014:a&lt;/code&gt;, &lt;code&gt;1.2.3.4:2114:b&lt;/code&gt;, &lt;code&gt;5.6.7.8:2014:c&lt;/code&gt;, &lt;code&gt;5.6.7.8:2114:d&lt;/code&gt;.  This isn&amp;#8217;t obvious from the documentation or even from reading the code, so keep this in mind.&lt;/p&gt;
+
+&lt;h2&gt;Whisper databases&lt;/h2&gt;
+
+&lt;p&gt;I started the migration from one Graphite node to two by &lt;code&gt;rsync&lt;/code&gt;ing all Betable&amp;#8217;s Whisper databases from the old node to the new node.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rsync -avz --exclude=carbon graphite-ops.betable.com:/var/lib/graphite/whisper /var/lib/graphite/&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The original plan (which is executed below) was to go back later and &amp;#8220;garbage collect&amp;#8221; the Whisper databases that didn&amp;#8217;t belong after the Graphite cluster was up-and-running.  If you&amp;#8217;re feeling adventurous, you should use &lt;code&gt;whisper-clean.py&lt;/code&gt; from &lt;a href="https://gist.github.com/3153844"&gt;https://gist.github.com/3153844&lt;/a&gt; to choose which Whisper databases to &lt;code&gt;rsync&lt;/code&gt; and delete up-front because a Whisper database on the local filesystem will be preferred over querying a remote &lt;code&gt;carbon-cache&lt;/code&gt; instance.&lt;/p&gt;
+
+&lt;h2&gt;&lt;code&gt;carbon-relay.py&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;Each Graphite node should run a single &lt;code&gt;carbon-relay.py&lt;/code&gt; instance.  It should listen on 2003 and 2004 so your senders don't have to be reconfigured.&lt;/p&gt;
+
+&lt;p&gt;List all &lt;code&gt;carbon-cache.py&lt;/code&gt; instances on all Graphite nodes in &lt;code&gt;DESTINATIONS&lt;/code&gt; in &lt;code&gt;carbon.conf&lt;/code&gt;, each with its &lt;code&gt;PICKLE_RECEIVER_INTERFACE&lt;/code&gt;, &lt;code&gt;PICKLE_RECEIVER_PORT&lt;/code&gt;, and instance name.  Sort the instances by their name.  This is what allows metrics to arrive at any Graphite node and be routed to the right Whisper database.&lt;/p&gt;
+
+&lt;p&gt;To use consistent hashing or not to use consistent hashing?  That&amp;#8217;s your own problem.  I use consistent hashing because I have better things to do than balance a Graphite cluster by hand.&lt;/p&gt;
+
+&lt;p&gt;With this configuration, Graphite&amp;#8217;s write path is federated between two nodes.  Its read path, however, appears to be missing half its data.&lt;/p&gt;
+
+&lt;h2&gt;Web app&lt;/h2&gt;
+
+&lt;p&gt;Each Graphite node should run the web app, even if you don&amp;#8217;t plan to use it directly.&lt;/p&gt;
+
+&lt;p&gt;Each web app should list the &lt;strong&gt;local&lt;/strong&gt; &lt;code&gt;carbon-cache.py&lt;/code&gt; instances in &lt;code&gt;CARBONLINK_HOSTS&lt;/code&gt; each with its &lt;code&gt;CACHE_QUERY_INTERFACE&lt;/code&gt;, &lt;code&gt;CACHE_QUERY_PORT&lt;/code&gt;, and instance name.  Sort the instances by their name as before so the consistent hash ring works properly.  If you&amp;#8217;re not using consistent hashing, sort the instances by their name to appease my OCD.&lt;/p&gt;
+
+&lt;p&gt;Each web app should list the other web apps in &lt;code&gt;CLUSTER_SERVERS&lt;/code&gt;, each with its address and port.  If a web app lists itself in &lt;code&gt;CLUSTER_SERVERS&lt;/code&gt;, it&amp;#8217;s gonna have a bad time.&lt;/p&gt;
+
+&lt;h2&gt;Garbage collection&lt;/h2&gt;
+
+&lt;p&gt;Once you&amp;#8217;re satisfied with your Graphite cluster, it&amp;#8217;s time to collect the garbage left by &lt;code&gt;rsync&lt;/code&gt;ing all those Whisper files around.  &lt;code&gt;whisper-clean.py&lt;/code&gt; from &lt;a href="https://gist.github.com/3153844"&gt;https://gist.github.com/3153844&lt;/a&gt; does exactly that.&lt;/p&gt;
+
+&lt;p&gt;(Of course, the usual disclaimers about how this deletes data but is only known to work for me apply so tread lightly.)&lt;/p&gt;
+
+&lt;p&gt;On &lt;code&gt;1.2.3.4&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;DJANGO_SETTINGS_MODULE="graphite.settings" python whisper-clean.py 1.2.3.4:a 1.2.3.4:b -5.6.7.8:c -5.6.7.8:d&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;On &lt;code&gt;5.6.7.8&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;DJANGO_SETTINGS_MODULE="graphite.settings" python whisper-clean.py -1.2.3.4:a -1.2.3.4:b 5.6.7.8:c 5.6.7.8:d&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you happen to have been smarter than I was with your &lt;code&gt;rsync&lt;/code&gt;ing, this step probably won&amp;#8217;t be necessary.&lt;/p&gt;
+
+&lt;h2&gt;Configuration management&lt;/h2&gt;
+
+&lt;p&gt;None of this configuration is done by hand.  We use Puppet but Chef works just fine.  I highly recommend using &lt;a href="http://docs.puppetlabs.com/guides/exported_resources.html"&gt;Exported Resources&lt;/a&gt;, &lt;a href="https://github.com/rcrowley/puppet-related_nodes"&gt;&lt;code&gt;puppet-related_nodes&lt;/code&gt;&lt;/a&gt;, or &lt;a href="http://wiki.opscode.com/display/chef/Search"&gt;Chef Search&lt;/a&gt; to keep the Graphite cluster aware of itself.&lt;/p&gt;
+
+&lt;p&gt;Betable&amp;#8217;s Graphite cluster learns its topology from &lt;code&gt;related_nodes&lt;/code&gt; queries like&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$carbonlink_hosts = related_nodes(Graphite::Carbon::Cache, true)
+$cluster_servers = related_nodes(Package["graphite"])
+$destinations = related_nodes(Graphite::Carbon::Cache, true)&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;that pick up Graphite nodes and the &lt;code&gt;graphite::carbon::cache&lt;/code&gt; resources declared with each &lt;code&gt;node&lt;/code&gt; stanza.  These enforce that instance names (&lt;code&gt;a&lt;/code&gt;, &lt;code&gt;b&lt;/code&gt;, &lt;code&gt;c&lt;/code&gt;, &lt;code&gt;d&lt;/code&gt;, etc.) are unique across the cluster.  Each &lt;code&gt;graphite::carbon::cache&lt;/code&gt; resource generates a SysV-init script and a &lt;code&gt;service&lt;/code&gt; resource that runs a &lt;code&gt;carbon-cache.py&lt;/code&gt; instance.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;carbon.conf&lt;/code&gt; and &lt;code&gt;local_settings.py&lt;/code&gt; templates Puppet uses are in &lt;a href="https://gist.github.com/3248921"&gt;https://gist.github.com/3248921&lt;/a&gt;.&lt;/p&gt;
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">Developing Operability
+</atom:title><atom:link href="http://rcrowley.org/2012/02/25/superconf.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/02/25/superconf.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2012-02-25" pubdate&gt;2012-02-25&lt;/time&gt;
+	&lt;h1&gt;Developing Operability&lt;/h1&gt;
+&lt;/header&gt;
+
+&lt;p&gt;&lt;em&gt;I had the pleasure of being invited to speak at &lt;a href="http://superconf.co"&gt;SuperConf&lt;/a&gt; in Miami about devops.&amp;nbsp; This is what I intended to say and fortunately approximately what I did say.&amp;nbsp; The slides that accompanied are at &lt;a href="http://rcrowley.org/talks/superconf-2012/"&gt;http://rcrowley.org/talks/superconf-2012/&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Hi, my name is Richard Crowley.&amp;nbsp; I&amp;#8217;m a production engineer at Square.&amp;nbsp; My team&amp;#8217;s responsible for the datacenter environment, network, hardware provisioning, operating system configuration, databases, backups, and monitoring.&amp;nbsp; I work there because I&amp;#8217;m interested in software systems that work well in production.&amp;nbsp; These systems are operable &amp;mdash; it&amp;#8217;s easy for humans to control, change, and grow them as needed.&amp;nbsp; It takes a lot of work to turn your average prototype into an operable system.&amp;nbsp; It&amp;#8217;s not a one-man job and it&amp;#8217;s never the same from company to company so what follows draws heavily from my experience and opinions, which have shown me over and over that developers should own the operability of their systems.&amp;nbsp; It&amp;#8217;s time to get our hands dirty.&lt;/p&gt;
+
+&lt;p&gt;I consider myself both a developer and an operator.&amp;nbsp; I help design and implement software systems and care deeply about how they&amp;#8217;re configured, deployed, and debugged in production.&amp;nbsp; After all, the vast majority of an application&amp;#8217;s life is spent being maintained and operated in production.&amp;nbsp; We&amp;#8217;re talking about years, here.&amp;nbsp; It&amp;#8217;s foolish to ignore that future during the relatively shorter design and implementation phases that are typically measured in weeks or months.&amp;nbsp; Alternatively, I may just be OCD, but I think that&amp;#8217;s less likely.&amp;nbsp; Let&amp;#8217;s talk about how I arrived here.&lt;/p&gt;
+
+&lt;p&gt;I founded a company called DevStructure with Matt Tanase two years ago.&amp;nbsp; We started with a simple thesis: configuring servers was too hard.&amp;nbsp; With that, we went to work building configuration management tools optimized for software developers.&amp;nbsp; In a way, we were luring developers into caring about operations.&amp;nbsp; We quickly decided that a prerequisite to solving the configuration management problem was reducing the distance between development and production environments.&amp;nbsp; While a Mac laptop is technically a form of UNIX, it&amp;#8217;s a far cry from the Linux servers we all use in production.&amp;nbsp; I see this distance to be a huge problem for the operability of most of our production systems.&amp;nbsp; Matt and I built some tools and embraced others, Vagrant especially, that brought Linux cloud instances and virtual machines into the development workflow.&amp;nbsp; From that base, we launched our Blueprint configuration management tools.&amp;nbsp; Operator- and production-focused configuration management tools like Puppet and Chef were always on our radar and we sought to interoperate with both of them.&amp;nbsp; As is common for bootstrapped startups, I consulted with several companies on developing their configuration management strategy, sometimes using Blueprint, other times using Puppet.&lt;/p&gt;
+
+&lt;p&gt;Square just happened to be one of those companies and I&amp;#8217;ve been there full-time since January.&amp;nbsp; Reliability is paramount at Square.&amp;nbsp; It&amp;#8217;s way more important than performance, within reason.&amp;nbsp; If a merchant can&amp;#8217;t accept a payment, we&amp;#8217;ve failed.&amp;nbsp; Historically, environments that value reliability fear change.&amp;nbsp; We&amp;#8217;re different.&amp;nbsp; We move fast &amp;mdash; there are many engineering teams working on many products &amp;mdash; but despite that it&amp;#8217;s critical we don&amp;#8217;t break things.&amp;nbsp; Matthew O&amp;#8217;Connor, our director of engineering, says it&amp;#8217;s rude to break the site.&amp;nbsp; I couldn&amp;#8217;t agree more.&amp;nbsp; Let&amp;#8217;s not be rude to our customers.&lt;/p&gt;
+
+&lt;p&gt;There&amp;#8217;s a buzzword out there &amp;mdash; devops &amp;mdash; that I don&amp;#8217;t care for too much.&amp;nbsp; It&amp;#8217;s helpful though, because finding a name that stuck has accelerated the idea that reducing the distance between development and production makes it possible to build more reliable systems.&amp;nbsp; The key, though, is that it&amp;#8217;s really about reducing the distance between developers and operators.&amp;nbsp; It&amp;#8217;s about people &amp;mdash; developers and operators.&amp;nbsp; As the agile mafia said, we value &amp;#8220;individuals and interactions over processes and tools.&amp;#8220;&lt;/p&gt;
+
+&lt;p&gt;Perhaps it&amp;#8217;s because developers have already blazed the agile trail but to me, the devops movement has always felt lopsided &amp;mdash; it&amp;#8217;s very operator-focused.&amp;nbsp; Case-in-point: its most visible sea change is the degree to which systems administrators are taking to high-level programming languages, learning to design software instead of &amp;#8220;writing scripts,&amp;#8221; and embracing agile development methods.&amp;nbsp; We&amp;#8217;re focusing on people, on working software, on customers, and on our response to change.&lt;/p&gt;
+
+&lt;p&gt;The goal, after all, is to create business value.&amp;nbsp; I&amp;#8217;m as guilty as anyone here in getting too absorbed in compiler flags, sysctls, or coding style and losing sight of the reality that I work for a company.&amp;nbsp; I have to remind myself that customers never have and never will care about load average.&amp;nbsp; We all need to focus on creating business value, and as developers and operators...&lt;/p&gt;
+
+&lt;p&gt;...we should measure that value.&amp;nbsp; Someone, I think either John Vincent or Theo Schlossnagle, likes to say, &amp;#8220;If you don&amp;#8217;t monitor it, it doesn&amp;#8217;t exist.&amp;#8221;&amp;nbsp; And if it doesn&amp;#8217;t exist, well, what are you working on?&amp;nbsp; A recent conversation with one of the dozen or so Eri[ck]s at Square gave us a good interview question: if you could monitor only one thing, what would it be?&amp;nbsp; We decided we would monitor whether the site is on the Internet.&amp;nbsp; An oversimplification, to be sure, and one that doesn&amp;#8217;t help much with debugging, but it&amp;#8217;s a start.&amp;nbsp; Undoubtedly, you&amp;#8217;ll expand from there and when you do, try to create metrics that answer questions.&amp;nbsp; Remember that, by and large, these metrics are for human consumption.&amp;nbsp; Responding to changes in metrics should be part of every company&amp;#8217;s culture.&lt;/p&gt;
+
+&lt;p&gt;You see, devops is a cultural thing.&amp;nbsp; Reducing the distance between developers and operators requires moving past the historic us-versus-them attitude.&amp;nbsp; Traditional systems administration consumes less time these days, thanks to innovations in managed hosting, virtualization, and provisioning APIs like EC2.&amp;nbsp; But operators aren&amp;#8217;t taking more vacation, we&amp;#8217;re contributing to the software development process.&amp;nbsp; On the flip side, we as developers are hopefully doing more than checking in code and going home.&amp;nbsp; Helping each other out leads to trust.&amp;nbsp; Operators have to trust that developers aren&amp;#8217;t rolling out new features to ruin the operator&amp;#8217;s sleep.&amp;nbsp; Developers also have to trust that operators don&amp;#8217;t say &amp;#8220;no&amp;#8221; because they hate you.&lt;/p&gt;
+
+&lt;p&gt;DevOps is certainly first and foremost a cultural solution to a cultural problem between two teams with different incentives.&amp;nbsp; But we are all engineers, we&amp;#8217;re makers of tools, and basically we can&amp;#8217;t help ourselves.&amp;nbsp; Thus, the tools we write codify the culture we create.&amp;nbsp; Configuration management, deployment, and monitoring tools are the most visibly affected software genres but it extends further to collaboration and project management, documentation, and even our office jukebox.&amp;nbsp; Much like writing clarifies the author&amp;#8217;s beliefs, working software makes fuzzy human interactions concrete and unambiguous.&lt;/p&gt;
+
+&lt;p&gt;If there&amp;#8217;s a common theme to all these tools, it&amp;#8217;s automation.&amp;nbsp; We automate to reduce the number of errors and inconsistencies present in our infrastructures.&amp;nbsp; We automate to make ourselves more efficient.&amp;nbsp; We can&amp;#8217;t leverage the raw power of thousands of computers if it takes us six months to configure them all.&amp;nbsp; My rule of thumb here is that you should never perform a manual process a third time.&amp;nbsp; This works at many layers of abstraction: it&amp;#8217;s OK to manually install an operating system once to get your feet wet but the second time, you should be using PXEBoot and Kickstart or preseed files to automate the installation.&amp;nbsp; Higher up the stack in the realm of developers, it&amp;#8217;s fine to manually craft a software build process that&amp;#8217;s just right but subsequent builds should be performed automatically, perhaps through a continuous integration tool like Jenkins or Buildbot.&lt;/p&gt;
+
+&lt;p&gt;Through all this automation, every layer of our infrastructure is being defined by code instead of wiki pages full of prose and syntax errors.&amp;nbsp; But it&amp;#8217;s more than just working code.&amp;nbsp; There&amp;#8217;s a subtle distinction here I want to make explicit: we&amp;#8217;re not talking about &amp;#8220;scripts&amp;#8221; anymore; we&amp;#8217;re not talking about &lt;code&gt;cat&lt;/code&gt;ing Bash history into &lt;code&gt;doit.sh&lt;/code&gt;; we&amp;#8217;re talking about well designed software systems that provide abstractions that make developers and operators more powerful.&lt;/p&gt;
+
+&lt;p&gt;The arrival of these distinctly computer science concepts in operations &amp;mdash; abstraction, encapsulation, and polymorphism to name but a few &amp;mdash; doesn&amp;#8217;t align with what I see as a distinct lack of traditional software developers getting serious about operations.&amp;nbsp; Systems administration is no longer a cowboy culture of Perl and shell. One-liners grown out-of-control are being tamed.&amp;nbsp; Operations are being driven by well-designed software systems built by systems administrators looking for a better way.&amp;nbsp; So I have to ask: where are my fellow developers?&lt;/p&gt;
+
+&lt;p&gt;This actually brings us back to DevStructure and the Blueprint project.&amp;nbsp; Matt and I ask developers to work in realistic development environments &amp;mdash; a real operating system, real web servers, and real database servers.&amp;nbsp; No toys.&amp;nbsp; No substitutes.&amp;nbsp; In return Blueprint can, in one command, enumerate all the packages installed by all the package managers, tar up software installed from source code, collect system configuration files that have changed, and learn which services are running.&amp;nbsp; In short, Blueprint makes ad-hoc configuration repeatable.&amp;nbsp; But there&amp;#8217;s another benefit to developers working in realistic development environments: when we do, we start to think just a little more like operators and the distance between the two camps shrinks.&lt;/p&gt;
+
+&lt;p&gt;As the distance shrinks, we start to think about the code we write in terms of the service it provides.&amp;nbsp; And that service has to survive the harsh realities of production &amp;mdash; rapidly growing traffic, out-of-memory errors, limited disk and network I/O bandwidth, and all the possible failures other services in the infrastructure may experience.&lt;/p&gt;
+
+&lt;p&gt;This is service-oriented architecture.&amp;nbsp; All sufficiently large engineering organizations go through the transformation from a monolithic application to SOA at some point.&amp;nbsp; Don&amp;#8217;t be intimidated, though, because if you squint just right, everyone starts with SOA, too: your application is a service which relies on your database service.&amp;nbsp; I&amp;#8217;m not suggesting that everyone in the audience with a monolithic Rails app should immediately start breaking it apart.&amp;nbsp; Premature refactoring is a sure way to factor out the wrong functionality and drive yourself crazy.&amp;nbsp; Instead, design software that&amp;#8217;s easy to refactor.&lt;/p&gt;
+
+&lt;p&gt;One strategy which I think accomplishes this is to begin with a library-oriented approach within your monolithic application.&amp;nbsp; Package logical components of your application independently &amp;mdash; literally as separate gems, eggs, RPMs, or whatever &amp;mdash; and maintain them as internal open-source projects.&amp;nbsp; This strategy works fantastically for GitHub and I can report it has made a difference at Square, too.&amp;nbsp; This approach combats the tightly-coupled spaghetti so often lurking in big codebases by giving everything a Right Place in which to exist.&amp;nbsp; It encourages reuse within your application and leaves the door open for reuse across services in the future.&amp;nbsp; But perhaps the biggest benefit, and one which I didn&amp;#8217;t fully appreciate until very recently, is the ease with which a coworker can familiarize themselves with small libraries and begin to contribute.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;#8217;s talk about deployment.&amp;nbsp; Whether you&amp;#8217;re deploying a monolithic application, a set of libraries, or a set of services, the act of deploying new software can be frightening.&amp;nbsp; It doesn&amp;#8217;t have to be.&amp;nbsp; Conventional wisdom says operators fear change so we block deploys for as long we can.&amp;nbsp; Eventually, though, the buildup of new features and improvements is so compelling that the suits demand a deploy.&amp;nbsp; Calamity frequently ensues because the team frankly isn&amp;#8217;t very good at doing deploys.&amp;nbsp; And how do we get better at something?&amp;nbsp; Practice.&amp;nbsp; Automate your deploy process.&amp;nbsp; Make deploys cheap so you can have lots of small deploys.&amp;nbsp; Now operators don&amp;#8217;t fear the armageddon following every deploy and developers aren&amp;#8217;t frustrated that their feature is languishing in staging.&lt;/p&gt;
+
+&lt;p&gt;Remember, this is still about creating business value and even though the lines have blurred, operators still increase value by providing a high-performance, highly-available service to customers and developers still increase value by releasing new features.&amp;nbsp;  Of course...&lt;/p&gt;
+
+&lt;p&gt;...not one of those features creates any business value until it&amp;#8217;s deployed.&amp;nbsp; As always when we suspect we&amp;#8217;re creating business value, it&amp;#8217;s our job, and usually our first instinct as engineers, to measure this value.&lt;/p&gt;
+
+&lt;p&gt;We know the most important metric is whether your site is on the Internet.&amp;nbsp; Beyond that, monitor what makes your business tick: signups, uploads, downloads, 400s, 500s, transactions, cancellations, cash money, and so on.&amp;nbsp; Note well that I haven&amp;#8217;t mentioned CPU, load average, or any other system metric.&amp;nbsp; System metrics are invaluable given the appropriate context but without that context, you can&amp;#8217;t say that 70% CPU or a load of 47 is actually a bad thing.&amp;nbsp; If, however, these correlate strongly with problems experienced by users, you&amp;#8217;ve got a promising avenue to take in debugging.&amp;nbsp; Developers should all be intimately familiar with all of these metrics and use them as their eyes in production when diagnosing problems.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;#8217;s talk again about developers getting involved with operations.&amp;nbsp; What follows is a short and highly unscientific selection of operational concerns most developers hand-wave away.&amp;nbsp; I think developers should have answers to these questions before services reach production.&lt;/p&gt;
+
+&lt;p&gt;How is this deployed?&amp;nbsp; There are really two questions here: the cultural and the mechanical.&amp;nbsp; The cultural part is about defining the process you use to deploy software.&amp;nbsp; How often?&amp;nbsp; Who initiates the deploy?&amp;nbsp; How can you tell it was successful?&amp;nbsp; The mechanical part should be a reflection of that culture.&amp;nbsp; If you have test-driven-development tattooed on your chest then you may think deploying every green CI build automatically is the way to go.&amp;nbsp; Many teams decouple testing from deployment and prefer to use SSH-based tools like Capistrano and Fabric directly to drive their deploys.&amp;nbsp; Some companies want their deploy history to be auditable, only sometimes due to government or industry regulations, and they tend to tag deploys in version control and deploy with RPMs or Debian packages.&lt;/p&gt;
+
+&lt;p&gt;How is this rolled back?&amp;nbsp; All software has bugs.&amp;nbsp; All test suites miss bugs.&amp;nbsp; These are facts of life.&amp;nbsp; John Allspaw suggests, then, that we minimize our mean time to respond to these failures even at the expense of our mean time between failures.&amp;nbsp; As always, there are several common strategies.&amp;nbsp; Many companies prefer to have a fast-path to redeploy the previously-deployed version of the application, thus recovering from an incident.&amp;nbsp; Tools like Capistrano all but assume this is what you&amp;#8217;re doing and deploy into timestamped directories with a symbolic link to the current release so rollbacks are easy.&amp;nbsp; Other companies prefer only rolling forward, meaning a new deploy must be made to address the failure.&amp;nbsp; Sometimes this is as easy as reverting the offending commit and deploying again.&amp;nbsp; Other times, especially when database migrations are involved, rolling forward is the only way.&amp;nbsp; Having the ability to disable features entirely without doing a full deploy, a technique known as feature flagging, takes a bit of the time pressure off of the developers charged with finding a permanent solution in a roll-forward situation.&lt;/p&gt;
+
+&lt;p&gt;How is this process (re)started?&amp;nbsp; A special concern both when deploying and rolling back is how quickly old code can be swapped out for new code.&amp;nbsp; You can&amp;#8217;t deploy frequently if each deploy brings along a 30-second outage.&amp;nbsp; In such cases or when the deploy process takes a long time, rolling deploys of one or a few servers at a time amortize the cost and hide it from users.&amp;nbsp; Deploys may be expensive in terms of database connections or briefly elevated network traffic so deploying one server at a time can lessen the impact.&amp;nbsp; Regardless of whether you perform all-at-once or rolling deploys, take care to gracefully finish requests that are in-flight so you don&amp;#8217;t aren&amp;#8217;t guaranteed to serve a few 500s on every deploy.&lt;/p&gt;
+
+&lt;p&gt;How is this process supervised?&amp;nbsp; There are two high-level options here: direct parent supervision and periodic supervision.&amp;nbsp; Direct parent supervision comes via tools like daemontools, Runit, and Upstart.&amp;nbsp; They operate by forking and execing your process as a child.&amp;nbsp; Then the parent blocks waiting on the child to exit, at which point the cycle begins again with the parent forking.&amp;nbsp; The Achilles&amp;#8217; Heel of direct parent supervision is that it can&amp;#8217;t be used to supervise processes like Nginx or Unicorn that perform a certain style of zero-downtime restart.&amp;nbsp; These processes restart by forking, which, thanks to good ol&amp;#8217; UNIX semantics, inherits the listening file descriptor, and executing a new copy of themselves which resumes accepting connections on the inherited file descriptor.&amp;nbsp; Once operational, the child signals the parent and the parent exits.&amp;nbsp; The child is then reparented to init and the direct parent supervision relationship is broken.&amp;nbsp; The periodic variety, like Monit, checks the system&amp;#8217;s process table or listening sockets every few seconds, starts the process anew if necessary, and goes back to sleep.&amp;nbsp; These tools can incur significantly more downtime in case of failure by sleeping several seconds before recognizing a process has exited unexpectedly.&lt;/p&gt;
+
+&lt;p&gt;What if two versions are live at once?&amp;nbsp; This may seem like a fringe concern but unless you take a complete outage for every deploy, you have this problem.&amp;nbsp; Solving it means ensuring new versions of the code can speak to old versions and vice versa.&amp;nbsp; The greater your tolerance here, the more you can do with A/B testing, canary deploys, and beta launches.&amp;nbsp; Database schema migrations present by far the most common challenge to running two versions at once.&amp;nbsp; It takes only three steps to get it right.&amp;nbsp; First, you must deploy a version of your application which tolerates both the new and the old schema.&amp;nbsp; Then you&amp;#8217;re free to do the database migration and any data backfills that are necessary.&amp;nbsp; Finally, you&amp;#8217;re free to remove special cases for the old schema.&lt;/p&gt;
+
+&lt;p&gt;What metrics are important?&amp;nbsp; I don&amp;#8217;t know your answer to this question because I don&amp;#8217;t know what your business values.&amp;nbsp; You know, though, and once you&amp;#8217;ve settled on the &amp;#8220;what,&amp;#8221; it&amp;#8217;s time to determine the &amp;#8220;how.&amp;#8221;&amp;nbsp; I can&amp;#8217;t recommend Graphite highly enough as the final destination for all your time-series metrics but it leaves the collection as an exercise to the reader.&amp;nbsp; Metrics that naturally map to regular intervals can be sent to Graphite via a plaintext protocol.&amp;nbsp; Metrics that don&amp;#8217;t emit on a regular interval, such as page views and their HTTP status codes, database or other service query times, and so on may be aggregated into Graphite&amp;#8217;s time series by Etsy&amp;#8217;s StatsD.&amp;nbsp; And system metrics like CPU, load average, memory use, and I/O are easily gathered by collectd and its bajillion plugins, and forwarded to Graphite.&amp;nbsp; Outside of the mechanics of gathering system metrics, reflect on and document how you expect them to change as your business grows because they&amp;#8217;ll be key to your capacity planning.&lt;/p&gt;
+
+&lt;p&gt;The theme that runs through all of these operational concerns and the myriad I didn&amp;#8217;t address is that the best solutions tend to involve collaboration between development and operations which tends to result in a specific contract made between application and platform.&amp;nbsp; Standards like CGI, Rack, and WSGI paved the way but don&amp;#8217;t extend far enough.&amp;nbsp; Heroku provides a standard operating environment for all sorts of applications built from environment variables, file descriptors, and a healthy dose of documentation that informs an application of the addresses and credentials of related services.&amp;nbsp; At Square we&amp;#8217;re standardizing how we deploy services through a library called Jetpack, which is available on GitHub, that deploys and supervises JRuby-based services in a consistent manner.&lt;/p&gt;
+
+&lt;p&gt;We&amp;#8217;ve covered a lot of ground here but these tools and these questions should be very familiar territory to the systems administrators you work with.&amp;nbsp; Talk to them.&amp;nbsp; Simply getting to know the other guys is often enough to set developer and operator culture on a path towards mutual trust that&amp;#8217;s critical to a business&amp;#8217; success.&amp;nbsp; No one is better suited than the developers to answer the questions we&amp;#8217;ve asked, to build deploy tools, and to collect metrics on all parts of your business.&amp;nbsp; The operability of your systems depend on it.&lt;/p&gt;
+
+&lt;p&gt;If you want to help build infrastructure to revolutionize payments, talk to me or head to &lt;a href="http://squareup.com/jobs"&gt;squareup.com/jobs&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;That&amp;#8217;s all.&amp;nbsp; Thank you.&lt;/p&gt;
+
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">Square
+</atom:title><atom:link href="http://rcrowley.org/2012/01/03/square.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/01/03/square.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2012-01-03" pubdate&gt;2012-01-03&lt;/time&gt;
+	&lt;h1&gt;Square&lt;/h1&gt;
+&lt;/header&gt;
+
+&lt;p&gt;Today is my first day at Square.&amp;nbsp; I&amp;#8217;m joining the infrastructure team there to help automate whole datacenters, build APIs to real hardware, smooth out deployment, and probably much more along the way.&amp;nbsp; I&amp;#8217;m very excited to return to working on scalability and performance problems on a pretty highly-trafficked API.&amp;nbsp; (When you spend all your time writing configuration management software, you tend not to manage any servers.)&lt;/p&gt;
+
+&lt;p&gt;Blueprint will remain an open-source configuration management tool that I maintain, newly decoupled from any business interests.&amp;nbsp; In fact, I just merged the S3-backed Blueprint Server into &lt;a href="https://github.com/devstructure/blueprint/commits/master"&gt;&lt;code&gt;master&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;It&amp;#8217;s been about two years since Matt and I set out to build heavily automated development environments and stumbled into a new configuration management workflow.&amp;nbsp; I can&amp;#8217;t understate how much I&amp;#8217;ve learned about both engineering and startups in that time.&amp;nbsp; For now, though, I want to spend my time engineering and not selling or searching for consulting work.&lt;/p&gt;
+
+&lt;p&gt;It&amp;#8217;s hip to be (a) square.&lt;/p&gt;
+
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">Blueprints in the new AWS CloudFormation
+</atom:title><atom:link href="http://rcrowley.org/2011/10/04/aws-cloudformation.html" rel="alternate" /><atom:id>http://rcrowley.org/2011/10/04/aws-cloudformation.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2011-10-03" pubdate&gt;2011-10-03&lt;/time&gt;
+	&lt;h1&gt;Blueprints in the new AWS CloudFormation&lt;/h1&gt;
+&lt;/header&gt;
+
+&lt;p&gt;&lt;em&gt;Cross-posted from the &lt;a href="http://blog.devstructure.com/blueprints-in-the-new-aws-cloudformation"&gt;DevStructure Blog&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Just last week, Amazon Web Services rolled out the &lt;a href="http://aws.typepad.com/aws/2011/09/amazon-linux-ami-production-status-new-features.html"&gt;first production release of the Amazon Linux AMI&lt;/a&gt; and with it some &lt;a href="http://aws.typepad.com/aws/2011/09/powerful-new-features-for-aws-cloudformation.html"&gt;powerful new features for CloudFormation&lt;/a&gt;.&amp;nbsp; There&amp;#8217;s a lot there (like updating stacks and IAM integration) but we at DevStructure are most excited about Application Bootstrapping.&lt;/p&gt;
+
+&lt;p&gt;The new Amazon Linux AMI comes with the &lt;code&gt;aws-cfn-bootstrap&lt;/code&gt; package, which can unpack tarballs, place configuration files, install packages, and restart services at provision time.&amp;nbsp; Sound familiar?&amp;nbsp; That&amp;#8217;s right, this new section of the CloudFormation template language uses the &lt;a href="http://devstructure.github.com/blueprint/blueprint.5.html"&gt;&lt;code&gt;blueprint&lt;/code&gt;(5)&lt;/a&gt; file format!&lt;/p&gt;
+
+&lt;p&gt;Amazon&amp;#8217;s PDF whitepaper, &lt;a href="https://s3.amazonaws.com/cloudformation-examples/BoostrappingApplicationsWithAWSCloudFormation.pdf"&gt;Bootstrapping Applications via AWS CloudFormation&lt;/a&gt;, walks through building a complete stack template by hand.&amp;nbsp; To summarize, you&amp;#8217;ll need to create an &lt;a href="http://docs.amazonwebservices.com/AWSCloudFormation/latest/UserGuide/index.html?aws-properties-iam-user.html"&gt;IAM resource&lt;/a&gt; and declare your EC2 instances like this:&lt;/p&gt;
+
+&lt;pre&gt;"Resources": {
+  "DemoInstance": {
+    &lt;strong&gt;"Metadata": {
+      "AWS::CloudFormation::Init": {
+        "config": &lt;em&gt;THIS IS WHERE THE BLUEPRINT GOES!&lt;/em&gt;
+      }
+    }&lt;/strong&gt;,
+    "Properties": {
+	    "ImageId": {"Fn::FindInMap": [
+	      "AWSRegionArch2AMI",
+	      {"Ref": "AWS::Region"},
+	      {"Fn::FindInMap": [
+	        "AWSInstanceType2Arch",
+	        {"Ref": "InstanceType"},
+	        "Arch"
+	      ]}
+	    ]},
+      "InstanceType": {"Ref": "InstanceType"},
+      "KeyName": {"Ref": "KeyName"},
+      "SecurityGroups": [{"Ref": "DemoSecurityGroup"}],
+      &lt;strong&gt;"UserData" : {"Fn::Base64" : {"Fn::Join" : ["", [
+        "#!/bin/sh\n",
+        "/opt/aws/bin/cfn-init",
+        " -s '", {"Ref" : "AWS::StackName"}, "'",
+        " -r 'DemoInstance'",
+        " --region '", { "Ref" : "AWS::Region" }, "'",
+        " --access-key '", {"Ref": "DemoKey"}, "'",
+        " --secret-key '", {"Fn::GetAtt": ["DemoKey", "SecretAccessKey"]}, "'",
+        "\n",
+        "/opt/aws/bin/cfn-signal",
+        " -e $?",
+        " '", {"Ref" : "DemoWaitConditionHandle"}, "'",
+        "\n"
+      ]]}}&lt;/strong&gt;
+    },
+    "Type": "AWS::EC2::Instance"
+  }
+}&lt;/pre&gt;
+
+&lt;p&gt;The user-data calls &lt;code&gt;cfn-init&lt;/code&gt; with the newly-generated IAM credentials to fetch and process the metadata, and &lt;code&gt;cfn-signal&lt;/code&gt; to report success or failure via a &lt;a href="http://docs.amazonwebservices.com/AWSCloudFormation/latest/UserGuide/index.html?aws-properties-waitcondition.html"&gt;WaitCondition&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Packages managed by Yum, Python&amp;#8217;s &lt;code&gt;easy_install&lt;/code&gt;, and RubyGems plus files and services all work natively within CloudFormation.&amp;nbsp; Source tarballs will work if you upload them someplace and provide the fully-qualified URL.&lt;/p&gt;
+
+&lt;p&gt;Going the other direction, the metadata from an existing CloudFormation template can be loaded into Blueprint by copying out the &lt;code&gt;"config"&lt;/code&gt; document fragment and passing it on standard input to &lt;a href="http://devstructure.github.com/blueprint/blueprint-create.1.html"&gt;&lt;code&gt;blueprint-create&lt;/code&gt;(1)&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Our thanks to the Reto Kramer, Chris Whitaker, and Adam Thomas for making it even easier to deploy blueprints to Amazon EC2.&lt;/p&gt;
+
+&lt;p&gt;Today, we&amp;#8217;re releasing Blueprint 3.1, which includes &lt;a href="https://github.com/devstructure/blueprint/compare/v3.0.8...v3.1.0"&gt;a number of fixes and improvements&lt;/a&gt; but most importantly, understands all of Amazon&amp;#8217;s extensions to the &lt;code&gt;blueprint&lt;/code&gt;(5) format, allowing seamless transition to and from AWS CloudFormation.&amp;nbsp; Get 3.1 from &lt;a href="https://github.com/devstructure/blueprint"&gt;GitHub&lt;/a&gt;, &lt;a href="https://github.com/devstructure/blueprint/wiki/Installing-with-a-package-manager"&gt;DevStructure&amp;#8217;s Debian archive&lt;/a&gt;, or from PyPI.&lt;/p&gt;
+
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/rubyconf-2011/</atom:title><atom:link href="http://rcrowley.org/talks/rubyconf-2011/" rel="alternate" /><atom:id>http://rcrowley.org/talks/rubyconf-2011/</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/rubyconf-2011/"&gt;http://rcrowley.org/talks/rubyconf-2011/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Monads without pretension
+</atom:title><atom:link href="http://rcrowley.org/2011/09/21/monads.html" rel="alternate" /><atom:id>http://rcrowley.org/2011/09/21/monads.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2011-09-21" pubdate&gt;2011-09-21&lt;/time&gt;
+	&lt;h1&gt;Monads without pretension&lt;/h1&gt;
+&lt;/header&gt;
+&lt;p&gt;The Strange Loop conference this week took a slight detour from its usual celebration of programming languages no one uses to really highlight Lisp in all its abstract glory.&amp;nbsp; Suddenly, Scala seemed like the most mainstream topic of discussion and monads were everywhere except within the understanding of most attendees.&lt;/p&gt;
+&lt;p&gt;I read &lt;a href="http://homepages.inf.ed.ac.uk/wadler/topics/monads.html#essence"&gt;The Essence of Functional Programming&lt;/a&gt; for the second or third time on the plane and am not a professor or language author so I'd like to take a stab at explaining monads to folks accustomed to imperative programming languages.&lt;/p&gt;
+&lt;p&gt;This is not an exhaustive discussion of monads.&amp;nbsp; This is what I consider to be the prerequisite material that no one bothered to cover in their talks.&amp;nbsp; These are the three monad laws implemented and tested in Python.&lt;/p&gt;
+&lt;script src="https://gist.github.com/1232809.js"&gt; &lt;/script&gt;
+&lt;p&gt;Such contrived code has no place in a real Python application but now with monads solved your only problem is homoiconic syntax.&amp;nbsp; To take monads to the next level, reimplement &lt;code&gt;M&lt;/code&gt;, &lt;code&gt;unitM&lt;/code&gt;, and &lt;code&gt;bindM&lt;/code&gt; to encapsulate side effects (such as the primitive logging above), propagate error messages and statistics (both as demonstrated in the paper), or perhaps automatically memoize &lt;code&gt;k&lt;/code&gt;.&lt;/p&gt;
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/sf-python-2011-09-14/</atom:title><atom:link href="http://rcrowley.org/talks/sf-python-2011-09-14/" rel="alternate" /><atom:id>http://rcrowley.org/talks/sf-python-2011-09-14/</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/sf-python-2011-09-14/"&gt;http://rcrowley.org/talks/sf-python-2011-09-14/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/sf-devops-2011-08-23/</atom:title><atom:link href="http://rcrowley.org/talks/sf-devops-2011-08-23/" rel="alternate" /><atom:id>http://rcrowley.org/talks/sf-devops-2011-08-23/</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/sf-devops-2011-08-23/"&gt;http://rcrowley.org/talks/sf-devops-2011-08-23/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">A blueprint is not a diff but it doesn&amp;#8217;t matter
+</atom:title><atom:link href="http://rcrowley.org/articles/blueprint-diff-analogy.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/blueprint-diff-analogy.html</atom:id><atom:published>2013-09-12T19:07:40Z</atom:published><atom:updated>2013-09-12T19:07:40Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2011-05-07" pubdate&gt;2011-05-07&lt;/time&gt;
+	&lt;h1&gt;A blueprint is not a diff but it doesn&amp;#8217;t matter&lt;/h1&gt;
+&lt;/header&gt;
+&lt;p&gt;The support we at &lt;a href="http://devstructure.com/"&gt;DevStructure&lt;/a&gt; have seen since opening the source to &lt;a href="https://github.com/devstructure/blueprint"&gt;Blueprint&lt;/a&gt; in February has been fantastic and addicting &amp;#8212; thank you all.&amp;nbsp; As a first introduction to how Blueprint works, I want to address an analogy I&amp;#8217;ve seen many times: that a blueprint is a diff of your server.&amp;nbsp; It&amp;#8217;s a perfect analogy and something instantly understood by developers and operators alike.&lt;/p&gt;
+&lt;p&gt;The funny thing is: it isn&amp;#8217;t a diff.&amp;nbsp; Even better: it doesn&amp;#8217;t matter.&lt;/p&gt;
+&lt;p&gt;Blueprint aims to describe the absolute state of a server in a concise format that is both human- and machine-readable.&amp;nbsp; That&amp;#8217;s the JSON format you see if you run &lt;code&gt;blueprint show &lt;em&gt;name&lt;/em&gt;&lt;/code&gt; without a format argument (&lt;code&gt;-P&lt;/code&gt;, &lt;code&gt;-C&lt;/code&gt;, or &lt;code&gt;-S&lt;/code&gt;).&amp;nbsp; There are many, many things that are a part of the absolute state of a server that we can omit in favor of brevity without sacrificing correctness and we take advantage of several.&lt;/p&gt;
+&lt;p&gt;Building Blueprint around the notion of a diff was a non-starter because it would impose an order of operations on the configuration process.&amp;nbsp; To diff between the current and some past state of a server, one could rely on file modification timestamps or explicitly invoke &lt;code&gt;blueprint start-paying-attention&lt;/code&gt;.&amp;nbsp; Either option requires knowing the time at which you began the configuration process.&amp;nbsp; Worse still, the latter requires you to know ahead of time and install Blueprint first.&lt;/p&gt;
+&lt;p&gt;When faced with the prospect of figuring out what you did to configure a server, "You should have installed Blueprint before you started," is not the answer I want to give.&amp;nbsp; Blueprint is just as happy given a server you&amp;#8217;ve been tweaking since 2007 as it is on a pristine machine.&amp;nbsp; This is because Blueprint deals in absolutes.&lt;/p&gt;
+&lt;p&gt;An image or a giant tarball certainly declare the absolute state of a system but miss the boat entirely on human readability and conciseness.&amp;nbsp; To have our cake and eat it, too, we needed to rise above the abstraction of files and think about packages, the more useful building blocks of Linux systems.&lt;/p&gt;
+&lt;h2&gt;Reducing the noise&lt;/h2&gt;
+&lt;p&gt;Of course, there are hundreds of packages on any given Linux server and most of them can be assumed and therefore omitted from a blueprint.&amp;nbsp; Packages like &lt;code&gt;coreutils&lt;/code&gt;, &lt;code&gt;grep&lt;/code&gt;, and &lt;code&gt;libc6&lt;/code&gt; are essential to a Linux userland &amp;#8212; Blueprint itself won&amp;#8217;t even work without them.&amp;nbsp; The system package managers like APT and Yum are easy to interrogate and can be asked about exactly these essential packages directly.&amp;nbsp; In addition, packages like &lt;code&gt;ubuntu-standard&lt;/code&gt; and all their dependencies are omitted for the same reasons.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/etc&lt;/code&gt; is home to thousands of configuration files, the vast majority of which simply don&amp;#8217;t matter to a blueprint.&amp;nbsp; By examining file metadata and comparing the MD5 sums of file content to both the manifest of files in installed packages and a secondary list of files maintained within Blueprint, almost all of those files may be confidently omitted from a blueprint, leaving only new and modified files.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/usr/local&lt;/code&gt; is a special directory.&amp;nbsp; It is the de facto standard home of programs compiled and installed from source.&amp;nbsp; Sort of.&amp;nbsp; There are plenty of files and plenty of alternative package managers (like Python&amp;#8217;s &lt;code&gt;easy_install&lt;/code&gt; and &lt;code&gt;pip&lt;/code&gt;) that place files in &lt;code&gt;/usr/local&lt;/code&gt;.&amp;nbsp; Blueprint intelligently trims away the fat and manages only the files that are truly important so you can compile from source knowing that Blueprint will faithfully package your build up for later.&lt;/p&gt;
+&lt;h2&gt;Sort of a diff, after all&lt;/h2&gt;
+&lt;p&gt;Blueprints certainly look and feel like diffs from outside and that&amp;#8217;s to a great degree by design.&amp;nbsp; The noise reduction techniques used to keep blueprints concise and understandable are very much in the spirit of diffing tools but operate outside the notion of points-in-time.&lt;/p&gt;
+&lt;p&gt;A blueprint is a bit like a diff between the minimal Linux installation, as best can be introspected from the installation itself, and the current, running state of the system.&amp;nbsp; Create blueprints from your perfectly configured development environment and deploy with confidence.&lt;/p&gt;
+&lt;/article&gt;
+
+</atom:content></atom:entry></atom:feed>

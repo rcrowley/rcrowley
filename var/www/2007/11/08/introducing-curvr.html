@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Introducing curvr &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/11/08/introducing-curvr">Introducing curvr</a> <small>2007/11/08</small></h1>
+<p><a href="http://flickr.com/photos/rcrowley/1922850426/"><img src="http://farm3.static.flickr.com/2080/1922850426_98f7f8d126.jpg" border="0" alt="" hspace="5" vspace="5" width="500" height="250" align="right" /></a>All inspirational credit, including the name, go to Aaron Straup Cope (<a href="http://aaronland.info/bin/filtr">filtr</a>).</p>
+<p>Curvr is a command-line tool that automates the most common operations I do in photoshop when I take pictures.  I'm quite lazy and I hope that having this tool will make me take more pictures.  This is the same line of reasoning that led me to an N73 and that is working out quite well.</p>
+<p>I could just run Aaron's filtr script, which does a sort of Lomo-y thing, but that's not so much my style*.  Instead, curvr perserves a little more reality and has a couple of key benefits.  (* My style being slightly high-contrast but otherwise realistic.)</p>
+<ol>
+	<li>Sets white- and black-points just like you can do in Photoshop's Levels dialog.</li>
+	<li>Tweaks the color curve to make mid-tones just a touch darker and force more contrast.</li>
+</ol>
+<p>The tweak of the color curve has a couple of nice side effects.  Since it doesn't touch colors near the white- or black-points, things look pretty realistic.  And for some reason, tweaking the mid-tones the way it does has the side effect of reducing haziness pretty effectively.  Plus, skies pick up a really nice deep blue color.</p>
+<p>My photography professor in college told us to use the red channel of the image to build black &amp; white from color, rather than letting Photoshop convert it to greyscale.  This advice carries through to the color mapping functions in curvr -- when replacing colors, the red channel is used as the key into the color map.  It works surprisingly well.</p>
+<p>Now the how-to-get-it bit.  On a Mac you'll need <a href="http://www.macports.org/">MacPorts</a> and a Terminal.  On Linux you'll probably be able to pick a lot of this up from your package manager (update the Makefile accordingly).</p>
+<pre>$ sudo port install libpng jpeg</pre>
+<p>Now you can unpack and install GraphicsMagick.  The GraphicsMagick source can be obtained at <a href="ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/">ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/</a>.  I use version 1.1.10.</p>
+<pre>./configure &amp;&amp; make &amp;&amp; sudo make install</pre>
+<p>Finally, curvr is just a simple <code>make</code>.</p>
+<p><big><del><a href="http://rcrowley.org/work/curvr-0.1.tar.bz2">curvr 0.1</a></del> <del><a href="http://svn.rcrowley.org/svn/curvr/">http://svn.rcrowley.org/svn/curvr/</a></del> <a href="http://github.com/rcrowley/curvr">http://github.com/rcrowley/curvr</a></big></p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(5)</small></h1>
+<ol>
+	<li>
+		<p>but...but...the first third of that picture looks the nicest!</p>
+		<p>&mdash; <a href="http://jeweledplatypus.org/">britta</a> &mdash; 2007/11/08 1:12 pm</p>
+	</li>
+
+	<li>
+		<p>I personally like the middle one the best.  It doesn't go too dark but has gotten a lot of the haziness out.  Perhaps I'm crazy.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2007/11/08 1:44 pm</p>
+	</li>
+
+	<li>
+		<p>Yeah, the middle one seems the best of the trio. I'll have to try this out once I install MacPorts.</p>
+		<p>&mdash; <a href="http://paulstamatiou.com">Paul Stamatiou</a> &mdash; 2007/11/08 9:36 pm</p>
+	</li>
+
+	<li>
+		<p>Hey, I'm having a bit of trouble getting this thing installed. It seems to be choking on /usr/local/include/exiv2 during the curvr make.</p>
+<p>I tried installing exiv2 via sudo port install exiv2, but it doesn't seem to have created the /usr/local/include/exiv2 directory.</p>
+<p>Also, I haven't been able to get GraphicsMagick to compile and install, but sudo port install GraphicsMagick seems to put 1.1.7 in place.  Do you think that could be the problem?</p>
+<p>Any ideas?</p>
+<p>Thanks! I'm hoping I can get curvr installed, because it makes your pictures look really nice, and I'm partial to low-overhead command-line tweaks that don't require a lot of clicking.</p>
+		<p>&mdash; <a href="http://foohack.com">Isaac Z. Schlueter</a> &mdash; 2008/01/07 10:24 am</p>
+	</li>
+
+	<li>
+		<p>You probably need to install development ports as well.  On Ubuntu many packages have a version with "-dev" appended to the end that install the headers and such.  Or just install from source, which is what I think I did for Exiv2 at least.  GraphicsMagick 1.1.7 should work but there have been several good fixes since then.  1.1.10 from source isn't that hard either.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/01/07 10:51 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/980abc4b8be33f0baa62163db0f93eaa?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

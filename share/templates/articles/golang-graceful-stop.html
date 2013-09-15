@@ -1,0 +1,16 @@
+{% block content %}
+<article>
+<header>
+	<time datetime="2013-04-27" pubdate>2013-04-27</time>
+	<h1>{% block title %}Graceful stopping in Go{% endblock %}</h1>
+</header>
+<p>It&#8217;s rude to deploy early and often if deploys interrupt user requests so we build our Go services at Betable to stop gracefully without interrupting anyone.&nbsp; The idea is to stop listening, presumably so a new process can take over, and let all open connections respond to any in-progress requests before finally stopping service.&nbsp; Incidentally, we use <a href="https://github.com/rcrowley/goagain"><code>goagain</code></a> to restart without even stopping listening but that&#8217;s beyond the scope of this article.</p>
+<p><code>main.main</code> does four things: listens, makes a <code>Service</code> and sends it into the background, blocks until signaled, and afterwards stops the service gracefully.&nbsp; Listening and signal handling are right out of the standard library playbook except that, to my great annoyance, you need a <code>*net.TCPListener</code> or <code>*net.TCPConn</code> and not merely a <code>net.Listener</code> or <code>net.Conn</code> to call <code>SetDeadline</code>.</p>
+<p><code>service.Serve(listener)</code> accepts connections and handles each one of them in its own goroutine.&nbsp; It sets a deadline so <code>listener.AcceptTCP()</code> doesn&#8217;t block forever and between successive iterations checks to see if it should stop listening.</p>
+<p><code>service.serve(conn)</code> reads and writes and likewise does so on a deadline.&nbsp; It sets a deadline so <code>conn.Read(buf)</code> doesn&#8217;t block forever and between writing a response and reading the next request or after the <code>conn.Read(buf)</code> deadline checks to see if it should close the connection.</p>
+<p>The various goroutines decide to close connections and listeners if the service&#8217;s channel receives a value which, because nothing ever sends on this channel, is only possible after <code>service.Stop()</code> has closed the channel.&nbsp; Recall the built-in <a href="http://golang.org/ref/spec#Close"><code>close</code></a> function that causes channels to forevermore receive the zero-value of the channel&#8217;s element type.</p>
+<p>The final piece of the puzzle is waiting for all goroutines to die which is implemented via the standard library&#8217;s <code>sync.WaitGroup</code>.</p>
+<p><a href="https://gist.github.com/rcrowley/5474430">https://gist.github.com/rcrowley/5474430</a> has it all:</p>
+<script src="https://gist.github.com/rcrowley/5474430.js"></script>
+</article>
+{% endblock %}

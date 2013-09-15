@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cross platform XPCOM (a howto) &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/07/17/cross-platform-xpcom-a-howto">Cross platform XPCOM (a howto)</a> <small>2007/07/17</small></h1>
+<p>The most important part of Mozilla's <a href="http://www.mozilla.org/projects/xpcom/">XPCOM</a> technology is its promise of a cross-platform interface between Javascript and native code.&nbsp; Yet few examples exist showing how to build a codebase for both Windows and Mac OS X.&nbsp; Building on <a href="http://starkravingfinkle.org/blog/2006/10/mozilla-platform-xpcom-in-c/">Mark Finkle's Windows how-to</a>, here is a completion showing the parallel track for Mac OS X and how to setup your development environment for a code-once, compile-twice, use anywhere XPCOM build.</p>
+<p>Our entire app is going to reside within the <code>app_repo</code> directory.&nbsp; Really you can place it wherever you like, but remember to change paths appropriately.&nbsp; You know the drill.&nbsp; Confusingly, the root of our app will be the <code>app</code> subdirectory.&nbsp; So far we have:</p>
+<ul>
+	<li>app_repo
+<ul>
+	<li>app</li>
+</ul>
+</li>
+</ul>
+<h2>XULRunner</h2>
+<p>Since the goal here is an XPCOM object for use in XULRunner, we'll start there.&nbsp; Installing XULRunner is quite painless.&nbsp; We have a version for each platform, which are kept quite separate.</p>
+<p><a href="http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.8.1.3/contrib/win32/">XULRunner for Windows</a> is simply a ZIP file, which you should extract into the root of your <code>app</code> directory.&nbsp; Copy the <code>xulrunner-stub.exe</code> program from <code>app/xulrunner</code> down into <code>app</code> and rename it however you like.&nbsp; This stub just looks for a XULRunner app in the current directory and runs it.&nbsp; Handy.</p>
+<p><a href="http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.8.1.3/contrib/mac/">XULRunner for Mac</a> is slightly more complicated because of strict requirements for GUI apps running in OS X.&nbsp; First, go download XULRunner and install the package.&nbsp; It will create itself deep within <code>/Library/Frameworks</code> (quite separate from the Windows version).&nbsp; In <code>app_repo</code>, create a new directory called <code>MacApp.app</code> or something else ending in <code>.app</code>.&nbsp; Within this directory create one called <code>Contents</code> (capitalization is important), and within <code>Contents</code> create <code>Frameworks</code> and <code>MacOS</code>.&nbsp; Now create three symbolic links to complete the Mac directory structure:</p>
+
+<pre>ln -s /Library/Frameworks/XUL.framework MacApp.app/Contents/Frameworks/XUL.framework
+ln -s ../../app MacApp.app/Contents/Resources
+ln -s /Library/Frameworks/XUL.framework/Versions/Current/xulrunner MacApp.app/Contents/MacOS/xulrunner</pre>
+
+<p>Now create <code>MacApp.app/Contents/Info.plist</code> and dump this in, making sure to change things in ALL CAPS.&nbsp; I am almost certain this is not optimal as it repeats itself a lot.&nbsp; But it is functional.&nbsp; Can someone who knows demystify this?</p>
+
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+&lt;plist version="1.0"&gt;
+&lt;dict&gt;
+        &lt;key&gt;CFBundleDevelopmentRegion&lt;/key&gt;
+        &lt;string&gt;English&lt;/string&gt;
+        &lt;key&gt;CFBundleExecutable&lt;/key&gt;
+        &lt;string&gt;xulrunner&lt;/string&gt;
+        &lt;key&gt;CFBundleGetInfoString&lt;/key&gt;
+        &lt;string&gt;3.0&lt;/string&gt;
+        &lt;key&gt;CFBundleIdentifier&lt;/key&gt;
+        &lt;string&gt;YOUR_APP_ID&lt;/string&gt;
+        &lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;
+        &lt;string&gt;YOUR_APP_VERSION&lt;/string&gt;
+        &lt;key&gt;CFBundleName&lt;/key&gt;
+        &lt;string&gt;YOUR_APP_NAME&lt;/string&gt;
+        &lt;key&gt;CFBundlePackageType&lt;/key&gt;
+        &lt;string&gt;APPL&lt;/string&gt;
+        &lt;key&gt;CFBundleShortVersionString&lt;/key&gt;
+        &lt;string&gt;YOUR_APP_VERSION&lt;/string&gt;
+        &lt;key&gt;CFBundleSignature&lt;/key&gt;
+        &lt;string&gt;YOUR_APP_ID&lt;/string&gt;
+        &lt;key&gt;CFBundleURLTypes&lt;/key&gt;
+        &lt;array&gt;
+                &lt;dict&gt;
+                        &lt;key&gt;CFBundleURLName&lt;/key&gt;
+                        &lt;string&gt;YOUR_APP_NAME&lt;/string&gt;
+                        &lt;key&gt;CFBundleURLSchemes&lt;/key&gt;
+                        &lt;array&gt;
+                                &lt;string&gt;chrome&lt;/string&gt;
+                        &lt;/array&gt;
+                &lt;/dict&gt;
+        &lt;/array&gt;
+        &lt;key&gt;CFBundleVersion&lt;/key&gt;
+        &lt;string&gt;YOUR_APP_VERSION&lt;/string&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;</pre>
+
+<p>As a review, here's how our tree looks now:</p>
+
+<ul>
+	<li>app_repo
+<ul>
+	<li>app
+<ul>
+	<li>xulrunner</li>
+</ul>
+</li>
+	<li>MacApp.app
+<ul>
+	<li>Contents
+<ul>
+	<li>Frameworks
+<ul>
+	<li>XUL.framework -&gt; /Library/Frameworks/XUL.framework</li>
+</ul>
+</li>
+	<li>Info.plist</li>
+	<li>MacOS
+<ul>
+	<li>xulrunner -&gt; /Library/Frameworks/XUL.framework/Versions/Current/xulrunner
+Resources -&gt; ../../app</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<h2>The rest of your XULRunner app</h2>
+<p>Building the XUL and Javascript part of a XULRunner app is a bit outside of the scope of this already very long post.&nbsp; There are plenty of good references on this though, starting with XUL Planet.&nbsp; Go forth and learn.</p>
+<h2>The Gecko SDK</h2>
+<p>You'll need to grab the Gecko SDK to build XPCOM objects.&nbsp; I took these and placed them in <code>app</code> at <code>gecko-sdk.win</code> and <code>gecko-sdk.mac</code>.&nbsp; I haven't started building PPC Mac versions, but the SDK for those will be under <code>gecko-sdk.ppc</code>.</p>
+<ul>
+	<li>Windows and PPC Mac: <a href="http://developer.mozilla.org/en/docs/Gecko_SDK">http://developer.mozilla.org/en/docs/Gecko_SDK</a></li>
+	<li>Intel Mac: <a href="http://www.oxymoronical.com/view/1114">http://www.oxymoronical.com/view/1114</a></li>
+</ul>
+<h2>At last, some C++</h2>
+<p>Now that your development environment is setup, I'll let you write some C++ code.&nbsp; I created another directory within <code>app</code> called <code>xpcom</code>, in which I placed my project, called <code>foo</code>.&nbsp; Here are some stub files that will get you off the ground.&nbsp; Be sure to <a href="http://www.famkruithof.net/uuid/uuidgen">create your own UUID</a>.</p>
+
+<h3>foo.idl</h3>
+<pre>#include "nsISupports.idl"
+[scriptable, uuid(0e0d0b74-2c06-11dc-8314-0800200c9a66)]
+interface IFoo : nsISupports {
+	attribute AString name;
+	long add(in long a, in long b);
+};</pre>
+
+<h3>foo.cpp (just to make Windows happy)</h3>
+<pre>#include "windows.h"
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
+	return TRUE;
+}</pre>
+<h3>foo_impl.h</h3>
+<pre>#ifndef FOO_IMPL_H
+#define FOO_IMPL_H
+#include "foo.h"
+#include "nsStringAPI.h"
+#define FOO_CONTRACTID "@richarddcrowley.org/foo;1"
+#define FOO_CLASSNAME "Foo"
+#define FOO_CID { 0x0e0d0b74, 0x2c06, 0x11dc, { 0x83, 0x14, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66 } }
+class CFoo : public IFoo {
+public:
+	NS_DECL_ISUPPORTS
+	NS_DECL_IFOO
+	CFoo();
+private:
+	~CFoo();
+protected:
+	nsString mName;
+};
+#endif</pre>
+
+<h3>foo_impl.cpp</h3>
+<pre>#include "foo_impl.h"
+NS_IMPL_ISUPPORTS1(CFoo, IFoo)
+CFoo::CFoo() {
+}
+CFoo::~CFoo() {
+}
+NS_IMETHODIMP CFoo::GetName(nsAString &amp; aName) {
+	aName.Assign(mName);
+	return NS_OK;
+}
+NS_IMETHODIMP CFoo::SetName(const nsAString &amp; aName) {
+	mName.Assign(aName);
+	return NS_OK;
+}
+NS_IMETHODIMP CFoo::Add(PRInt32 a, PRInt32 b, PRInt32 *_retval) {
+	*_retval = a + b;
+	return NS_OK;
+}</pre>
+
+<h3>foo_module.cpp</h3>
+<pre>#include "nsIGenericFactory.h"
+#include "foo_impl.h"
+NS_GENERIC_FACTORY_CONSTRUCTOR(CFoo)
+static nsModuleComponentInfo components[] = {
+	{
+		FOO_CLASSNAME,
+		FOO_CID,
+		FOO_CONTRACTID,
+		CFooConstructor,
+	}
+};
+NS_IMPL_NSGETMODULE("FooModule", components)</pre>
+
+<h2>Building for Windows</h2>
+<p>Because the length here is getting out of hand, I will defer to Mark Finkle for the ins-and-outs of the Visual Studio build.&nbsp; The short version is you setup a few includes and libraries, set some preprocessor directives, and go.&nbsp; <a href="http://starkravingfinkle.org/blog/2006/10/mozilla-platform-xpcom-in-c/">Mark Finkle's Weblog » Mozilla Platform - XPCOM in C++</a></p>
+<p>I used Visual Studio 2005 on Windows XP and did exactly as Mark prescribed.&nbsp; It worked on the first try.&nbsp; I wanted to gloat a little bit, but I seriously hope you have as much luck.</p>
+<h2>Building for Mac</h2>
+<p>Building on the Mac is easy since a Mac is UNIX-y.&nbsp; Use this Makefile:</p>
+<pre>GECKO_SDK := ../../gecko-sdk.mac
+XULRUNNER := /Library/Frameworks/XUL.framework/Versions/Current
+DEFINE := -DXP_UNIX -DXP_MACOSX
+all: xpt dylib
+xpt:
+	$(GECKO_SDK)/bin/xpidl -m header -I$(GECKO_SDK)/idl foo.idl
+	$(GECKO_SDK)/bin/xpidl -m typelib -I$(GECKO_SDK)/idl foo.idl
+impl:
+	g++ -w -c -o foo_impl.&nbsp; -I $(GECKO_SDK)/include $(DEFINE) foo_impl.cpp
+module:
+	g++ -w -c -o foo_module.&nbsp; -I $(GECKO_SDK)/include $(DEFINE) foo_module.cpp
+dylib: impl module
+	g++ -dynamiclib -o foo.dylib foo_impl.&nbsp; foo_module.&nbsp; -L$(GECKO_SDK)/lib
+	-L$(XULRUNNER) -Wl,-executable_path,$(XULRUNNER)
+	-lxpcomglue_s -lxpcom -lnspr4
+clean:
+	rm *.o
+	rm foo.h
+	rm foo.xpt
+	rm foo.dylib</pre>
+<p>Having the XPT file (which is the same for all platforms) as well as a DLL and a DYLIB, we can dump them into <code>app/components</code>, increment <code>BuildID</code> in <code>application.ini</code> and run our application.</p>
+
+<h2>The interface between C++ and Javascript</h2>
+<p>Now that the application has access to the native code, let's write some Javascript to call it.&nbsp; The code here will create the object, alerting us of any error, and then use the <code>add</code> function we defined in <code>foo_impl.cpp</code>.</p>
+<pre>try {
+	var xpcom = Components.classes['@richarddcrowley.org/foo;1'].createInstance();
+	foo = xpcom.QueryInterface(Components.interfaces.IFoo);
+} catch (err) alert(err);
+alert(foo.add(3, 4));</pre>
+<h2>That wasn't so bad, was it?</h2>
+<p>This has been a bit of a whirlwind tour,  I know.&nbsp; But that's how it goes when you're playing with relatively new technologies.&nbsp; It will be sweet, though, the first time you get 7 from 3 + 4.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(10)</small></h1>
+<ol>
+	<li>
+		<p>Wowza. Way over my head!</p>
+		<p>&mdash; <a href="http://www.youtilize.com">Dimitry</a> &mdash; 2007/07/17 6:35 pm</p>
+	</li>
+
+	<li>
+		<p>Just wanted you to know this helped me out. The app name for the third symlink is wrong though ;)</p>
+		<p>&mdash; <a href="http://blueapples.org">Isaac</a> &mdash; 2007/10/06 2:45 pm</p>
+	</li>
+
+	<li>
+		<p>Richard, thanks for the sample files. The problem I am facing is generating the xpt file from idl. Using XPIDL utilty results in problem with finding MSVCR80.dll(Iam using MSVS 2005 for development). Is there any way so that I can bind the SDK( the whole include, lib, idl and bin ) to MSVS 2005. I can't generate xpt file without which anything coded will be worth nothing. Please help me out. Send me in my email id, some workarounds. I know you maybe busy with your activities, but it is you people who can guide people like us.</p>
+		<p>&mdash; Anil &mdash; 2007/10/10 10:58 pm</p>
+	</li>
+
+	<li>
+		<p>It sounds like you're using the Microsoft IDL compiler instead of Mozilla's.&nbsp; The two are incompatible so here is what I'd recommend.&nbsp; In the directory with all of your components create xpidl-build.bat and put these two lines in it:</p>
+<p>"..\gecko-sdk.win\bin\xpidl.exe" -m header -I"..\gecko-sdk.win\idl" %1
+"..\gecko-sdk.win\bin\xpidl.exe" -m typelib -I"..\gecko-sdk.win\idl" %1</p>
+<p>Then run xpidl-build.bat with the argument gm.idl to build gm.&nbsp; and gm.xpt.&nbsp; You can setup a custom build step in Visual Studio to run this, or you can just manually run it every time you change your IDL file (it's pointless otherwise).</p>
+<p>I do not know much about building the whole SDK.&nbsp; I haven't yet needed that much control so I haven't dug in.&nbsp; If you do decide to, link me some instructions.&nbsp; Good luck!</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2007/10/11 5:44 am</p>
+	</li>
+
+	<li>
+		<p>Hello. I'm from Korea.</p>
+<p>So, I can't speak English well.</p>
+<p>Now, I want to make Mozilla firefox plugins on mac.</p>
+<p>So I try to do this post.</p>
+<p>But, I have some link error. ( I'm a Newbie on mac. )</p>
+<p>My error message is that :</p>
+<p>id: Undefined symbols:
+_NS_StringContainerFinish
+_NS_StringContainerInit
+_NS_StringCopy
+__Z20NS_NewGenericModule2PK12nsModuleInfoPP9nslModule
+/usr/bin/libtool: internal link edit command failed
+make: *** [dylib] Error 1</p>
+<p>----------------------------------------------------------------</p>
+<p>Can I get your help?</p>
+		<p>&mdash; junpp &mdash; 2007/12/13 3:49 am</p>
+	</li>
+
+	<li>
+		<p>[...&nbsp; http://groups.google.pt/group/mozilla.dev.tech.xul/browse_thread/thread/d8c0127036615492 http://rcrowley.org/2007/07/17/cross-platform-xpcom-a-howto/ [...]</p>
+		<p>&mdash; <a href="http://www.kenpardue.com/blog/2008/04/29/creating-a-xulrunner-19-app-on-os-x/">Paradise Road: Ken&#8217;s Blog &raquo; Blog Archive &raquo; Creating a XULRunner 1.9 App on OS X</a> &mdash; 2008/04/29 11:18 am</p>
+	</li>
+
+	<li>
+		<p>I think this has helped me as well! I've done everything up to the last point where the IFoo object is created in JavaScript. In my case, I want to create it in C++ and return it as a callback parm to JavaScript. I have this code:</p>
+<p>nsCOMPtr myFoo = do_CreateInstance(FOO_CONTRACTID);</p>
+<p>but myFoo returns as NULL. Looking at the JavaScript, I'm not sure what it is do_CreateInstance is returning if the JavaScript object you use (var xpcom) needs to QI for IFoo. Any ideas?</p>
+<p>Good stuff...&nbsp; Thanks!</p>
+		<p>&mdash; <a href="http://www.endurasoft.com">Kenn</a> &mdash; 2008/05/15 11:48 am</p>
+	</li>
+
+	<li>
+		<p>This is what I'm looking for. Can I ask the author or anyone who has followed this how to, and successfully completing the application, to put a download link or upload a file? This is for ease of use for new users like me. I'll do it myself when I'm done with it, if no one has beat me to it.</p>
+<p>AC</p>
+		<p>&mdash; Aaron Calderon &mdash; 2008/11/14 12:55 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/fa45225a2fa409a88da7e37af32723d7?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>How-to &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2009/04/02/how-to">How-to</a> <small>2009/04/02</small></h1>
+<p>My absolute favorite kind of how-to post involves me downloading,
+<em>reading</em> and running a shell script that automates an otherwise
+tedious and non-obvious process.&nbsp; If it were straightforward, I
+wouldn&#8217;t be googling for it in the first place.&nbsp; The Gist
+tool on GitHub is perfect for how-to scripts, so here we go.</p>
+
+<p>So, since I&#8217;ve already chugged the promises of the Drizzle
+Kool-Aid, it is time I started using it in hopes I can soon contribute
+code myself.&nbsp; Step one is getting the bugger to install.&nbsp; Step
+two is writing a little program using the <em>very</em> Brian Aker-ified
+<code>libdrizzle</code> C library.&nbsp; Today is a step one kind of
+day.</p>
+
+<p>I&#8217;m on Ubuntu Intrepid myself but from the package lists, this
+looks like it'll work almost out-of-the-box for all Ubuntu flavors.&nbsp;
+The hands-on part will be the Bazaar PPA but a visit to
+<a href="https://launchpad.net/~bzr/+archive/ppa">Launchpad</a> will get
+you the right <code>/etc/apt/sources.list</code> lines and the appropriate
+key.</p>
+
+<p>I started from a system that was already full of compilers and libraries
+so, for completeness, I&#8217;ve included a modification to the
+<a href="http://drizzle.org/wiki/Compiling#Ubuntu_2">official Ubuntu
+dependency list</a>.&nbsp; The modifications get you newer Bazaar, newer
+<code>libevent</code> and what I believe to be a more generally build-ready
+environment.</p>
+
+<p>This installs <code>libprotobuf</code> and <code>libevent</code>
+manually so make sure to comment those sections if you already have a
+version you like.</p>
+
+<script src="http://gist.github.com/88478.js"></script>
+
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/5207467e08c7882c0d304a6a146e599e?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

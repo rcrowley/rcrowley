@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Out of paper &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2009/01/13/out-of-paper">Out of paper</a> <small>2009/01/13</small></h1>
+<p>Last night at the laundromat it took me three attempts to add money to
+my stored-value card because I, like everyone else, don't read the messages
+in modal dialogs.&nbsp; I know that ATMs, gas pumps, laundromats and other
+credit card readers ask if you&rsquo;d like a receipt before they complete
+the transaction.&nbsp; Sometimes, though, they tell you they can&rsquo;t
+print a receipt and ask for your permission to continue.&nbsp; The problem
+is that the options available are the same in both cases: &ldquo;yes&rdquo;
+or &ldquo;no.&rdquo;&nbsp; It looks like this:</p>
+
+<pre>Would you like a receipt?
+    YES             NO</pre>
+
+<pre>Unable to print receipt.&nbsp; Continue?
+    YES             NO</pre>
+
+<p>Because no one reads the actual prompt, the options need to indicate
+that something unexpected is going on.&nbsp; This is doubly true when the
+machine is so low that I can&rsquo;t even see the top line of the
+display.&nbsp; The special case of the printer being out of paper should
+read:</p>
+
+<pre>Unable to print receipt.
+    OK              CANCEL</pre>
+
+<p>By breaking the expected pattern of put in my card, press &ldquo;no&rdquo;,
+select $20 and wait, I can do the right thing the first time and avoid being
+turned away by the washing machine.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(6)</small></h1>
+<ol>
+	<li>
+		<p>So, I just turned my mind in a knot on something:
+I was going to say it should ask you for a receipt and then only tell you it couldn't print one if you said you wanted one.
+But then I decided that if it knows it can't print a receipt, it shouldn't ask you if you want one.</p>
+<p>So, your solution wins.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2009/01/18 3:50 pm</p>
+	</li>
+
+	<li>
+		<p>Despite generally getting things wrong, the Bank of Ireland ATMs I'm familiar with get this a bit better by reversing the 'Yes' and 'No' for the out of paper scenario.</p>
+<p>So 'no' to a receipt is in the same position as 'yes' to continue without a receipt.</p>
+<p>What about a design where each action on a step is always displayed adjacent to a particular button:</p>
+<p>Would you like a receipt?</p>
+<p>Print Receipt & Continue             Continue without receipt</p>
+<p>Receipts unavailable</p>
+<p>Cancel Transaction!&nbsp;            Continue without receipt</p>
+		<p>&mdash; <a href="http://eoghanmurray.com/">Eoghan Murray</a> &mdash; 2009/01/19 3:10 am</p>
+	</li>
+
+	<li>
+		<p>Would you like a receipt? </p>
+<p>Print Receipt &amp; Continue ____________________ Continue without receipt</p>
+<p>Receipts unavailable:</p>
+<p>Cancel Transaction!  _____________________________        Continue without receipt</p>
+		<p>&mdash; <a href="http://eoghanmurray.com/">Eoghan Murray</a> &mdash; 2009/01/19 3:12 am</p>
+	</li>
+
+	<li>
+<p>Sounds like a personal problem...</p>		<p>&mdash; <a href="http://mihasya.com">Mike P</a> &mdash; 2009/01/19 3:05 pm</p>
+	</li>
+
+	<li>
+<p>I think laundry machine credits should be authorized per mobile number. You just SMS in 'WASH 1234' (1234 being the machine number), and it starts washing. If you're low on funds, it just takes out more from the CC on file.</p>
+		<p>Easy, simple and no need to carry extra card!</p>		<p>&mdash; <a href="http://www.iamdimitry.com">Dimitry</a> &mdash; 2009/01/23 5:15 am</p>
+	</li>
+
+	<li>
+<p>Baby steps, Dima.&nbsp; Though you can pay some SF parking meters by phone.</p>		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2009/01/24 7:37 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/08a67073a633eb5e3bf2fa60c4fa9081?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

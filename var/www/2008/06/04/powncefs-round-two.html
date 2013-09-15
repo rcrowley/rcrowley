@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PownceFS, round two &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/06/04/powncefs-round-two">PownceFS, round two</a> <small>2008/06/04</small></h1>
+<p>Well, <a href="http://rcrowley.org/2008/03/22/powncefs/">the first version of PownceFS</a> didn't turn out as well as I had hoped.&nbsp; After I put it out in the world, <a href="http://randomfoo.net/blog/id/4158">Leonard ran with it</a> and very nearly got everything to behave on a Mac.&nbsp; But even with his help I still hadn't been able to import songs my friends had uploaded to Pownce directly into iTunes.</p>
+<p>That was March, this is June.&nbsp; A couple of nights ago I got PownceFS working well on Leopard.&nbsp; Things aren't all well quite yet but it's much closer.&nbsp; I can mount the filesystem by running <code>./powncefs.py mnt</code>, and it'll show up in Finder just like I'd hoped but there the quirks begin.&nbsp; Finder is rather fickle about what system calls it actually issues, so I'm trying to figure out how to guarantee the directory entries are present.&nbsp; Thus far, the most foolproof way is simply running <code>ls -lR</code> after mounting the filesystem.&nbsp; (Less than fast.&nbsp;  Assuming Finder plays nice, the iTunes import will step in and be mean to you.&nbsp; For some unknown reason the script dies during the iTunes import (with the copy-to-iTunes-folder bit set).&nbsp; I've got to instrument the code a bit to see what's really happening but that is for another day.</p>
+<p>This blog post isn't really a release, per se, just getting something more out there for other folks to hack on.&nbsp; Here we go now: <big><a href="http://github.com/rcrowley/powncefs/tree/master">PownceFS on GitHub</a></big></p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(2)</small></h1>
+<ol>
+	<li>
+		<p>I tried to find where you were running ls-lR after mounting the filesystem and it was less than obvious.&nbsp; I was just wondering what extra info the -l provided that you wanted.&nbsp; (I might be completely missing the point of running ls-lR.)</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/06/05 3:47 am</p>
+	</li>
+
+	<li>
+		<p>The ls -lR was really an afterthought.&nbsp; It isn't listed in the README, which lists ls -l just as an example of what you could do with this program.&nbsp; The -l is of course not necessary, it's just pretty.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/06/05 11:11 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/3362373b0c00eb7eca1c5920f55a3bc6?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

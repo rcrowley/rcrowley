@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MD5 in XULRunner (or Firefox extensions) &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/11/15/md5-in-xulrunner-or-firefox-extensions">MD5 in XULRunner (or Firefox extensions)</a> <small>2007/11/15</small></h1>
+<p>Rather than including an outside JavaScript library just to do MD5 sums, how about using Mozilla's <code>nsICryptoHash</code> interface?&nbsp; For the Flickr API, this took slightly more effort than expected because it only returns data in base64-encoded ASCII or binary.&nbsp; Fortunately for me, the binary format was packed as a string, so making this usable was a matter of a little <code>bin2hex</code> function.&nbsp; Behold:</p>
+<pre>var _md5 = null;
+try {
+	_md5 = Cc['@mozilla.org/security/hash;1'].createInstance(Ci.nsICryptoHash);
+} catch (err) {
+	Components.utils.reportError(err);
+}
+var md5 = function(str) {
+	if (null == _md5) {
+		return '';
+	}
+
+	// Build array of character codes to MD5
+	var arr = [];
+	var ii = str.length;
+	for (var i = 0; i &lt; ii; ++i) {
+		arr.push(str.charCodeAt(i));
+	}
+	_md5.init(Ci.nsICryptoHash.MD5);
+	_md5.update(arr, arr.length);
+	var hash = _md5.finish(false);
+
+	// Unpack the binary data bin2hex style
+	var ascii = [];
+	ii = hash.length;
+	for (var i = 0; i &lt; ii; ++i) {
+		var c = hash.charCodeAt(i);
+		var ones = c % 16;
+		var tens = c &gt;&gt; 4;
+		ascii.push(String.fromCharCode(tens + (tens &gt; 9 ? 87 : 48)) +
+			String.fromCharCode(ones + (ones &gt; 9 ? 87 : 48)));
+	}
+
+	return ascii.join('');
+};</pre>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(4)</small></h1>
+<ol>
+	<li>
+		<p>Should really do === when comparing to null :p</p>
+<p>Running away b/c I don't even get what the hell is going on in this function...</p>
+		<p>&mdash; <a href="http://www.youtilize.com">Dimitry</a> &mdash; 2007/11/15 10:18 pm</p>
+	</li>
+
+	<li>
+		<p>Great stuff, I was just trying to use JS MD5 on bigger files (~1MB) in my extension. It timed out a couple of times before finished calculating. This is fast and should be used instead!</p>
+		<p>&mdash; Kojalaharcos &mdash; 2008/01/02 3:38 pm</p>
+	</li>
+
+	<li>
+		<p>i found many sites that give md5 coding and decoding like
+http://www.joomlaaa.com/md5-coding-decoding
+i do not know how they can decode md5
+anyone know a script to decode md5</p>
+		<p>&mdash; michosn &mdash; 2008/04/30 3:51 am</p>
+	</li>
+
+	<li>
+		<p>michosn: Please kill yourself.</p>
+		<p>&mdash; Mike D &mdash; 2008/04/30 8:12 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/6286a18629e75dc716beb88f0b493085?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

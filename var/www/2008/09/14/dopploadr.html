@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dopploadr at Yahoo! Open Hack Day &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/09/14/dopploadr">Dopploadr at Yahoo! Open Hack Day</a> <small>2008/09/14</small></h1>
+<p>My hat's off to Yahoo! for putting on a great show this weekend.&nbsp; More
+than one person told me how much more excited they are about Yahoo! after
+experiencing Hack Day.&nbsp; It really does bring out the best in everyone.
+Plus, the Girl Talk set Friday night was killer.</p>
+
+<p>MikeD and I showed up proudly wearing our OpenDNS t-shirts and were
+taken aback by the number of excited OpenDNS users we encountered &mdash;
+thanks, guys.&nbsp; Mike did the vast majority of the work on our main hack,
+a reworking of the OpenDNS Guide to use Yahoo!'s BOSS search API.&nbsp; We're
+excited about the prospects of integrating our user's preferences directly
+into search results.&nbsp; My part in all of this was to wrangle the markup
+and CSS.&nbsp; We really could roll this out next week and we wanted it to look
+that way.&nbsp; In the demo, Mike mentioned (casually) that we could throw a
+few million queries per day at BOSS.&nbsp; We aren't kidding.</p>
+
+<h2>Enough OpenDNS, tell me about the cheating</h2>
+
+<p>Before I sat down to crank out the eye-candy for the OpenDNS Guide, I
+built an extension for the Flickr Uploadr.&nbsp; But <strong>I wrote the Flickr
+Uploadr</strong>.&nbsp; This is totally cheating.&nbsp; I'd like to think that the
+Flickr judges felt the same way and that's why I didn't win any prizes but
+it doesn't matter because some people I really admire graciously complimented
+my work and I expect it will see quite a bit of day-to-day use.&nbsp; I hope it can
+also serve as a good starting point for future extensions.&nbsp; Without further
+ado:</p>
+
+<h2><a href="http://dopploadr.rcrowley.org/">Dopploadr</a></h2>
+
+<p>Dopploadr is an extension for the open-source, Mozilla-based Flickr
+Uploadr.&nbsp; As I said in the demo, it works just like a Firefox extension
+because it is.&nbsp; The Uploadr includes Mozilla's Extension Manager.</p>
+
+<p>Once you install Dopploadr, Uploadr will take you to Dopplr to
+authenticate.&nbsp; My apologies for the copy &amp; paste step but there's
+no equivalent of <code>flickr.auth.getToken</code> in the Dopplr API.
+One other catch that should be mentioned is that Dopplr's API must be
+accessed over SSL and (at Yahoo! and during my demo, at least) their
+servers or certificates frequently and randomly fail.&nbsp; Try again.</p>
+
+<p>Once you're authenticated, there's really no UI to it.&nbsp; The status
+bar will indicate you're signed in, saying "Dopploadr for rcrowley"
+or some such but the real magic happens behind the scenes.&nbsp; Each time
+Uploadr thumbnails a photo, it hands off the date-taken field during the
+<code>after_thumb</code> event and Dopploadr decides where you were at
+that time, noting the latitude/longitude and some tags like:</p>
+
+<ul>
+	<li>danville</li>
+	<li>ky</li>
+	<li>unitedstates</li>
+	<li>woe:id=2389342</li>
+	<li>geonames:locality=4289445</li>
+	<li>dopplr:trip=207163 (if you were on a trip)</li>
+</ul>
+
+<p>When you upload a batch, Uploadr will again be really secretive but Just
+Work.&nbsp; The <code>before_one_upload</code> event will combine the user's tags
+with the geo tags above and then let Uploadr continue with the upload.&nbsp; When
+Uploadr finishes, it hands off the photo's ID to Dopploadr during the
+<code>after_one_upload</code> event so Dopploadr can call
+<code>flickr.photos.geo.setLocation</code> with the stored
+latitude/longitude.</p>
+
+<p>My official monkeypatch count sits at 3.&nbsp; First was adding the
+<code>after_logout</code> event that I still haven't actually used (see also
+version 0.2).&nbsp; Second was a short walk around the DOM to insert Dopploadr's
+string bundle (strings accessible from JavaScript).&nbsp; Third was adding a
+counter for outstanding Dopplr API calls and making the
+<code>buttons.upload.enable()</code> method sensitive to the count to prevent
+uploading before everything's been geotagged.</p>
+
+<p>Here's the photo I uploaded during my demo:  <a
+href="http://flickr.com/photos/rcrowley/2853699765/"
+>http://flickr.com/photos/rcrowley/2853699765/</a>.
+(See, it really works!)</p>
+
+<p>You can <big><a href="http://dopploadr.rcrowley.org/">download Dopploadr
+0.1</a></big> or <big><a href="http://github.com/rcrowley/dopploadr">check
+out the code on GitHub</a></big>.</p>
+
+<p>My sincerest thanks once more to the folks all over Yahoo! that made Hack
+Day happen.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(9)</small></h1>
+<ol>
+	<li>
+		<p>Glad you had a good time :D</p>
+		<p>&mdash; <a href="http://mihasya.com">Mike P</a> &mdash; 2008/09/14 3:46 pm</p>
+	</li>
+
+	<li>
+		<p>I'm really excited to hear that OpenDNS will be using Yahoo! BOSS.&nbsp; I think that will present some interesting opportunities and show the power of using BOSS in a corporate environment.&nbsp; I wish I had thought of that idea.</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David Hall</a> &mdash; 2008/09/15 4:14 am</p>
+	</li>
+
+	<li>
+		<p>Thanks for coming.&nbsp; I'm glad you had fun!
+Cheers,
+-c</p>
+		<p>&mdash; <a href="http://kidsallright.com">Cody Simms</a> &mdash; 2008/09/15 5:43 am</p>
+	</li>
+
+	<li>
+		<p>Dopploadr was a really smart hack. Good work!</p>
+<p>Also, the OpenDNS hack was quite nice, too. Love your guys' service. Keep up the great work.</p>
+		<p>&mdash; <a href="http://www.laaker.com/micah/">That Kid from Omaha</a> &mdash; 2008/09/15 9:31 am</p>
+	</li>
+
+	<li>
+		<p>Since you know all of the Flickr staff, the prizes might not have been that useful to you :)</p>
+<p>But *awesome* hack, none the less. I'm really glad at least a few people realized how cool machine tags are.</p>
+		<p>&mdash; <a href="http://techfoolery.com/">Ross</a> &mdash; 2008/09/15 5:27 pm</p>
+	</li>
+
+	<li>
+		<p>On Uploadr 3.1 (a special video build I got from the Flickr forums), the statusbar says 'Dopploadr ready for (null) (1)'. There is only one suspicious error in the console:</p>
+<p>Error: l is null
+Source File: chrome://dopploadr/content/overlay.js
+Line: 58</p>
+		<p>&mdash; <a href="http://briks.si">Brian King</a> &mdash; 2008/09/16 9:09 am</p>
+	</li>
+
+	<li>
+		<p>@Brian: That issue should be fixed in the master branch and the new 0.1.1 build.&nbsp; Thanks for pointing it out.&nbsp; Shoddy error checking on my part.</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2008/09/16 8:48 pm</p>
+	</li>
+
+	<li>
+		<p>Nice hack. I've been working on something that sort of does the same thing, but with images already on Flickr.</p>
+<p>This does lead me to a slight issue- some of photos I'm tagging already have location data. Obviously I don't want to overwrite that, so I won't, but I am considering using a dopplr:woeid= machine tag (to make it clear that's where the trip was), so that the user can keep (or add their own) woe:id= tag later. Would you be open to doing the same?</p>
+		<p>&mdash; <a href="http://husk.org/">Paul Mison</a> &mdash; 2008/09/21 4:18 am</p>
+	</li>
+
+	<li>
+		<p>Until recently we were suffering from http://davidsmalley.com/2008/6/22/firefox-3-triggers-an-openssl-bug - an openSSL interaction bug with firefox 3, and I know it was causing API problems. Let me know if you're still seeing issues.</p>
+<p>Great tool, by the way.</p>
+		<p>&mdash; <a href="http://www.dopplr.com/traveller/jerakeen/">Tom Insam</a> &mdash; 2008/09/29 4:06 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/9650b0bbecf87181bc2734ef4ab39000?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rxvt-unicode &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+<article>
+<header>
+	<time datetime="2010-06-14" pubdate>2010-06-14</time>
+	<h1>rxvt-unicode</h1>
+</header>
+<p>In person, I have long been vocally dissatisfied with the state of terminal emulation on Mac OS X.  The terminal is my home, yet on OS X, an otherwise stellar example of UNIX on the desktop, it feels hostile stubbornly stuck in the past.  I have very seriously considered how I would execute the transition to a Thinkpad running Ubuntu but balked at the scope: it would require babysitting drivers at all times and giving up the Mac trackpad, backlit keyboard, FireWire 800, Mac hardware quality, and ultimately my iPhone.  The terminal is the problem, anyway, let&#8217;s fix that.</p>
+<p>My minimally featured terminal emulator supports 256 colors, copy, paste, and scrollback with the two-finger scroll gesture.  Terminal.app is out because it&#8217;s still stuck in the 16 color stone ages.  <a href="http://iterm.sourceforge.net/">iTerm</a> is up to spec but has me rebooting more often than never due to the <a href="http://rcrowley.org/2010/05/10/q-r-s-t.html">q, r, s, t</a> issue.  The xterm that comes with Apple&#8217;s X11 doesn&#8217;t appear to support 256 colors.</p>
+<p>That&#8217;s enough hype: <a href="http://software.schmorp.de/pkg/rxvt-unicode.html">rxvt-unicode</a> is the winner.  <a href="http://gist.github.com/438773">Gist 438773</a> will setup rxvt-unicode.  It assumes you already have <a href="http://macports.org/">MacPorts</a>.</p>
+<script src="http://gist.github.com/438773.js"></script>
+<p>If you&#8217;re a Vim user, you&#8217;ll want to <code>set t_Co=256</code> in your <code>.vimrc</code>.</p>
+</article>
+<footer class="site">
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2010 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

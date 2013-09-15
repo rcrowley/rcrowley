@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Things UNIX can do atomically &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2010/01/06/things-unix-can-do-atomically">Things UNIX can do atomically</a> <small>2010/01/06</small></h1>
+<p>This is a catalog of things UNIX-like/POSIX-compliant operating systems can do atomically, making them useful as building blocks for thread-safe and multi-process-safe programs without mutexes or read/write locks.&nbsp; The list is by no means exhaustive and I expect it to be updated frequently for the foreseeable future.</p>
+
+<p>The philosophy here is to let the kernel do as much work as possible.&nbsp; At my most pessimistic, I trust the kernel developers more than a trust myself.&nbsp; More practically, it&#8217;s stupid to spend CPU time locking around an operation that&#8217;s already atomic.&nbsp; <em>Added 2010-01-07.</em></p>
+
+<h2>Operating on a pathname</h2>
+
+<p>The operations below are best left to local filesystems.&nbsp; More than a few people have written in crying foul if any of these techniques are used on an NFS mount.&nbsp; True.&nbsp; When there are multiple kernels involved, the kernel can&#8217;t very well take care of all the locking for us.&nbsp; <em>Added 2010-01-06.</em></p>
+
+<ul>
+	<li id="mv"><code>mv -T &lt;oldsymlink&gt; &lt;newsymlink&gt;</code> atomically changes the target of <code>&lt;newsymlink&gt;</code> to the directory pointed to by <code>&lt;oldsymlink&gt;</code> and is indispensable when deploying new code.&nbsp; <em>Updated 2010-01-06: both operands are symlinks.</em>&nbsp; (So this isn&#8217;t a system call, it&#8217;s still useful.)&nbsp; <del>A reader pointed out that <code>ln -Tfs &lt;directory&gt; &lt;symlink&gt;</code> accomplishes the same thing without the second symlink.&nbsp; <em>Added 2010-01-06.</em></del>&nbsp; <em>Deleted 2010-01-06: <code>strace(1)</code> shows that <code>ln -Tfs &lt;directory&gt; &lt;symlink&gt;</code> actually calls <code>symlink(2)</code>, <code>unlink(2)</code>, and <code>symlink(2)</code> once more, disqualifying it from this page.&nbsp; <code>mv -T &lt;oldsymlink&gt; &lt;newsymlink&gt;</code> ends up calling <code>rename(2)</code> which can atomically replace <code>&lt;newsymlink&gt;</code>.</em>&nbsp; <em>Caveat 2013-01-07: this does not apply to Mac OS X, whose <a href="https://developer.apple.com/library/mac/#documentation/Darwin/Reference/Manpages/man1/mv.1.html"><code>mv(1)</code></a> doesn&#8217;t call <code>rename(2)</code>.</em>&nbsp; <a href="http://linux.die.net/man/1/mv"><code>mv(1)</code></a>.</li>
+	<li id="link"><code>link(oldpath, newpath)</code> creates a new hard link called <code>newpath</code> pointing to the same inode as <code>oldpath</code> and increases the link count by one.&nbsp; This will fail with the error code <code>EEXIST</code> if <code>newpath</code> already exists, making this a useful mechanism for locking a file amongst threads or processes that can all agree upon the name <code>newpath</code>.&nbsp; I prefer this technique for whole-file locking because the lock is visible to <code>ls(1)</code>.&nbsp; <a href="http://linux.die.net/man/2/link"><code>link(2)</code></a>.</li>
+	<li id="symlink"><code>symlink(oldpath, newpath)</code> operates very much like <code>link(2)</code> but creates a symbolic link at a new inode rather than a hard link to the same inode.&nbsp; Symbolic links can point to directories, which hard links cannot, making them a perfect analogy to <code>link(2)</code> when locking entire directories.&nbsp; This will fail with the error code <code>EEXIST</code> if <code>newpath</code> already exists, making this a perfect analogy to <code>link(2)</code> that works for directories, too.&nbsp; Be careful of symbolic links whose target inode has been removed ("dangling" symbolic links) &mdash; <code>open(2)</code> will fail with the error code <code>ENOENT</code>.&nbsp; It should be mentioned that inodes are a finite resource (this particular machine has 1,245,184 inodes).&nbsp; <a href="http://linux.die.net/man/2/symlink"><code>symlink(2)</code></a>.&nbsp; <em>Added 2010-01-07</em></li>
+	<li id="rename"><code>rename(oldpath, newpath)</code> can change a pathname atomically, provided <code>oldpath</code> and <code>newpath</code> are on the same filesystem.&nbsp; This will fail with the error code <code>ENOENT</code> if <code>oldpath</code> does not exist, enabling interprocess locking much like <code>link(oldpath, newpath)</code> above.&nbsp; I find this technique more natural when the files in question will be <code>unlink</code>ed later.&nbsp; <a href="http://linux.die.net/man/2/rename"><code>rename(2)</code></a>.</li>
+	<li id="open"><code>open(pathname, O_CREAT | O_EXCL, 0644)</code> creates and opens a new file.&nbsp; (Don&#8217;t forget to set the mode in the third argument!)&nbsp; <code>O_EXCL</code> instructs this to fail with the error code <code>EEXIST</code> if <code>pathname</code> exists.&nbsp; This is a useful way to decide which process should handle a task: whoever successfully creates the file.&nbsp; <a href="http://linux.die.net/man/2/open"><code>open(2)</code></a>.</li>
+	<li id="mkdir"><code>mkdir(dirname, 0755)</code> creates a new directory but fails with the error code <code>EEXIST</code> if <code>dirname</code> exists.&nbsp; This provides for directories the same mechanism <del><code>link(2)</code></del> <code>open(2)</code> with <code>O_EXCL</code> provides for files.&nbsp; <a href="http://linux.die.net/man/2/mkdir"><code>mkdir(2)</code></a>.&nbsp; <em>Added 2010-01-06; edited 2013-01-07.</em></li>
+</ul>
+
+<h2>Operating on a file descriptor</h2>
+
+<ul>
+	<li id="fcntl-lock"><code>fcntl(fd, F_GETLK, &amp;lock)</code>, <code>fcntl(fd, F_SETLK, &amp;lock)</code>, and <code>fcntl(fd, F_SETLKW, &amp;lock)</code> allow cooperating processes to lock regions of a file to serialize their access.&nbsp; <code>lock</code> is of type <code>struct flock</code> and describes the type of lock and the region being locked.&nbsp; <code>F_SETLKW</code> is particularly useful as it blocks the calling process until the lock is acquired.&nbsp; There is a &#8220;mandatory locking&#8221; mode but Linux&#8217;s implementation is unreliable as it&#8217;s subject to a race condition.&nbsp; <a href="http://linux.die.net/man/2/fcntl"><code>fcntl(2)</code></a>.</li>
+	<li id="fcntl-lease"><code>fcntl(fd, F_GETLEASE)</code> and <code>fcntl(fd, F_SETLEASE, lease)</code> ask the kernel to notify the calling process with <code>SIGIO</code> when another process <code>open</code>s or <code>truncate</code>s the file referred to by <code>fd</code>.&nbsp; When that signals arrives, the lease needs to be removed by <code>fcntl(fd, F_SETLEASE, F_UNLCK)</code>.&nbsp; <code>fcntl(fd, F_NOTIFY, arg)</code> is similar but doesn&#8217;t block other processes, so it isn&#8217;t useful for synchronization.&nbsp; <a href="http://linux.die.net/man/2/fcntl"><code>fcntl(2)</code></a>.</li>
+	<li id="mmap"><code>mmap(0, length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)</code> returns a pointer from which a file&#8217;s contents can be read and written by normal memory operations.&nbsp; By making frequent use of <code>msync(addr, length, MS_INVALIDATE)</code>, data written in this manner can be shared between processes that both map the same file.&nbsp; <a href="http://linux.die.net/man/2/mmap"><code>mmap(2)</code></a>, <a href="http://linux.die.net/man/2/msync"><code>msync(2)</code></a>.</li>
+</ul>
+
+<h2>Operating on virtual memory</h2>
+
+<ul>
+	<li id="gcc-atomic-builtins"><code>__sync_fetch_and_add</code>, <code>__sync_add_and_fetch</code>, <code>__sync_val_compare_and_swap</code>, and friends provide a full barrier so &#8220;no memory operand will be moved across the operation, either forward or backward.&#8221; These operations are the basis for most (all?) lock-free algorithms.&nbsp; <a href="http://gcc.gnu.org/onlinedocs/gcc-4.1.2/gcc/Atomic-Builtins.html">GCC Atomic Builtins</a>.</li>
+</ul>
+
+<p>Something I should add to my repertoire?&nbsp; Race condition?&nbsp; Let me know at <a href="mailto:r@rcrowley.org">r@rcrowley.org</a> or <a href="http://twitter.com/rcrowley">@rcrowley</a> and I&#8217;ll fix it.</p>
+
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/f89dbcff6092ad8eb18fd3645f07feb6?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>College courses I should have taken &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2009/04/09/college-courses-i-should-have-taken">College courses I should have taken</a> <small>2009/04/09</small></h1>
+<p>Yesterday, I read through A List Apart&#8217;s 2008 Survey and the
+Relevance of Education <a id="f-09-1-src" href="#f-09-1" class="footnote">[1]</a>
+section tricked me into reflecting on my time at Wash U.&nbsp; My professors
+taught me all about performance and time complexity, data structures,
+operating systems, circuits and hardware architecture (I am a hardware
+designer by education).&nbsp; All of this, save the direct design of new
+hardware, has been immensely helpful in my first two years as a Real
+Boy&trade;.</p>
+
+<p>Since yes-or-no questions are kind of boring, I reflected further on
+what my college education lacked&nbsp;&mdash; courses I wish I&#8217;d
+taken.&nbsp; While I was working for Flickr and recruiting for Yahoo!, I
+spent a part of each visit to Wash U encouraging the Computer Science
+department to get serious about web programming.&nbsp; The result was an
+ostensibly senior-level course that guided students through LAMP, Rails,
+databases and JavaScript plus the protocols/standards they build upon:
+HTTP, HTML and CSS.&nbsp; It was a great addition to the program and
+I hope it&#8217;s still around.&nbsp; Though I&#8217;ve not kept up
+my course-list evangelism, I now have several more courses I wish I&#8217;d
+taken.</p>
+
+<h2>Network algorithms</h2>
+<p>The algorithms course that I took focused on efficient computation on
+a single node.&nbsp; Wash U offered an Advanced Algorithms course that, in
+retrospect, I should have taken.&nbsp; I hope such a course covers
+network-aware algorithms like map/reduce, gossip and P2P protocols,
+queuing and distributed hash tables (Chord
+<a id="f-09-2-src" href="#f-09-2" class="footnote">[2]</a>, etc.).&nbsp; These topics
+become required knowledge when you start talking about &#8220;Internet
+scale&#8221; anything.</p>
+
+<h2>Managing disk I/O</h2>
+<p>This course definitely doesn&#8217;t exist.&nbsp; Academics are big fans
+of pretending they have infinite I/O capacity but they do students a
+disservice by hand-waving one of the largest time-sinks in all of
+computing.&nbsp; I have learned a lot by reading papers and blog posts
+produced by my more experienced peers and even more by
+trial-and-error.&nbsp; Topics for such a course include write-ahead logs
+(and all of the other things InnoDB does), <code>aio</code> and its effect
+on performance plus some time to address concurrency as it pertains to
+disk performance.&nbsp; Engineering school should prepare people for reality
+and I can&#8217;t thing of anything more real than <code>iowait</code>.</p>
+
+<h2>Lock-less data structures</h2>
+<p>I&#8217;m not certain this doesn&#8217;t exist at Wash U.&nbsp; The
+Drizzle mailing list <a id="f-09-3-src" href="#f-09-3" class="footnote">[3]</a>
+made mention of lock-free data structures, a topic I haven&#8217;t given
+much thought to beyond using <code>concurrent_hash_map</code> from the
+Intel TBB <a id="f-09-4-src" href="#f-09-4" class="footnote">[4]</a>.&nbsp; Not
+surprisingly, the design of these libraries is difficult and
+theoretical&nbsp;&mdash; you have to <em>prove</em> correctness since so
+much is left to chance.&nbsp; Academics love proofs, right?</p>
+
+<h2>OS kernels</h2>
+<p>I took Wash U&#8217;s senior-level Operating Systems course but never
+got around to taking the graduate-level version.&nbsp; The former focused
+on <code>libc</code>, system calls, threading and writing programs that
+behave like UNIX programs.&nbsp; The latter dives into the Linux kernel
+itself.&nbsp; I don&#8217;t anticipate becoming a kernel hacker anytime
+soon but having deep knowledge on the design of the Linux kernel would
+definitely make me a better software architect.</p>
+
+<h2>More econ</h2>
+<p>I took up through intermediate microeconomics and wish I had learned
+more.&nbsp; I don&#8217;t have the solutions to the world&#8217;s problems
+and I still wouldn&#8217;t even if I knew more but I would understand
+the expert&#8217;s opinions more thoroughly.</p>
+
+<p>Anything I&#8217;m missing?&nbsp; I&#8217;m curious what others wish
+they&#8217;d taken in college, especially those who have been at it
+professionally for more than two years.</p>
+
+
+<ol class="footnote">
+	<li id="f-09-1"><a href="http://aneventapart.com/alasurvey2008/02.html">http://aneventapart.com/alasurvey2008/02.html</a> <a href="#f-09-1-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-09-2"><a href="http://en.wikipedia.org/wiki/Chord_(DHT)">http://en.wikipedia.org/wiki/Chord_(DHT)</a> <a href="#f-09-2-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-09-3"><a href="https://lists.launchpad.net/drizzle-discuss/msg03337.html">https://lists.launchpad.net/drizzle-discuss/msg03337.html</a> <a href="#f-09-3-src" class="footnote-src">&#8617;</a></li>
+	<li id="f-09-4"><a href="http://software.intel.com/en-us/intel-tbb/">http://software.intel.com/en-us/intel-tbb/</a> <a href="#f-09-4-src" class="footnote-src">&#8617;</a></li>
+</ol>
+
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/4766970d8d29f2ea6eb37256e86a1560?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

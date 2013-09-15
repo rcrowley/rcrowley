@@ -1,0 +1,30 @@
+{% block content %}
+<article>
+<header>
+	<time datetime="2011-01-28" pubdate>2011-01-28</time>
+	<h1>{% block title %}Debian packaging for busy people &mdash; Debra and Freight{% endblock %}</h1>
+</header>
+<p>I know the stereotypes.&nbsp; Developers suck at packaging.&nbsp; We&#8217;re typecast as thinking <code>./configure &amp;&amp; make &amp;&amp; make install</code> is good enough or that piping <code>wget</code> into <code>sh</code> is acceptable.&nbsp; But there are plenty of <code>Makefile</code>s without a working <code>uninstall</code> target and there are plenty of malicious shell scripts waiting to be piped to your shell.&nbsp; Good packaging is a thing of beauty.</p>
+<p>Of course, even the beautiful things get old.&nbsp; There are parts of the Debian packaging system that I don&#8217;t believe have much use anymore so the tools and workflows I&#8217;m about to advocate do not and probably will not support them.</p>
+<h2><code>conffiles</code> control file</h2>
+<p><code>conffiles</code> instructs the package manager to treat the files listed within specially, taking great care not to squash deviations from the packaged version.&nbsp; The extra care is welcome from the central Debian archive and never needed elsewhere.&nbsp; Sometimes I know enough about my target systems to package configuration files just like other files.&nbsp; All other times, I use Puppet to intelligently manage the file across my entire installation.</p>
+<h2>Source packages</h2>
+<p>The concept make sense for the central Debian archive because of the great distance between your average open-source project and the associated Debian maintainer.&nbsp; See <a href="http://www.lucas-nussbaum.net/blog/?p=617">Giving up on Ruby packaging</a> to get a sense of the problem.&nbsp; However, in the year 2011 when version control is not heretic but required, why endorse another way to ship source code around?&nbsp; Source packages have been superseded by GitHub.&nbsp; The argument gets even stronger when I&#8217;m both author and maintainer.&nbsp; Rather than having binary packages, source packages, source package source, and source source (still here?), everything is reduced to a Git repository and <code>make deb</code>.</p>
+<h2>Debra builds Debian packages</h2>
+<p>Debra was <a href="http://rcrowley.org/articles/debra.html">released months ago</a> so I&#8217;ll treat this as a brief review.&nbsp; Debra is how I build packages.&nbsp; It ends up calling <code>dpkg-deb</code>(1) just like you&#8217;d expect but handles the heavy lifting for you.&nbsp; Three commands:</p>
+<pre>debra create foo control
+# Put files in foo/
+debra build foo foo_$VERSION_$ARCH.deb
+debra destroy foo</pre>
+<p><a href="http://rcrowley.github.com/debra/">Debra</a></p>
+<h2>Freight builds Debian archives</h2>
+<p>Freight replaces <code>reprepro</code>(1) with two shell scripts.&nbsp; <code>freight-add</code>(1) manages a staging area, typically in <code>/var/lib/freight</code> where it maps repositories to sets of package filenames.&nbsp; Packages may appear in more than one repository to, for example, distribute the same package to several Debian/Ubuntu releases.&nbsp; <code>freight-cache</code>(1) manages the web server&#8217;s document root, typically <code>/var/cache/freight</code>.&nbsp; There it creates the <code>Release</code> and <code>Packages</code> files, deals with GPG signing, and managed the various available architectures.</p>
+<p>Freight uses hard links aggressively to drop old packages from the cache and use as little storage as possible.&nbsp; (I&#8217;m mildly obsessed with hard links.)</p>
+<pre>freight add foo_0.0.0-1_all.deb apt/lucid apt/maverick
+freight cache apt/lucid apt/maverick</pre>
+<p>That&#8217;s all it takes to publish a Debian archive.&nbsp; Just BYO web server.</p>
+<p><a href="http://rcrowley.github.com/freight/">Freight</a></p>
+<h2>Pack it up</h2>
+<p>You don&#8217;t have to go through what I&#8217;ve heard described as a &#8220;two year hazing process&#8221; to become a Debian developer and understand The Right Way to make packages.&nbsp; Think through the benefits they provide (if you need help, read <a href="http://morethanseven.net/2011/01/16/Why-developers-should-care-about-system-packages.html">Why Developers Should Care About System Packages</a>) then get that <code>make deb</code> target ready.</p>
+</article>
+{% endblock %}

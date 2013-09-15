@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Drizzle &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2009/03/03/drizzle">Drizzle</a> <small>2009/03/03</small></h1>
+<p>The SF MySQL meetup last night <a id="foot-1-src" href="#foot-1"
+class="footnote">[1]</a> about Drizzle <a id="foot-2-src" href="#foot-2"
+class="footnote">[2]</a> was a home run by my limited research <a
+id="foot-3-src" href="#foot-3" class="footnote">[3]</a>.&nbsp; It
+won&#8217;t be a get-out-of-jail-free card for very write-heavy
+applications but I bet it will do wonders for heavily replicated, heavily
+federated, read-heavy architectures (you know, normal stuff).</p>
+
+<p>The common conception of Drizzle is a bit off center so I&#8217;d
+like to offer my 2-sentence version.&nbsp; First and foremost, Drizzle
+is a refactor of MySQL for today&#8217;s hardware and today&#8217;s
+architectures.&nbsp; Second, Drizzle is pluggable &mdash; everything
+from the storage engines (which default to InnoDB) to the pluggable
+PAM authentication and replication &mdash; is replaceable or removable.</p>
+
+<p>I intimately understand the pros and cons of global mutexes.&nbsp;
+Much of my performance testing at OpenDNS has to do with how long our
+stats pipeline spends waiting for mutex locks.&nbsp; I have to commend
+Brian Aker and Drizzle&#8217;s commitment to their removal.&nbsp; I
+suspect read-heavy loads will see a major performance increase from
+this alone (Brian was quoting something like 11-13% of time was spent
+in the heavily-mutexed authentication code <strong>Update: that time
+is spent in parsing, not in auth, still, the mutexes are
+bad</strong>).&nbsp; The last big mutex is the one that enables MyISAM
+and it sounded like (it could have been a convincing planned monologue)
+Brian decided during his talk to remove it, meaning you&#8217;d not be
+able to use MyISAM in Drizzle.&nbsp; That&#8217;s fine by me &mdash;
+I only use MyISAM in places where table-level locks are okay.</p>
+
+<p>That time spent in authentication is usually a complete waste.&nbsp;
+Motivated by the countless MySQL instances running as &#8220;root&#8221;
+with no password, authentication is now a removable plugin that can
+also use PAM auth like your OS can.&nbsp; I hope my operator will let
+me just take it out.</p>
+
+<p>Most folks in the room didn&#8217;t seem to pick up on this one but
+there was a hand-wavey mention of a &#8220;shard bit&#8221; in the wire
+protocol which would open the doors to software (or even hardware!)
+load-balancers that could understand how you federate your data.</p>
+
+<p>The last thing I found compelling enough to write down is that Drizzle
+is making heavy use of Google&#8217;s Protocol Buffers <a id="foot-4-src"
+href="#foot-4" class="footnote">[4]</a> as part of their query planning.&nbsp;
+Serialized, they&#8217;re used as an alternative wire format and as the
+replication protocol.&nbsp; Crazy things like replicating some Drizzle
+tables through a Protocol Buffer proxy into a different database engine
+become downright easy.&nbsp; For example, keeping your main table in a
+very indexed Drizzle database while replicating a distilled version into
+MemcacheDB for fast primary-key lookups of the essential data.</p>
+
+<p><em>(This reads like a press release, I&#8217;m sorry.&nbsp; I wrote
+all of this down as a cheatsheet for talking to the rest of OpenDNS about
+when and if this will make sense for parts of our architecture.)</em></p>
+
+<ol>
+	<li id="foot-1"><a href="http://mysql.meetup.com/30/calendar/9471261/">SF MySQL Meetup &mdash; Why Drizzle</a> <a href="#foot-1-src" class="footnote">&#8617;</a></li>
+	<li id="foot-2"><a href="https://launchpad.net/drizzle">Drizzle</a> <a href="#foot-2-src" class="footnote">&#8617;</a></li>
+	<li id="foot-3"><a href="http://twitter.com/mjmalone/status/1272455967">mjmalone</a>, <a href="http://twitter.com/mihasya/status/1272845884">mihasya</a> &amp; <a href="http://twitter.com/ericflo/status/1272837912">ericflo</a> <a href="#foot-3-src" class="footnote">&#8617;</a></li>
+	<li id="foot-4"><a href="http://code.google.com/p/protobuf/">Google Protocol Buffers</a> <a href="#foot-4-src" class="footnote">&#8617;</a></li>
+</ol>
+
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/4e24cbe9117d18cfde3409c8d1648c70?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

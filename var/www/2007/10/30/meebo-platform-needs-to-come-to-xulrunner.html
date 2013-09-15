@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meebo platform needs to come to XULRunner &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/10/30/meebo-platform-needs-to-come-to-xulrunner">Meebo platform needs to come to XULRunner</a> <small>2007/10/30</small></h1>
+<p>Today Om is reporting that <a href="http://gigaom.com/2007/10/29/meebo-20/">Meebo is launching its own platform</a> for third-party Meebo widgets.&nbsp;  I could care less about the widgets, but could this be a REST API for sending IMs?&nbsp; No (dammit).</p>
+<p>The Meebo API is actually an ingenious bit of Flash with a JavaScript wrapper that talks to Meebo.&nbsp; Once your <em>hosted</em> app gets some params from Meebo, you can do exciting things like listen for new messages.&nbsp; Through the same JavaScript-wrapped Flash object, you can also send messages.&nbsp; Praise be!&nbsp; For more, check out the <a href="http://wwwl.meebo.com/platform/javascript.html">Meebo JavaScript docs</a>, which are minimal to say the least.&nbsp; Oh well, there's sample code.</p>
+<p>A couple weeks back, <a href="http://instantbird.com/">Instantbird</a> did a lap around the Internet.&nbsp; I must call failure here, because when I tried to sign into Yahoo! Messenger it crashed immediately, spectacularly and consistently (tried four times).&nbsp; I know what you're thinking: but Yahoo! Messenger is a closed system, of course there will be problems.&nbsp; Yeah, but Adium is built on the same library and pretty much always signs in happily (but never, ever shows me when Cal is online).</p>
+<p>Seeing as Instantbird is built on <a href="http://developer.mozilla.org/en/docs/XULRunner">XULRunner</a> (my new life partner), a nice JavaScript way to send IMs would be just sweet.&nbsp; From my limited research, it seems embedding Flash in XULRunner is possible, as is opening a browser window within Instantbird to snag the authentication params from Meebo.&nbsp; Then it's smooth sailing.&nbsp; Maybe.</p>
+<p>The glaring hole in all of this is that while you can <code>sendMsg</code> to your heart's content, thus far you have no one to send <em>to</em>.&nbsp; This isn't a full-blown API, folks.&nbsp; It's a widget platform.&nbsp; There's no way to get at someone's buddy list.&nbsp; Back to libpurple, I suppose.&nbsp; But if Meebo made the rest of their service available as a REST API (to complement the far superior Flash method of sending/receiving messages), I'd be sold.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(4)</small></h1>
+<ol>
+	<li>
+		<p>"I must call failure here, because when I tried to sign into Yahoo! Messenger it crashed immediately, spectacularly and consistently (tried four times). I know what you’re thinking: but Yahoo! Messenger is a closed system, of course there will be problems."</p>
+<p>No, you don't know what I'm thinking. I think you should file a bug report and send us a stack trace.</p>
+		<p>&mdash; <a href="http://www.instantbird.com/">Florian Quèze</a> &mdash; 2007/10/31 12:20 pm</p>
+	</li>
+
+	<li>
+		<p>It seems you actually didn't know about this before, so I've put in a bug:
+http://bugzilla.instantbird.org/show_bug.cgi?id=31</p>
+		<p>&mdash; <a href="http://rcrowley.org/">Richard Crowley</a> &mdash; 2007/10/31 12:41 pm</p>
+	</li>
+
+	<li>
+		<p>Thank you :-).</p>
+		<p>&mdash; <a href="http://www.instantbird.com/">Florian Quèze</a> &mdash; 2007/10/31 12:56 pm</p>
+	</li>
+
+	<li>
+		<p>Richard, check out SamePlace and xmpp4moz at http://sameplace.cc.&nbsp; As far as I can see, what I described/released at http://hyperstruct.net/2006/10/22/instant-messaging-two-point-o was roughly the same API thing, just one year earlier.&nbsp; :-) (Oh, and it's built on Mozilla.)</p>
+		<p>&mdash; <a href="http://hyperstruct.net">Massimiliano Mirra</a> &mdash; 2008/03/25 4:30 pm</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/781e6ecb904c317b9d7f08f6fb1bdf09?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

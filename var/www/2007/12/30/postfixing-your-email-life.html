@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>(Post)fixing your (email) life &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2007/12/30/postfixing-your-email-life">(Post)fixing your (email) life</a> <small>2007/12/30</small></h1>
+<p>This post is about two things.&nbsp; Most proudly it is about me finally taking the time to setup all of the necessary gears and levers for my phone to post <em>processed</em> photos through to Flickr.&nbsp; Bonus-ly, it is about rolling what seems like your own email server from a few config files and Yahoo! Mail (or GMail, if your twisted brain is so inclined).</p>
+<p>First, the fun stuff.&nbsp; I posted in November about <code>curvr</code>, my automated and assumption-filled command-line Photoshop.&nbsp; Refresher course here: <a href="http://rcrowley.org/2007/11/08/introducing-curvr/">http://rcrowley.org/2007/11/08/introducing-curvr/</a>.&nbsp; The day after I wrote <code>curvr</code> I started to experience what can only be described as "crunch time" on Flickr Uploadr, so a quick shell script called <code>curvall</code> was born so I could at least use curvr after Bluetoothing photos from my phone.</p>
+<p>Almost two months later and this is just silly.&nbsp; A different kind of crunch time, if you will.&nbsp; From a distance the solution isn't nearly as ugly as the syntax of <code>.procmailrc</code> but I won't be mean.&nbsp; I setup an MX record for my domain to send mail to the box in my apartment.&nbsp; From there, <code>postfix</code> rejects the riff-raff and passes the good stuff on to <code>procmail</code> which either works photos over with <code>curvr</code> or forwards to Yahoo! Mail for my consumption.</p>
+<h2>Postfix, there's more to life than UNIX accounts</h2>
+<p>We need to teach postfix what email addresses to accept.</p>
+<p><code>/etc/postfix/virtual</code>:</p>
+<pre>r@rcrowley.org rcrowley@localhost
+SPECIAL_CURVRMAIL_ADDRESS@rcrowley.org rcrowley@localhost</pre>
+<p><code>/etc/postfix/main.cf</code> (<a href="http://svn.rcrowley.org/svn/curvr/main.cf.example">available in SVN</a>):</p>
+<pre># See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+# Debian specific:  Specifying a file name will cause the first
+# line of that file to be used as the name.&nbsp; The Debian default
+# is /etc/mailname.
+#myorigin = /etc/mailname
+
+smtpd_banner = $myhostname ESMTP $mail_name (Ubuntu)
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+# TLS parameters
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${queue_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${queue_directory}/smtp_scache
+
+# See /usr/share/doc/postfix/TLS_README.gz in the postfix-doc package for
+# information on enabling SSL in the smtp client.
+<strong>myhostname = banzai</strong>
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+myorigin = /etc/mailname
+<strong>mydestination = banzai, localhost.localdomain, localhost</strong>
+relayhost =
+mynetworks = 127.0.0.0/8
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = all
+<strong># Nasty homegrown config
+virtual_alias_domains = rcrowley.org
+virtual_alias_maps = hash:/etc/postfix/virtual
+mailbox_command = /usr/bin/procmail</strong></pre>
+<p>It really is important not to put the same domain in <code>mydestination</code> and <code>virtual_alias_domains</code>.&nbsp; Fecal matter and oscillating device and all that.&nbsp; Then run these commands:</p>
+<pre>$ sudo postmap /etc/postfix/virtual
+$ sudo postfix reload</pre>
+<h2>Procmail, your syntactic colon is full of shit</h2>
+<p>If photo, Flickr it.&nbsp; If not, throw it out into the cold.</p>
+<p><code>~/.procmailrc</code> (<a href="http://svn.rcrowley.org/svn/curvr/procmail.rc.example">also available in SVN</a>):</p>
+<pre>:0 bfW
+* ^TO_&lt;SECRET_CURVRMAIL_ADDRESS&gt;@rcrowley.org
+| /home/rcrowley/bin/curvrmail
+
+:0 E :
+! &lt;normal_forwarding_destination&gt;@yahoo.com</pre>
+<p>Now, Stephen R. van den Berg willing, email to your special address will be sent through <code>curvr</code> and onto Flickr (assuming you updated the <code>curvrmail</code> script with your secret Flickr email address) and all of your normal email will be forwarded somewhere else.</p>
+<h2>Yahoo-oooo!</h2>
+<p>I admit it, I like Yahoo! Mail.&nbsp; So I have my <code>.procmailrc</code> forwarding to Yahoo! Mail.&nbsp; Over at Yahoo! Mail I have a default mailbox setup as the-first-letter-of-my-first-name@rcrowley.org so that I can also send mail as my better email address.</p>
+<p>Anyway, it's all in SVN: <a href="http://svn.rcrowley.org/svn/curvr/">http://svn.rcrowley.org/svn/curvr/</a></p>
+<p>I'm interested to know how similar this all is to Aaron's <a href="http://www.aaronland.info/weblog/2006/07/31/baconmelon/#filtr">filtr</a> workflow.</p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(6)</small></h1>
+<ol>
+	<li>
+		<p>This looks amazing. I wish I knew what that code meant. I just checked out the code into my local port, and will look at it.</p>
+<p>I really like curvr too :)</p>
+		<p>&mdash; <a href="http://www.andrewmager.com">Andrew Mager</a> &mdash; 2007/12/31 2:53 pm</p>
+	</li>
+
+	<li>
+		<p>Have you looked at the mailparse pecl extension?&nbsp; I thought it might be able to make curvrmail simpler in the code searching for the jpeg attachment.&nbsp;  I'm not sure whether the docs on php.net are up to date, but it's definitely getting love from Brian Shire, who I understand has made some huge improvements to APC.&nbsp; (If he's working on it, it also means facebook is probably using it since that's his employer.)</p>
+		<p>&mdash; <a href="http://cowsandmilk.net">David</a> &mdash; 2008/01/09 5:57 pm</p>
+	</li>
+
+	<li>
+		<p>KjIjh6  xpqcaqobldrt, [url=http://zryfcafyclud.com/]zryfcafyclud[/url], [link=http://jjwyskxgyrzq.com/]jjwyskxgyrzq[/link], http://vlnidiaecblc.com/</p>
+		<p>&mdash; <a href="http://iwkjdypkicuv.com/">fngjedmz</a> &mdash; 2008/09/06 8:37 am</p>
+	</li>
+
+	<li>
+		<p>[url=http://en.netlog.com/milcyrnaked]Miley Cyrus naked[/url] Miley Cyrus naked [url=http://bebo.com/CloeG38]Blake Lively nude[/url] Blake Lively nude [url=http://ballhype.com/story/angelina_jolie_nude]Angelina Jolie nude[/url] Angelina Jolie nude [url=http://wikio.com/article/70424131]Emma Watson Naked[/url] Emma Watson Naked [url=http://pear.php.net/user/sertlex]Eva Mendes nude[/url] Eva Mendes nude [url=http://freeswitch.org/user/1353]Carmen Electra nude[/url] Carmen Electra nude [url=http://confluence.atlassian.com/display/~fredd]Kim Kardashian sex tape[/url] Kim Kardashian sex tape [url=http://britney.com/blog/nside]Kim Kardashian Naked[/url] Kim Kardashian Naked </p>
+		<p>&mdash; jzsefnidxi &mdash; 2008/09/07 6:13 pm</p>
+	</li>
+
+	<li>
+		<p>O9apaC hmL40Mdg41UrgAs6a</p>
+		<p>&mdash; <a href="http://brainer.com">barner</a> &mdash; 2008/09/16 12:26 pm</p>
+	</li>
+
+	<li>
+		<p>Hey, don't start bashing procmail's syntactic column!&nbsp; The program may be old, but it's a rather benign entity :-).
+The colon is a relic from when I was rather young and inexperienced..&nbsp;  Now adding the zero behind it, *that* is the work of a "true genius"...
+Alas those are the burdens for backward compatibility.&nbsp; I've learnt since then.</p>
+		<p>&mdash; Stephen R. van den Berg &mdash; 2009/01/05 6:18 am</p>
+	</li>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/33ccf2ae8c352ffae35f57e7fe329329?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

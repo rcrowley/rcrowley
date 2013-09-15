@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MultIO Ruby IO multiplexer &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+<article>
+<header>
+	<time datetime="2010-07-27" pubdate>2010-07-27</time>
+	<h1>MultIO Ruby IO multiplexer</h1>
+</header>
+<p>All across the Internet, Rubyists load entire files into memory to create multipart HTTP POST requests, seemingly unaware of <code>Net::HTTP</code>&#8217;s ability to stream an <code>IO</code>-like object using <code>Net::HTTPGenericRequest#body_stream=</code>.&nbsp; All it needs is an object that implements <code>read(length)</code>.&nbsp; So, here we go, a multipart HTTP POST without loading the entire file into memory at once.</p>
+<script src="http://gist.github.com/493562.js?file=post.rb"></script>
+<p>The <code>MultIO</code> class is an <code>Array</code> but you should use <code>MultIO#&lt;&lt;</code> to append new <code>String</code>s, <code>File</code>s or other <code>IO</code>-like objects.&nbsp; In order to use <code>MultIO</code> with <code>Net::HTTP</code>, all objects appended need to be able to find their size so the <code>Content-Length</code> header can be set.</p>
+<script src="http://gist.github.com/493562.js?file=multio.rb"></script>
+<p>The whole shebang: <a href="http://gist.github.com/493562">http://gist.github.com/493562</a>.</p>
+</article>
+<footer class="site">
+	<p><strong>Richard Crowley?</strong>&nbsp; Kentuckian engineer on the Internet in San Francisco.&nbsp; Occasionally I blog about programming, UNIX, databases, and scalability.&nbsp; <a href="/about.html">More&hellip;</a></p>
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2010 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

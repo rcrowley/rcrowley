@@ -1,0 +1,9 @@
+h1 { font-size: 128px; }
+
+h2 { font-size: 96px; }
+
+p, li { font-size: 64px; }
+
+.bullets ul li { margin-left: 0; }
+
+small { font-size: 48px; }

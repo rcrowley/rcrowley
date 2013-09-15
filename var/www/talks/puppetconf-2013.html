@@ -1,0 +1,1041 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Taming the Cowboy Laptop</title>
+    <meta charset='utf-8'>
+    <script src='/static/slides.js'></script>
+  </head>
+
+  <body style='display: none'>
+
+    <section class='slides layout-widescreen'>
+      
+      <article>
+        <h1>Taming the Cowboy Laptop</h1>
+        
+        
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+
+          </div>
+        
+      </article>
+      
+  
+  
+      <article>
+      
+        <h3>Hi, I’m Richard</h3>
+        
+  
+  <p>
+    <a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a> or <a href="https://twitter.com/rcrowley" target="_blank">@rcrowley</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Various work laptops I’ve owned</h3>
+        
+  
+  <p>
+    Flickr
+<br>
+
+    OpenDNS
+<br>
+
+    DevStructure
+<br>
+
+    Square
+<br>
+
+    Betable
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Various configuration management tools I’ve used</h3>
+        
+  
+  <p>
+    Yahoo’s proprietary Perl mess, <code>yinst</code>
+<br>
+
+    Wiki pages
+<br>
+
+    <a href="http://devstructure.com/blueprint/" target="_blank">Blueprint</a>
+<br>
+
+    Shell scripts
+<br>
+
+    Puppet
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>An operator by other names</h3>
+        
+  
+  <p>
+    Have not, until now, officially been an operator
+<br>
+
+    Always focused on how things work in production
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>My biggest mistake</h3>
+        
+  
+  <p>
+    The first thing I did at Betable was build the staging and production environments
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Why this was a mistake</h3>
+        
+  
+  <p>
+    At that time there were no customers
+<br>
+
+    There were only coworkers
+<br>
+
+    And I wasn’t serving them
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>My best advice</h3>
+        
+  
+  <p>
+    (to which I paid no attention)
+<br>
+
+    Reduce the distance between development and production
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Confidence in production</h3>
+        
+  
+  <p>
+    ...is earned in development
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Taming the cowboy laptop</h3>
+        
+  
+  <p>
+    (better late than never)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Goal</h3>
+        
+  
+  <p>
+    Reduce the distance between development and production
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Actionable goals</h3>
+        
+  
+  <p>
+    Homogeneity
+<br>
+
+    Automatic provisioning
+<br>
+
+    Automatic maintenance
+<br>
+
+    Avoid a full-scale IT process
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Options</h3>
+        
+  
+  <p>
+    Shell scripts
+<br>
+
+    Vagrant
+<br>
+
+    PXE boot VirtualBox
+<br>
+
+    Boxen
+<br>
+
+    Not Boxen, just Puppet
+<br>
+
+    EC2 or similar (The Cloud)
+<br>
+
+    Hypervisors in the closet
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Shell scripts</h3>
+        
+  
+  <p>
+    We’ve mostly decided this isn’t good enough for production
+<br>
+
+    Why should it be good enough for development?
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Good options</h3>
+        
+  
+  <p>
+    Vagrant
+<br>
+
+    PXE boot VirtualBox
+<br>
+
+    Boxen
+<br>
+
+    Not Boxen, just Puppet
+<br>
+
+    EC2 or similar The Cloud
+<br>
+
+    Hypervisors in the closet
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>A lesson learned at DevStructure</h3>
+        
+  
+  <p>
+    Remote development environments are literally a hard sell
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Local options</h3>
+        
+  
+  <p>
+    Vagrant
+<br>
+
+    PXE boot VirtualBox
+<br>
+
+    Boxen
+<br>
+
+    Not Boxen, just Puppet
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>VirtualBox at Square</h3>
+        
+  
+  <p>
+    Built for the production engineering team
+<br>
+
+    PXE boot VirtualBox to test pre-Puppet automation
+<br>
+
+    <a href="https://github.com/rcrowley/puppet-virtualbox" target="_blank">puppet-virtualbox</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Vagrant</h3>
+        
+  
+  <p>
+    A great option, well-covered elsewhere
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Real talk with Nick Forte</h3>
+        
+  
+  <p>
+    Given a VM, he’d become a cowboy
+<br>
+
+    Lots of coworkers felt this way
+<br>
+
+    Many felt like they had no say in the matter
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Automation, in general</h3>
+        
+  
+  <p>
+    Something must get better
+<br>
+
+    Nothing can get worse
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Advantage Mac</h3>
+        
+  
+  <p>
+    Editors
+<br>
+
+    GUIs
+<br>
+
+    No goofy port forwarding
+<br>
+
+    No NFS, Samba, SSHFS, or similar
+<br>
+
+    Offline access (same as a VM)
+<br>
+
+    UNIX-like
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Something worse but not for engineers</h3>
+        
+  
+  <p>
+    Regardless of what you put on top of it (except a VM), no one’s production environment is well-modeled by a Mac
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Mac options</h3>
+        
+  
+  <p>
+    Boxen
+<br>
+
+    Not Boxen, just Puppet
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Boxen</h3>
+        
+  
+  <p>
+    <a href="https://twitter.com/wfarr" target="_blank">@wfarr</a> covered this two hours ago
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Not Boxen</h3>
+        
+  
+  <p>
+    Production Puppet codebase
+<br>
+
+    Focus on development environment, not Evernote, FitBit, and Spotify
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Puppet at Betable</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Staging and production</h3>
+        
+  
+  <p>
+    Masterless
+<br>
+
+    <code>git push</code> to deploy
+<br>
+
+    <a href="https://github.com/rcrowley/puppet-related_nodes" target="_blank">puppet-related_nodes</a>
+<br>
+
+    Assumes Debian/Ubuntu throughout
+<br>
+
+    VM-based development process
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Minimal additions for the Mac</h3>
+        
+  
+  <p>
+    Homebrew
+<br>
+
+    XCode command-line tools
+<br>
+
+    Cassandra schema and fixtures
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Minimal changes for the Mac</h3>
+        
+  
+  <p>
+    Java
+<br>
+
+    Git and Git repositories
+<br>
+
+    Shared rather than vendored dependencies
+<br>
+
+    Service supervision
+<br>
+
+    <code>if &#34;Darwin&#34; == $::operatingsystem</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Git</h3>
+        
+  
+  <p>
+    Chicken and egg
+<br>
+
+    Well-practiced install automation in shell
+  </p>
+  
+
+  
+  <div class="code"><pre>cd &#34;$HOME/Downloads&#34;
+[ -f &#34;git-$GIT_VERSION-intel-universal-snow-leopard.dmg&#34; ] ||
+curl -O &#34;https://git-osx-installer.googlecode.com/files/git-$GIT_VERSION-intel-universal-snow-leopard.dmg&#34;
+[ -d &#34;/Volumes/Git $GIT_VERSION Snow Leopard Intel Universal&#34; ] ||
+hdiutil attach &#34;git-$GIT_VERSION-intel-universal-snow-leopard.dmg&#34;
+installer -package &#34;/Volumes/Git $GIT_VERSION Snow Leopard Intel Universal/git-$GIT_VERSION-intel-universal-snow-leopard.pkg&#34; -target &#34;/&#34;
+cat &gt;&#34;/var/db/.puppet_pkgdmg_installed_git-$GIT_VERSION-intel-universal-snow-leopard.dmg&#34; &lt;&lt;EOF
+name: &#39;git-$GIT_VERSION-intel-universal-snow-leopard.dmg&#39;
+source: &#39;https://git-osx-installer.googlecode.com/files/git-$GIT_VERSION-intel-universal-snow-leopard.dmg&#39;
+EOF
+hdiutil detach &#34;/Volumes/Git $GIT_VERSION Snow Leopard Intel Universal&#34;</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Homebrew</h3>
+        
+  
+  <p>
+    My first experience using the Puppet Forge
+<br>
+
+    Homebrew makes a lot of our production Puppet code Just Work™.
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>XCode</h3>
+        
+  
+  <p>
+    Tedious to automate
+<br>
+
+    Homebrew module makes it a bit better
+<br>
+
+    We host <code>xcode462_cltools_*.dmg</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>XCode and Homebrew</h3>
+        
+  
+  <div class="code"><pre>$command_line_tools_package = $::macosx_productversion_major ? {
+    &#34;10.7&#34; =&gt; &#34;xcode462_cltools_10_76938260a.dmg&#34;,
+    &#34;10.8&#34; =&gt; &#34;xcode462_cltools_10_86938259a.dmg&#34;,
+}
+class {
+    &#34;homebrew&#34;:
+        command_line_tools_package =&gt; &#34;$command_line_tools_package&#34;,
+        command_line_tools_source =&gt; &#34;https://packages.ops.betable.com/$command_line_tools_package&#34;,
+        user =&gt; &#34;$::user&#34;,
+}
+file { &#34;/usr/local/bin/xcode-select&#34;:
+    content =&gt; &#34;#!/bin/sh\n&#34;,
+    ensure =&gt; file,
+    group =&gt; &#34;admin&#34;,
+    mode =&gt; 0755,
+    owner =&gt; &#34;root&#34;,
+}
+File[&#34;/usr/local/bin/brew&#34;] -&gt; Package&lt;| title != &#34;$command_line_tools_package&#34; |&gt;
+File[&#34;/usr/local/bin/xcode-select&#34;] -&gt; Package&lt;| title != &#34;$command_line_tools_package&#34; |&gt;
+Package[&#34;$command_line_tools_package&#34;] -&gt; Package&lt;| title != &#34;$command_line_tools_package&#34; |&gt;</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Java</h3>
+        
+  
+  <div class="code"><pre>package { &#34;JavaForOSX2013-004.dmg&#34;:
+    ensure =&gt; installed,
+    provider =&gt; &#34;pkgdmg&#34;,
+    source =&gt;
+    &#34;http://support.apple.com/downloads/DL1572/en_US/JavaForOSX2013-004.dmg&#34;,
+}</pre></div>
+  
+
+  
+  <p>
+    It’s really difficult to tell you have the right download
+<br>
+
+    There’s no way to <code>ensure =&gt; latest</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Git repositories</h3>
+        
+  
+  <p>
+    <code>git::repo</code> resources in every environment
+<br>
+
+    <code>staging</code> and <code>production</code>:
+<br>
+
+    Bare repository in <code>/var/lib/git</code>
+<br>
+
+    Working copy in <code>/usr/local</code>
+<br>
+
+    <code>development</code>: working copy in <code>/Users/$::user/src</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Node.js dependency management</h3>
+        
+  
+  <p>
+    <code>npm::link</code> resources
+<br>
+
+    <code>npm::install</code> resources
+<br>
+
+    In the future these should parse <code>package.json</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Go dependency management</h3>
+        
+  
+  <p>
+    <code>export GOPATH=&#34;$HOME&#34;</code>
+  </p>
+  
+
+  
+  <p>
+    And you’re done
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Service supervision</h3>
+        
+  
+  <p>
+    Two classes of services:
+<br>
+
+    Those we actively develop
+<br>
+
+    Those we don’t
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>launchd for Cassandra</h3>
+        
+  
+  <div class="code"><pre>launchd::service { &#34;cassandra&#34;:
+    args =&gt; [&#34;/usr/local/cassandra/bin/cassandra&#34;, &#34;-f&#34;],
+    description =&gt; &#34;Cassandra&#34;,
+    ensure =&gt; running,
+    label =&gt; &#34;org.apache.cassandra&#34;,
+    log =&gt; &#34;/var/log/cassandra/output.log&#34;,
+}</pre></div>
+  
+
+  
+  <p>
+    <code>launchd::service</code> manages <code>/Library/LaunchDaemons/$label.plist</code> and <code>Service[&#34;$name&#34;]</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>screen, tmux, or Foreman</h3>
+        
+  
+  <p>
+    For services we actively develop
+<br>
+
+    Highly personal
+<br>
+
+    Not managed by Puppet (yet)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Deploying to development</h3>
+        
+  
+  <p>
+    16+ services and lots of libraries
+<br>
+
+    Coworkers can’t be bothered to <code>git pull</code> all of ‘em
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Keeping up-to-date...</h3>
+        
+  
+  <p>
+    ...but not too up-to-date
+<br>
+
+    Pull, not push
+<br>
+
+    <code>puppetme</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Considerate Git repository updates</h3>
+        
+  
+  <div class="code"><pre>Exec { cwd =&gt; &#34;$directory/$name&#34; }
+exec {
+    &#34;git-clone-$name&#34;:
+        command =&gt; &#34;git clone git@git.ops.betable.com:$name.git&#34;,
+        creates =&gt; &#34;$directory/$name&#34;,
+        cwd =&gt; &#34;$directory&#34;,
+        notify =&gt; Exec[&#34;git-remote-update-$name&#34;];
+    &#34;git-remote-update-$name&#34;:
+        command =&gt; &#34;git remote update origin&#34;,
+        notify =&gt; Exec[&#34;git-fetch-$name&#34;];
+    &#34;git-fetch-$name&#34;:
+        command =&gt; &#34;git fetch origin&#34;,
+        notify =&gt; Exec[&#34;git-merge-$name&#34;];
+    &#34;git-merge-$name&#34;:
+        command =&gt; &#34;git merge --ff-only origin/master&#34;,
+        notify =&gt; Exec[&#34;git-submodule-update-$name&#34;],
+        returns =&gt; [0, 1];
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Deploying to production</h3>
+        
+  
+  <p>
+    <code>git push origin master</code>
+<br>
+
+    Confidently
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Cowboys turned to ranchers</h3>
+        
+  
+  <p>
+    Homogeneity...
+<br>
+
+    ...between development, staging, and production
+<br>
+
+    ...and between each other’s laptops
+<br>
+
+    Automatic provisioning for new hires
+<br>
+
+    Automatic maintenance as we ship
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>A word from my sponsors</h3>
+        
+  
+  <p>
+    <a href="mailto:jobs@betable.com" target="_blank">jobs@betable.com</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+
+      <article>
+        <h3>Thank you</h1>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+<p class="link"><a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a></p><p class="link"><a href="#ZgotmplZ" target="_blank"><a href="http://rcrowley.org/talks/puppetconf-2013.html" target="_blank">rcrowley.org/talks/puppetconf-2013.html</a></a></p><p class="link"><a href="http://twitter.com/rcrowley" target="_blank">@rcrowley</a></p>
+          </div>
+        
+      </article>
+
+  </body>
+  
+</html>

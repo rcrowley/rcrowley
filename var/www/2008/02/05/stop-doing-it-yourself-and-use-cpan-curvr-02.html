@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stop doing it yourself and use CPAN &mdash; curvr-0.2 &#8212; Crowley Code!</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/style.css" />
+<link type="application/atom+xml" rel="alternate" title="Crowley Code!" href="http://feeds.feedburner.com/rcrowley" />
+<link rel="openid.server" href="http://idproxy.net/openid/server/" />
+<link rel="openid.delegate" href="http://rcrowley.idproxy.net/" />
+</head>
+<body>
+<div class="head">
+	<div class="title"><a href="/">Crowley Code!</a>&nbsp;</div>
+	<div class="subtitle">&nbsp;<small>(Take 12)</small></div>
+	<ul>
+		<li><a href="http://feeds.feedburner.com/rcrowley">Syndicate!</a></li>
+	</ul>
+</div>
+<div class="content"><div class="post">
+<h1><a href="/2008/02/05/stop-doing-it-yourself-and-use-cpan-curvr-02">Stop doing it yourself and use CPAN &mdash; curvr-0.2</a> <small>2008/02/05</small></h1>
+<p>Just like the career of the average software engineer, Curvr has now grown up just a bit and started reusing other people's code.</p>
+<h2>Dopplr integration in <code>curvrmail</code></h2>
+<p>Geotagging is awesome but a bit of a pain to automate with any kind of accuracy.&nbsp; I'm making a compromise here by automatically tagging things using my location according to <a href="http://dopplr.com/">Dopplr</a>.&nbsp; I had this working with my original PHP <code>curvrmail</code> script but have since switched to using <code>Flickr::Upload::Dopplr</code> just to practice some Perl.</p>
+<h2><span style="text-decoration: line-through">Auto</span>Manual image rotation</h2>
+<p>Since my N73 isn't friendly enough to rotate pictures for me, I've added a way to specify rotation in the email you send to Curvr.&nbsp; Prefixing with "L " or "l " will rotate 90 degrees counterclockwise and prefixing with "R " or "r " will rotate 90 degrees clockwise.&nbsp; Note in both cases that it is a letter followed by a space followed by the normal title/tags syntax.</p>
+<p>It is a bit awkward to think about in terms of left and right, since I could either be talking about the direction you rotated the camera or the direction the photo should be rotated (which itself could be rather ambiguous, so we'll say that it is relative to the top).&nbsp; So here's the official word: the rotate syntax wants to know which direction you rotated the camera to take the picture.</p>
+<h2><code>curvrconf</code> for getting API tokens</h2>
+<p>Getting tokens for the Flickr and Dopplr API, while not something you need to do often, is quite a drag.&nbsp; Enter <code>curvrconf</code>, the copy-and-paste simple way to get your tokens out.&nbsp; All it needs is to be setup with the same API key as <code>curvrmail</code> and it'll guide you through grabbing tokens.&nbsp; For the Flickr API, setup your key for web-based auth and give it a garbage URL to return to (I use http://localhost:81/).</p>
+<p>As usual, the API key is up to you.&nbsp; I accidentally committed my keys/secrets/tokens to Subversion but have expired all of them so don't even bother trying to steal my accounts.</p>
+<h2>Anti-blue C code</h2>
+<p>The main <code>curvr</code> program has for a long time introduced some strange blue artifacts into my photos.&nbsp; I figured this was due to some underflow or overflow issues with my color maps.&nbsp; I finally took the time to do some serious experimentation and it turns out that if I just favor a stronger red channel in these edge cases, the artifacts seem to go away.&nbsp; Strange and beautiful indeed.&nbsp; I can't fully explain the phenomenon but believe it's somehow related to my using the red channel as my indicator of color value (as many photographers do when converting to black &amp; white).</p>
+<p>So there it is, curvr-0.2.</p>
+<p>Er, here it is: <big><a href="http://svn.rcrowley.org/svn/curvr/tags/curvr-0.2">http://svn.rcrowley.org/svn/curvr/tags/curvr-0.2</a></big></p>
+
+</div>
+<div id="comments">
+<h1>Comments <small>(0)</small></h1>
+<ol>
+</ol>
+</div>
+</div>
+<div class="foot">
+	<div class="about">
+		<p><big>Richard Crowley?</big>&nbsp;
+		Kentuckian engineer who cooks and eats in between bicycling
+		and beering.</p>
+		<p>I blog mostly about programming and databases.&nbsp; Browse
+		by <a href="/archives">month</a> or <a href="/tags">tag</a>.</p>
+		<ul>
+			<li><a href="http://github.com/rcrowley">GitHub</a></li>
+			<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+			<li><a href="http://del.icio.us/rcrowley">del.icio.us</a></li>
+			<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+		</ul>
+	</div>
+	<div class="projects">
+		<p><big>To blame for...</big></p>
+		<ul>
+			<li><a href="/2009/06/23/building-opendns-stats-at-velocity">OpenDNS
+		Stats</a></li>
+			<li>The <a href="http://code.flickr.com/trac/browser/trunk/uploadr">open
+			source</a> <a href="http://flickr.com/tools/uploadr">Flickr
+			Uploadr</a></li>
+			<li><a href="http://car.rcrowley.org/">Where&#8217;s my car?</a>, for
+			preventing parking tickets in San Francisco</li>
+			<li><a href="http://oembed.com/">OEmbed</a> (beer is the one true
+			Internet standard)</li>
+			<li><a href="http://github.com/rcrowley/bashpress">Bashpress</a></li>
+			<li><a href="http://dopploadr.rcrowley.org/">Dopploadr</a>, for fuzzy
+			geotags</li>
+			<li><a href="http://github.com/rcrowley/powncefs">PownceFS</a> (RIP)</li>
+		</ul>
+	</div>
+	<br />
+</div>
+<div class="foot">
+	<p>&copy; 2009 Richard Crowley.&nbsp; Managed by <a
+	href="http://github.com/rcrowley/bashpress">Bashpress</a>.</p>
+</div>
+<script type="text/javascript" src="/js/delicious.js"></script>
+<script type="text/javascript" src="http://feeds.delicious.com/v2/json/url/ec47ee577092458e7ea1a732292fed86?count=100&amp;callback=delicious"></script>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-20973978-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>

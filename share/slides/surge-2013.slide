@@ -1,0 +1,447 @@
+A State Machine Datastore in the Wild
+
+Richard Crowley
+Betable operations
+r@rcrowley.org
+[[http://rcrowley.org/talks/surge-2013.html]]
+@rcrowley
+
+* Hi, I’m Richard
+
+[[mailto:r@rcrowley.org]] or [[https://twitter.com/rcrowley][@rcrowley]]
+
+* Betable
+
+Gambling-as-a-service
+Licensed and regulated so game developers don’t have to be
+
+* Games of chance
+
+Single-player
+Single-event
+Against the house
+Easy to model as a REST API
+
+* Roulette
+
+Multi-player
+Single-event, sort of
+Against the house
+Time dimension didn’t fit into REST
+
+* Multi-player games
+
+Roulette is but the first of a new class of game mechanic
+Most events are asynchronous from a player’s perspective
+Most events are temporally localized from the house’s perspective
+
+* Requirements
+
+Player presence
+Server-to-client broadcasts and messages
+Timeouts in case of player inaction
+
+* WebSockets
+
+[[http://www.ietf.org/rfc/rfc6455.txt]]
+Beginning to see widely-deployed support
+Providing useful semantics on top of WebSockets would be an interesting talk in its own right
+
+* Layers
+
+WebSockets out front
+Internal REST APIs in between
+Storage underneath
+
+* Storage
+
+All Cassandra, all the time
+`N=3` `R=2` `W=2` (quorum reads and writes)
+Naturally, we tried this first
+
+* Requirements
+
+Correctly enforced domain-specific constraints
+Serializable updates
+Audit trail
+High concurrency
+
+* Strawman use-case
+
+Sell 1000 bingo cards “instantly”
+Don’t sell more than 1000
+Don’t sell more than 4 to any player
+Don’t sell any after the first ball is drawn
+
+* Strawman use-case
+
+Conservatively 200 kB, mutated slightly 1000 times
+Cards only semi-independent due to domain-specific constraints
+Enough thinking, let’s hack!
+
+* Cassandra 1
+
+Doubly-linked list
+Optimistic concurrency control
+Two column families: `entries` and `pointers` (with `LongType` columns)
+Death by roundtrip
+
+* Cassandra 1 algorithm
+
+Write new tail to `entries` and include the previous tail’s row key
+Write to the previous tail’s row in `pointers` with a timestamp and the new tail’s row key
+Read the previous tail’s row in `pointers` to see if our write won the append race
+
+* Cassandra 2
+
+Consistent hashing of entities to processes
+Locked read-modify-write over the network
+Also death by roundtrip
+At this point, why even use Cassandra?
+
+* RDBMS
+
+Lacks expressiveness
+(read: Turing-completeness)
+Basically used it like a filesystem
+Also also death by roundtrip
+
+* Technology-agnostic design goals
+
+Enforce complex constraints on data
+Efficient in terms of network I/O
+Distributed, for some value of distributed
+Scale horizontally
+1000 bingo card strawman
+
+* Are we really going to build this?
+
+Existing storage engines lack expressiveness
+Small scale makes a custom solution plausible
+YAGNI versus nothing more permanent than a temporary solution
+
+* Design
+
+* Entities
+
+Arbitrary size and structure
+Unit of atomicity
+Unit of distribution
+Examples: `RouletteTable`, `RouletteRound`, but not `RouletteBet`
+
+* Entity schema
+
+    type Table struct {
+        ID             string
+        GameID         string
+        RoundID        string
+        Players        []Player
+        NextTransition time.Time
+        // ...
+    }
+
+* Transitions
+
+Mechanism of all reads and writes
+Analogous to stored procedures
+Apply to (at most) one entity
+Examples: `CreateRouletteTable`, `CreateRouletteRound`, `CreateRouletteBet`, and `ResolveRouletteRound`
+
+* Transition API
+
+    type CreateTable struct {
+        TableID string
+        // ...
+    }
+
+    func (ct *CreateTable) Prepare(pc PrepareContext) error {
+        return nil
+    }
+
+    func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
+        t := &Table{
+            ID: ct.TableID,
+            // ...
+        }
+        if err := ac.Store(t.ID, t); nil != err {
+            return nil, err
+        }
+        return t, nil
+    }
+
+* Prepare a transition
+
+Dispatch other transitions
+Generate data
+Mutate the transition
+`PrepareContext` has `Dispatch`, `Load`, and more but not `Store`, `LoadExcl`, or `StoreExcl`
+
+* Dispatched transitions
+
+    func (ct *CreateTable) Prepare(pc PrepareContext) error {
+        r, err := pc.Dispatch(&CreateRound{
+            // ...
+        })
+        if nil != err {
+            return err
+        }
+        ct.RoundID = r.ID
+        return nil
+    }
+
+Cross-entity operations
+No transactional guarantees
+Efficient for humans and networks
+
+* Apply a transition
+
+Transition written to write-ahead log
+Enforce domain-specific constraints
+Update a stored entity
+`ApplyContext` has `Load`, `Store`, `LoadExcl`, `StoreExcl`, and more
+
+* Generic transitions
+
+`GetEntity` reads an entity given a type and a key
+`GetIndex` reads a secondary index given its name and a secondary key
+`UpdateEntity` could theoretically update fields in any entity but we haven’t needed it
+
+* ACID properties
+
+Atomicity: entity writes are as atomic as you want
+Consistency: weak guarantees since transitions contain arbitrary code
+Isolation: within an entity when requested
+Durability: `fsync(2)` the write-ahead log
+
+* CAP properties
+
+Consistency: no stale reads
+Availability: requests hashed to non-failing coordinators respond but no second-choice coordinators
+Partition tolerance: unreachable coordinators don’t make reachable coordinators unavailable
+
+* Guarantees not made
+
+Atomicity of entity-spanning operations
+Locality of any two entities
+Pat Helland’s _Life_beyond_Distributed_Transactions:_an_Apostate’s_Opinion_ in CIDR 2007
+
+* Coordinators
+
+Transitions declare a distribution key
+Distribution key conventionally identifies an entity
+Consistent hash function maps transitions to a coordinator process
+
+* Peers
+
+Command-line flags easily configured by Puppet
+Declare peers on your consistent hash ring
+Declare masters from which to replicate
+
+* Flexible topology
+
+Master-slave
+Master-master
+Next `N-1` peers
+
+* Network transparency
+
+One listening socket per process
+Clients connect to any process
+Peers proxy transitions to their coordinator
+Clients can embed the consistent hashing algorithm as an optimization
+
+* Replication
+
+Asynchronous
+Loosely inspired by MySQL
+Replicate transitions, which are small, not entities, which may be very large
+`Prepare` not called when replicating
+
+* Replication
+
+Slave sends a `BeginReplication` transition with an `Index` and `Offset`
+Master streams transitions from the initial `Index` and `Offset` forward
+
+* Replication cursors
+
+Slave atomically logs the cursor with each replicated transition
+`Addr` of master, `Index` of and `Offset` into master’s write-ahead log
+
+* Replication cursors
+
+Log rotation copies the last cursor in the previous log file into the next log file
+Recovery requires reading the most recent log and accepting the last cursor found
+
+* Secondary indexes
+
+    type Table struct {
+        ID     string `index:"-"`
+        GameID string `index:"GameID_TableID"`
+        // ...
+    }
+
+Declare a primary key for the entity
+(does not have to be the distribution key)
+Declare entity fields to be indexed
+An index maps a secondary key to a list of primary keys
+
+* Indexing
+
+Secondary indexes automatically updated during `Store` and `StoreExcl`
+Eventually consistent via asynchronous replication
+Optimistic: not atomic with entity storage
+
+* Querying indexes
+
+`Query(index,`key)` with a `PrepareContext` or an `ApplyContext`
+False positives and negatives possible
+
+* Storage engine
+
+Objects and blobs
+`ObjectStore` and `BlobStore` interfaces
+`Load`, `Store`, `LoadExcl`, and `StoreExcl`
+Layered implementations
+
+* Storage engine
+
+`BSONObjectStore` serializes and stores objects in a `BlobStore`
+The key is prefixed with the object’s type
+
+* Storage engine
+
+`FileBlobStore` stores blobs on the filesystem
+`Store` and `StoreExcl` are atomic via `rename(2)`
+`LoadExcl` and `StoreExcl` use `flock(2)`
+Pathnames contain an epoch to support snapshot backups
+
+* Index storage engine
+
+An `IndexingObjectStore` has an `ObjectIndex` and an `ObjectStore`
+Calls `Index` and then `Store` or `StoreExcl`
+Delegates `Query`, `Load` and `LoadExcl`
+`DirObjectIndex` builds secondary indexes on the filesystem
+
+* Disk protocol
+
+    +---------+----------+----------+---------+
+    |         |          |          |         |
+    | version |  flags   |  length  |  type   |
+    | (uint8) | (uint16) | (uint16) | (UTF-8) |
+    |         |          |          |         |
+    +---------+----------+----------+---------+
+
+    +----------+----------------+
+    |          | +------------+ |
+    |  length  | | transition | |
+    | (uint32) | |   (BSON)   | |
+    |          | +------------+ |
+    +----------+----------------+
+
+Naming the type outside of the JSON facilitates deserialization
+Naive and expensive
+
+* BSON over the alternatives
+
+It’s easy to create protocol buffer-like versioning and extensibility by being careful with BSON
+`go-bson` nicely mirrors `encoding/json`
+`go-bson` actually feels more naturally Go than `goprotobuf`
+
+* Wire protocol
+
+    +---------+----------+----------+----------+---------+
+    |         |          |          |          |         |
+    | version |  nonce   |  flags   |  length  |  type   |
+    | (uint8) | (uint32) | (uint16) | (uint16) | (UTF-8) |
+    |         |          |          |          |         |
+    +---------+----------+----------+----------+---------+
+
+    +----------+----------------+
+    |          | +------------+ |
+    |  length  | | transition | |
+    | (uint32) | |   (JSON)   | |
+    |          | +------------+ |
+    +----------+----------------+
+
+Naming the type outside of the JSON facilitates deserialization
+
+* Language choices
+
+Java: even fluent Java tastes bad to us
+Scala: scary, C++-like amount of syntax
+C: it’s a nice hammer to have in a pinch
+Go: all but garbage collector maturity
+
+* Go
+
+Always google it as “golang”
+Approaching four years old
+Thompson, Pike, Cox, Griesemer
+Statically typed
+Not classically object-oriented
+CSP primitives as syntax
+
+* Appendix: Crash Course in Go
+
+[[http://rcrowley.org/talks/surge-2013-golang.html]]
+
+* War stories
+
+* Co-implementation
+
+One service spread across two Git repositories
+No one had ever worked with stored procedures, much less ones with this much power
+
+* Clashing design processes
+
+Both top-down and bottom-up
+Neither top-down nor bottom-up
+I tried to preserve engineers’ artistic freedom
+I needed a more formal process
+
+* Non-HTTP interface
+
+Protocol designed to allow non-request-oriented workloads
+That never panned out
+If it were HTTP, I think people would use it as an application platform, not a database
+
+* Testing
+
+Can test each side of distribution/replication as units
+Start 3 services in one Go process and sleep a bit to test together
+Jump through hoops to test network errors
+
+* Runtime metrics lock contention
+
+Sporadic timeouts that didn’t show up in metrics
+Very busy lock in a `metrics.Registry`
+Fixed the bug in `go-metrics`
+
+* Replicating dispatched transitions
+
+Used to allow `Dispatch` in `Apply` methods
+Prevent double-applying in replication
+Non-deterministic replication
+Eliot Moss’s _Nested_Transactions:_An_Approach_to_Reliable_Distributed_Computing_
+
+* Admin tools
+
+`go-metrics` and Graphite
+`apply-transition` and `get-entity`
+`hd(1)`
+Budget half your time for admin tools
+(not kidding)
+
+* Would we do it again?
+
+We’re backing more and more services with this storage engine every day
+
+* Future work
+
+High-availability coordinators
+Next-generation secondary indexes
+Native HTTP via soon-to-be open-sourced Go HTTP service framework
+
+* A word from my sponsors
+
+[[mailto:jobs@betable.com]]

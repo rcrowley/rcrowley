@@ -1,0 +1,133 @@
+/*
+ * Fonts
+ */
+
+body {
+	font-family: Cambria, Georgia, "Times New Roman", serif;
+	font-size: 16px;
+	color: #333;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-family: Cambria, Georgia, "Times New Roman", serif;
+	font-weight: normal;
+	color: #333;
+}
+h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
+	font-family: "Lucida Grande", Verdana, sans-serif;
+}
+input, textarea {
+	font-family: "Lucida Grande", Verdana, sans-serif;
+}
+
+
+
+/*
+ * Everything else
+ */
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+a, a:link, a:hover, a:active, a:visited {
+	color: #3636cf;
+	text-decoration: none;
+	border-bottom: 1px dotted #3636cf;
+}
+a:hover { background: #f4f4fd; }
+a:visited {
+	color: #007;
+	border-color: #007;
+}
+a.foot, a.foot:link, a.foot:hover, a.foot:active, a.foot:visited,
+a.footnote, a.footnote:link, a.footnote:hover, a.footnote:active,
+a.footnote:visited,
+a.footnote-src, a.footnote-src:link, a.footnote-src:hover,
+a.footnote-src:active, a.footnote-src:visited {
+	color: #888;
+	border: 0;
+}
+
+strong, em { background: #ffc; }
+/*kbd, code { background: #f4f4f4; }*/
+
+h1.archives {
+	font-size: 1em;
+	font-weight: bold;
+	text-align: right;
+}
+ul.archives { text-align: center; }
+ul.archives li {
+	display: inline;
+	padding: 10%;
+}
+
+.post, #comments, #comment { padding: 0 0 3em 0; }
+.post h1 small { color: #888; }
+.post ul.tags { list-style-type: none; }
+.post ul.tags li {
+	display: inline;
+	padding: 0 1em 0 0;
+}
+
+.head {
+	position: relative;
+	height: 18px;
+	margin: 0;
+	padding: 6px 20%;
+	font-family: "Lucida Grande", Verdana, sans-serif;
+	font-size: 0.75em;
+	text-transform: lowercase;
+	color: #888;
+	background: #444;
+	border: 1px solid black;
+	border-width: 0 0 1px 0;
+}
+.head a, .head a:link, .head a:hover, .head a:active, .head a:visited {
+	color: white;
+	text-decoration: none;
+	background: none;
+	border: none;
+}
+.head a:hover { background: #444; }
+.head a:visited { color: #eee; }
+.head div, .head ul {
+	position: absolute;
+	width: 20%;
+	margin: 0;
+	padding: 0;
+}
+.head div.title {
+	right: 80%;
+	text-align: right;
+}
+.head div.subtitle { left: 20%; }
+.head ul {
+	left: 80%;
+	list-style-type: none;
+}
+
+.content, div.foot { padding: 2em 20% 0.5em 20%; }
+
+div.foot {
+	font-family: "Lucida Grande", Verdana, sans-serif;
+	font-size: 0.75em;
+	background: #eee;
+	border: 1px solid #ddd;
+	border-width: 1px 0 0 0;
+}
+div.foot br { clear: both; }
+.about, .projects {
+	width: 45%;
+}
+.about {
+	float: left;
+	padding-right: 2.5%;
+}
+.projects {
+	float: right;
+	padding-left: 2.5%;
+}
+div.foot p, div.foot li { line-height: 2em; }
+div.foot p, div.foot ul { margin-bottom: 2em; }

@@ -1,0 +1,1430 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>A State Machine Datastore in the Wild</title>
+    <meta charset='utf-8'>
+    <script src='/static/slides.js'></script>
+  </head>
+
+  <body style='display: none'>
+
+    <section class='slides layout-widescreen'>
+      
+      <article>
+        <h1>A State Machine Datastore in the Wild</h1>
+        
+        
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+
+          </div>
+        
+      </article>
+      
+  
+  
+      <article>
+      
+        <h3>Hi, I’m Richard</h3>
+        
+  
+  <p>
+    <a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a> or <a href="https://twitter.com/rcrowley" target="_blank">@rcrowley</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Betable</h3>
+        
+  
+  <p>
+    Gambling-as-a-service
+<br>
+
+    Licensed and regulated so game developers don’t have to be
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Games of chance</h3>
+        
+  
+  <p>
+    Single-player
+<br>
+
+    Single-event
+<br>
+
+    Against the house
+<br>
+
+    Easy to model as a REST API
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Roulette</h3>
+        
+  
+  <p>
+    Multi-player
+<br>
+
+    Single-event, sort of
+<br>
+
+    Against the house
+<br>
+
+    Time dimension didn’t fit into REST
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Multi-player games</h3>
+        
+  
+  <p>
+    Roulette is but the first of a new class of game mechanic
+<br>
+
+    Most events are asynchronous from a player’s perspective
+<br>
+
+    Most events are temporally localized from the house’s perspective
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Requirements</h3>
+        
+  
+  <p>
+    Player presence
+<br>
+
+    Server-to-client broadcasts and messages
+<br>
+
+    Timeouts in case of player inaction
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>WebSockets</h3>
+        
+  
+  <p>
+    <a href="http://www.ietf.org/rfc/rfc6455.txt" target="_blank">www.ietf.org/rfc/rfc6455.txt</a>
+<br>
+
+    Beginning to see widely-deployed support
+<br>
+
+    Providing useful semantics on top of WebSockets would be an interesting talk in its own right
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Layers</h3>
+        
+  
+  <p>
+    WebSockets out front
+<br>
+
+    Internal REST APIs in between
+<br>
+
+    Storage underneath
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Storage</h3>
+        
+  
+  <p>
+    All Cassandra, all the time
+<br>
+
+    <code>N=3</code> <code>R=2</code> <code>W=2</code> (quorum reads and writes)
+<br>
+
+    Naturally, we tried this first
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Requirements</h3>
+        
+  
+  <p>
+    Correctly enforced domain-specific constraints
+<br>
+
+    Serializable updates
+<br>
+
+    Audit trail
+<br>
+
+    High concurrency
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Strawman use-case</h3>
+        
+  
+  <p>
+    Sell 1000 bingo cards “instantly”
+<br>
+
+    Don’t sell more than 1000
+<br>
+
+    Don’t sell more than 4 to any player
+<br>
+
+    Don’t sell any after the first ball is drawn
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Strawman use-case</h3>
+        
+  
+  <p>
+    Conservatively 200 kB, mutated slightly 1000 times
+<br>
+
+    Cards only semi-independent due to domain-specific constraints
+<br>
+
+    Enough thinking, let’s hack!
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Cassandra 1</h3>
+        
+  
+  <p>
+    Doubly-linked list
+<br>
+
+    Optimistic concurrency control
+<br>
+
+    Two column families: <code>entries</code> and <code>pointers</code> (with <code>LongType</code> columns)
+<br>
+
+    Death by roundtrip
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Cassandra 1 algorithm</h3>
+        
+  
+  <p>
+    Write new tail to <code>entries</code> and include the previous tail’s row key
+<br>
+
+    Write to the previous tail’s row in <code>pointers</code> with a timestamp and the new tail’s row key
+<br>
+
+    Read the previous tail’s row in <code>pointers</code> to see if our write won the append race
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Cassandra 2</h3>
+        
+  
+  <p>
+    Consistent hashing of entities to processes
+<br>
+
+    Locked read-modify-write over the network
+<br>
+
+    Also death by roundtrip
+<br>
+
+    At this point, why even use Cassandra?
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>RDBMS</h3>
+        
+  
+  <p>
+    Lacks expressiveness
+<br>
+
+    (read: Turing-completeness)
+<br>
+
+    Basically used it like a filesystem
+<br>
+
+    Also also death by roundtrip
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Technology-agnostic design goals</h3>
+        
+  
+  <p>
+    Enforce complex constraints on data
+<br>
+
+    Efficient in terms of network I/O
+<br>
+
+    Distributed, for some value of distributed
+<br>
+
+    Scale horizontally
+<br>
+
+    1000 bingo card strawman
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Are we really going to build this?</h3>
+        
+  
+  <p>
+    Existing storage engines lack expressiveness
+<br>
+
+    Small scale makes a custom solution plausible
+<br>
+
+    YAGNI versus nothing more permanent than a temporary solution
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Design</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Entities</h3>
+        
+  
+  <p>
+    Arbitrary size and structure
+<br>
+
+    Unit of atomicity
+<br>
+
+    Unit of distribution
+<br>
+
+    Examples: <code>RouletteTable</code>, <code>RouletteRound</code>, but not <code>RouletteBet</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Entity schema</h3>
+        
+  
+  <div class="code"><pre>type Table struct {
+    ID             string
+    GameID         string
+    RoundID        string
+    Players        []Player
+    NextTransition time.Time
+    // ...
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Transitions</h3>
+        
+  
+  <p>
+    Mechanism of all reads and writes
+<br>
+
+    Analogous to stored procedures
+<br>
+
+    Apply to (at most) one entity
+<br>
+
+    Examples: <code>CreateRouletteTable</code>, <code>CreateRouletteRound</code>, <code>CreateRouletteBet</code>, and <code>ResolveRouletteRound</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Transition API</h3>
+        
+  
+  <div class="code"><pre>type CreateTable struct {
+    TableID string
+    // ...
+}
+
+func (ct *CreateTable) Prepare(pc PrepareContext) error {
+    return nil
+}
+
+func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
+    t := &amp;Table{
+        ID: ct.TableID,
+        // ...
+    }
+    if err := ac.Store(t.ID, t); nil != err {
+        return nil, err
+    }
+    return t, nil
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Prepare a transition</h3>
+        
+  
+  <p>
+    Dispatch other transitions
+<br>
+
+    Generate data
+<br>
+
+    Mutate the transition
+<br>
+
+    <code>PrepareContext</code> has <code>Dispatch</code>, <code>Load</code>, and more but not <code>Store</code>, <code>LoadExcl</code>, or <code>StoreExcl</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Dispatched transitions</h3>
+        
+  
+  <div class="code"><pre>func (ct *CreateTable) Prepare(pc PrepareContext) error {
+    r, err := pc.Dispatch(&amp;CreateRound{
+        // ...
+    })
+    if nil != err {
+        return err
+    }
+    ct.RoundID = r.ID
+    return nil
+}</pre></div>
+  
+
+  
+  <p>
+    Cross-entity operations
+<br>
+
+    No transactional guarantees
+<br>
+
+    Efficient for humans and networks
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Apply a transition</h3>
+        
+  
+  <p>
+    Transition written to write-ahead log
+<br>
+
+    Enforce domain-specific constraints
+<br>
+
+    Update a stored entity
+<br>
+
+    <code>ApplyContext</code> has <code>Load</code>, <code>Store</code>, <code>LoadExcl</code>, <code>StoreExcl</code>, and more
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Generic transitions</h3>
+        
+  
+  <p>
+    <code>GetEntity</code> reads an entity given a type and a key
+<br>
+
+    <code>GetIndex</code> reads a secondary index given its name and a secondary key
+<br>
+
+    <code>UpdateEntity</code> could theoretically update fields in any entity but we haven’t needed it
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>ACID properties</h3>
+        
+  
+  <p>
+    Atomicity: entity writes are as atomic as you want
+<br>
+
+    Consistency: weak guarantees since transitions contain arbitrary code
+<br>
+
+    Isolation: within an entity when requested
+<br>
+
+    Durability: <code>fsync(2)</code> the write-ahead log
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>CAP properties</h3>
+        
+  
+  <p>
+    Consistency: no stale reads
+<br>
+
+    Availability: requests hashed to non-failing coordinators respond but no second-choice coordinators
+<br>
+
+    Partition tolerance: unreachable coordinators don’t make reachable coordinators unavailable
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Guarantees not made</h3>
+        
+  
+  <p>
+    Atomicity of entity-spanning operations
+<br>
+
+    Locality of any two entities
+<br>
+
+    Pat Helland’s <i>Life beyond Distributed Transactions: an Apostate’s Opinion</i> in CIDR 2007
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Coordinators</h3>
+        
+  
+  <p>
+    Transitions declare a distribution key
+<br>
+
+    Distribution key conventionally identifies an entity
+<br>
+
+    Consistent hash function maps transitions to a coordinator process
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Peers</h3>
+        
+  
+  <p>
+    Command-line flags easily configured by Puppet
+<br>
+
+    Declare peers on your consistent hash ring
+<br>
+
+    Declare masters from which to replicate
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Flexible topology</h3>
+        
+  
+  <p>
+    Master-slave
+<br>
+
+    Master-master
+<br>
+
+    Next <code>N-1</code> peers
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Network transparency</h3>
+        
+  
+  <p>
+    One listening socket per process
+<br>
+
+    Clients connect to any process
+<br>
+
+    Peers proxy transitions to their coordinator
+<br>
+
+    Clients can embed the consistent hashing algorithm as an optimization
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Replication</h3>
+        
+  
+  <p>
+    Asynchronous
+<br>
+
+    Loosely inspired by MySQL
+<br>
+
+    Replicate transitions, which are small, not entities, which may be very large
+<br>
+
+    <code>Prepare</code> not called when replicating
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Replication</h3>
+        
+  
+  <p>
+    Slave sends a <code>BeginReplication</code> transition with an <code>Index</code> and <code>Offset</code>
+<br>
+
+    Master streams transitions from the initial <code>Index</code> and <code>Offset</code> forward
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Replication cursors</h3>
+        
+  
+  <p>
+    Slave atomically logs the cursor with each replicated transition
+<br>
+
+    <code>Addr</code> of master, <code>Index</code> of and <code>Offset</code> into master’s write-ahead log
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Replication cursors</h3>
+        
+  
+  <p>
+    Log rotation copies the last cursor in the previous log file into the next log file
+<br>
+
+    Recovery requires reading the most recent log and accepting the last cursor found
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Secondary indexes</h3>
+        
+  
+  <div class="code"><pre>type Table struct {
+    ID     string `index:&#34;-&#34;`
+    GameID string `index:&#34;GameID_TableID&#34;`
+    // ...
+}</pre></div>
+  
+
+  
+  <p>
+    Declare a primary key for the entity
+<br>
+
+    (does not have to be the distribution key)
+<br>
+
+    Declare entity fields to be indexed
+<br>
+
+    An index maps a secondary key to a list of primary keys
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Indexing</h3>
+        
+  
+  <p>
+    Secondary indexes automatically updated during <code>Store</code> and <code>StoreExcl</code>
+<br>
+
+    Eventually consistent via asynchronous replication
+<br>
+
+    Optimistic: not atomic with entity storage
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Querying indexes</h3>
+        
+  
+  <p>
+    <code>Query(index, key)</code> with a <code>PrepareContext</code> or an <code>ApplyContext</code>
+<br>
+
+    False positives and negatives possible
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Storage engine</h3>
+        
+  
+  <p>
+    Objects and blobs
+<br>
+
+    <code>ObjectStore</code> and <code>BlobStore</code> interfaces
+<br>
+
+    <code>Load</code>, <code>Store</code>, <code>LoadExcl</code>, and <code>StoreExcl</code>
+<br>
+
+    Layered implementations
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Storage engine</h3>
+        
+  
+  <p>
+    <code>BSONObjectStore</code> serializes and stores objects in a <code>BlobStore</code>
+<br>
+
+    The key is prefixed with the object’s type
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Storage engine</h3>
+        
+  
+  <p>
+    <code>FileBlobStore</code> stores blobs on the filesystem
+<br>
+
+    <code>Store</code> and <code>StoreExcl</code> are atomic via <code>rename(2)</code>
+<br>
+
+    <code>LoadExcl</code> and <code>StoreExcl</code> use <code>flock(2)</code>
+<br>
+
+    Pathnames contain an epoch to support snapshot backups
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Index storage engine</h3>
+        
+  
+  <p>
+    An <code>IndexingObjectStore</code> has an <code>ObjectIndex</code> and an <code>ObjectStore</code>
+<br>
+
+    Calls <code>Index</code> and then <code>Store</code> or <code>StoreExcl</code>
+<br>
+
+    Delegates <code>Query</code>, <code>Load</code> and <code>LoadExcl</code>
+<br>
+
+    <code>DirObjectIndex</code> builds secondary indexes on the filesystem
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Disk protocol</h3>
+        
+  
+  <div class="code"><pre>&#43;---------&#43;----------&#43;----------&#43;---------&#43;
+|         |          |          |         |
+| version |  flags   |  length  |  type   |
+| (uint8) | (uint16) | (uint16) | (UTF-8) |
+|         |          |          |         |
+&#43;---------&#43;----------&#43;----------&#43;---------&#43;
+
+&#43;----------&#43;----------------&#43;
+|          | &#43;------------&#43; |
+|  length  | | transition | |
+| (uint32) | |   (BSON)   | |
+|          | &#43;------------&#43; |
+&#43;----------&#43;----------------&#43;</pre></div>
+  
+
+  
+  <p>
+    Naming the type outside of the JSON facilitates deserialization
+<br>
+
+    Naive and expensive
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>BSON over the alternatives</h3>
+        
+  
+  <p>
+    It’s easy to create protocol buffer-like versioning and extensibility by being careful with BSON
+<br>
+
+    <code>go-bson</code> nicely mirrors <code>encoding/json</code>
+<br>
+
+    <code>go-bson</code> actually feels more naturally Go than <code>goprotobuf</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Wire protocol</h3>
+        
+  
+  <div class="code"><pre>&#43;---------&#43;----------&#43;----------&#43;----------&#43;---------&#43;
+|         |          |          |          |         |
+| version |  nonce   |  flags   |  length  |  type   |
+| (uint8) | (uint32) | (uint16) | (uint16) | (UTF-8) |
+|         |          |          |          |         |
+&#43;---------&#43;----------&#43;----------&#43;----------&#43;---------&#43;
+
+&#43;----------&#43;----------------&#43;
+|          | &#43;------------&#43; |
+|  length  | | transition | |
+| (uint32) | |   (JSON)   | |
+|          | &#43;------------&#43; |
+&#43;----------&#43;----------------&#43;</pre></div>
+  
+
+  
+  <p>
+    Naming the type outside of the JSON facilitates deserialization
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Language choices</h3>
+        
+  
+  <p>
+    Java: even fluent Java tastes bad to us
+<br>
+
+    Scala: scary, C++-like amount of syntax
+<br>
+
+    C: it’s a nice hammer to have in a pinch
+<br>
+
+    Go: all but garbage collector maturity
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Go</h3>
+        
+  
+  <p>
+    Always google it as “golang”
+<br>
+
+    Approaching four years old
+<br>
+
+    Thompson, Pike, Cox, Griesemer
+<br>
+
+    Statically typed
+<br>
+
+    Not classically object-oriented
+<br>
+
+    CSP primitives as syntax
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Appendix: Crash Course in Go</h3>
+        
+  
+  <p>
+    <a href="http://rcrowley.org/talks/surge-2013-golang.html" target="_blank">rcrowley.org/talks/surge-2013-golang.html</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>War stories</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Co-implementation</h3>
+        
+  
+  <p>
+    One service spread across two Git repositories
+<br>
+
+    No one had ever worked with stored procedures, much less ones with this much power
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Clashing design processes</h3>
+        
+  
+  <p>
+    Both top-down and bottom-up
+<br>
+
+    Neither top-down nor bottom-up
+<br>
+
+    I tried to preserve engineers’ artistic freedom
+<br>
+
+    I needed a more formal process
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Non-HTTP interface</h3>
+        
+  
+  <p>
+    Protocol designed to allow non-request-oriented workloads
+<br>
+
+    That never panned out
+<br>
+
+    If it were HTTP, I think people would use it as an application platform, not a database
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Testing</h3>
+        
+  
+  <p>
+    Can test each side of distribution/replication as units
+<br>
+
+    Start 3 services in one Go process and sleep a bit to test together
+<br>
+
+    Jump through hoops to test network errors
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Runtime metrics lock contention</h3>
+        
+  
+  <p>
+    Sporadic timeouts that didn’t show up in metrics
+<br>
+
+    Very busy lock in a <code>metrics.Registry</code>
+<br>
+
+    Fixed the bug in <code>go-metrics</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Replicating dispatched transitions</h3>
+        
+  
+  <p>
+    Used to allow <code>Dispatch</code> in <code>Apply</code> methods
+<br>
+
+    Prevent double-applying in replication
+<br>
+
+    Non-deterministic replication
+<br>
+
+    Eliot Moss’s <i>Nested Transactions: An Approach to Reliable Distributed Computing</i>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Admin tools</h3>
+        
+  
+  <p>
+    <code>go-metrics</code> and Graphite
+<br>
+
+    <code>apply-transition</code> and <code>get-entity</code>
+<br>
+
+    <code>hd(1)</code>
+<br>
+
+    Budget half your time for admin tools
+<br>
+
+    (not kidding)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Would we do it again?</h3>
+        
+  
+  <p>
+    We’re backing more and more services with this storage engine every day
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Future work</h3>
+        
+  
+  <p>
+    High-availability coordinators
+<br>
+
+    Next-generation secondary indexes
+<br>
+
+    Native HTTP via soon-to-be open-sourced Go HTTP service framework
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>A word from my sponsors</h3>
+        
+  
+  <p>
+    <a href="mailto:jobs@betable.com" target="_blank">jobs@betable.com</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+
+      <article>
+        <h3>Thank you</h1>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+<p class="link"><a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a></p><p class="link"><a href="#ZgotmplZ" target="_blank"><a href="http://rcrowley.org/talks/surge-2013.html" target="_blank">rcrowley.org/talks/surge-2013.html</a></a></p><p class="link"><a href="http://twitter.com/rcrowley" target="_blank">@rcrowley</a></p>
+          </div>
+        
+      </article>
+
+  </body>
+  
+</html>
