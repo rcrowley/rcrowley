@@ -1,5 +1,6 @@
 *
 !.bash_profile
+!.freight.conf
 !.gemrc
 !.gitconfig
 !.gitignore
