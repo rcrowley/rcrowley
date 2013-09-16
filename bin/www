@@ -1,15 +1,3 @@
 #!/bin/sh
 
-set -e
-
-mkdir -p "$HOME/src/github.com/rcrowley"
-cd "$HOME/src/github.com/rcrowley"
-if [ ! -d "go-metrics" ]
-then git clone "git@github.com:rcrowley/go-metrics.git"
-fi
-if [ ! -d "go-tigertonic" ]
-then git clone "git@github.com:rcrowley/go-tigertonic.git"
-fi
-cd "-" >"/dev/null"
-
 exec go run "$(dirname "$0")/www.go" "$@"
