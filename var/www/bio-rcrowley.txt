@@ -1,0 +1,6 @@
+Richard keeps the servers happy at Betable.  He's something of a polyglot,
+working frequently in C, Go, Java, JavaScript, Puppet, Python, Ruby, and
+shell.  He's the creator of the Blueprint configuration management tool, a
+contributor to Puppet, and previously worked at OpenDNS and Flickr.  He's
+passionate about engineering tools and practice and thinks vi is a better
+religion than emacs.
