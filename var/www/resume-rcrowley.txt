@@ -1,7 +1,7 @@
 Richard Crowley
 1125 Union Street #6
 San Francisco, CA 94109
-314-537-7085 (cell)
+314-537-7085
 <r@rcrowley.org>
 <http://rcrowley.org>
 
@@ -9,14 +9,14 @@ San Francisco, CA 94109
  
 Summary
 
-Software engineer focused on Internet-scale problems.
+Engineer and operator focused on Internet-scale problems.
 
 
 
 Skills
 
-C/C++, Cassandra, Go, Graphite, Java, JavaScript, MySQL, Puppet, Python, Ruby,
-shell
+C, C++, Cassandra, Go, Graphite, Java, JavaScript, Linux (especially Debian and
+Ubuntu), MySQL, Puppet, Python, Ruby, shell
 
 
 
@@ -41,28 +41,26 @@ and a datastore modeled as a distributed, replicated state machine.
 Founder & CTO
 DevStructure [3], San Francisco, CA
 February 2010 - April 2012
-Built Blueprint, a configuration management tool that reverse-engineers
-servers and generates shell, Puppet, or Chef code.  Built a hosted
-platform for users of Blueprint to backup, share, and deploy blueprints.
+Built Blueprint, a configuration management tool that reverse-engineers servers and generates shell, Puppet, or Chef code.  Built a hosted platform for users
+of Blueprint to backup, share, and deploy blueprints.
 
 Engineer
 OpenDNS [4], San Francisco, CA
 April 2008 - February 2010
-Built a pipeline capable of aggregating and sorting more than
-20 billion DNS queries each day by domain and hour for hundreds of
-thousands of users.
+Built a pipeline capable of aggregating and sorting more than 20 billion DNS
+queries each day by domain and hour for hundreds of thousands of users.
 
 XUL Hacker
 Flickr [5], San Francisco, CA
 June 2007 - April 2008
-Built the cross-platform, open-source and extendable Flickr Uploadr [6]
-using Mozilla's XULRunner [7] platform.
+Built the cross-platform, open-source and extendable Flickr Uploadr [6] using
+Mozilla's XULRunner [7] platform.
 
 Operations Intern
 Yahoo! [8], Sunnyvale, CA
 May 2006 - May 2007
-Automated collection and processing of data from the trouble ticket
-system and presented it in an intuitive and customizable way.
+Automated collection and processing of data from the trouble ticket system and
+presented it in an intuitive and customizable way.
 
 Biosequence Search Hardware Engineer
 Washington University, Saint Louis, MO
@@ -74,8 +72,8 @@ Project Manager & Web Programmer
 STaRS Program at Washington University [11], Saint Louis, MO
 October 2003 - January 2006
 Led a team of six programmers and designers to develop web sites and
-applications for University clients.  Built web applications using PHP,
-MySQL, JavaScript and standard XHTML/CSS.
+applications for University clients.  Built web applications using PHP, MySQL,
+JavaScript and standards-compliant XHTML and CSS.
 
 
 
@@ -95,5 +93,5 @@ Eagle Scout, Troop 119, Boy Scouts of America
 [7] <http://developer.mozilla.org/en/docs/XULRunner>
 [8] <http://yahoo.com>
 [9] <http://blast.ncbi.nlm.nih.gov/Blast.cgi>
-[10] <http://www.xilinx.com/products/silicon_solutions/>
+[10] <http://www.xilinx.com/products/silicon-devices/fpga/index.htm>
 [11] <http://stars.wustl.edu>
