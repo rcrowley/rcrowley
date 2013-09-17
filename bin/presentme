@@ -18,11 +18,7 @@ present -play="false" &
 trap "kill \"$!\"" EXIT INT QUIT TERM
 sleep 1
 
-mkdir -p "$HOME/src/github.com/rcrowley"
-cd "$HOME/src/github.com/rcrowley"
-[ -d "rcrowley" ] || git clone "git@github.com:rcrowley/rcrowley.git"
-
-cd "rcrowley/public"
+cd "var/www"
 mkdir -p "static"
 curl -o"static/slides.js" "http://127.0.0.1:3999/static/slides.js"
 #curl -o"static/styles.css" "http://127.0.0.1:3999/static/styles.css"
