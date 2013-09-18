@@ -25,8 +25,7 @@ Of machine resources
 
 * Scalability and performance
 
-It's easier to scale performant systems
-Theo Schlossnagle: benchmarks are never low so they help you to understand the minimum size of a system (TODO MAYBE SUPERFLUOUS?)
+It’s easier to scale performant systems
 
 * Competing language choices
 
@@ -51,18 +50,18 @@ Static type system
 Compiles to x86, ARM, etc.
 CSP
 Thompson, Pike, Cox, Griesemer
-Google
 Brad Fitz
 
 * Bad reasons people choose Go
 
-It isn't Java
-It isn't running on the JVM
+Google
+It isn’t Java
+It isn’t running on the JVM
 (Guilty)
 
 * Good reasons to not choose Go
 
-Your problem won't tolerate a naive garbage collector
+Your problem won’t tolerate a naive garbage collector
 Library immaturity overburdens your team
 
 * Rule #1
@@ -98,15 +97,9 @@ Always google it as “golang”
         http.ListenAndServe(":8080", nil)
     }
 
-* Go source files
-
-`package` declaration
-`import` statements
-Top level declarations:
-`const`, `func`, `type`, `var`
-
 * Exports
 
+All about capitalization
 `type`a` is visible to all files in a package
 `type`b` is not exported beyond its declaring package, `p`
 `type`C` is visible to packages that import `p`
@@ -122,8 +115,8 @@ Other packages must qualify `C` as `p.C`
 
 May be named or anonymous
 All functions are closures
-Pass-by-value
 Zero or more typed parameters
+Parameters are pass-by-value
 Zero or more typed return values
 
 * Structs
@@ -190,13 +183,28 @@ Types that implement all methods implement the interface implicitly
 
 * Under the hood
 
-Raise your hand if you've been burned by `BaseHTTPServer` or `WEBrick`
-What's `Serve` do, anyway?
+Raise your hand if you’ve been burned by `BaseHTTPServer` or `WEBrick`
+What’s `Serve` do, anyway?
 (For one thing, power [[http://dl.google.com]])
 
 * Echo server
 
-`go` makes any function call asynchronous in a "goroutine"
+    func main() {
+        listener, err := net.Listen("tcp", ":1234")
+        if nil != err {
+            log.Fatalln(err)
+        }
+        defer listener.Close()
+        for {
+            conn, err := listener.Accept()
+            if nil != err {
+                log.Fatalln(err)
+            }
+            go handle(conn)
+        }
+    }
+
+`go` makes any function call asynchronous in a “goroutine”
 
 * Echo server
 
@@ -228,13 +236,13 @@ This is how the standard library HTTP server works, too
 * CSP
 
 Tony Hoare’s _Communicating_Sequential_Processes_ in CACM volume 21 issue 8
-“Do not communicate by sharing memory; instead, share memory by communicating.”
+Go’s summary: “Do not communicate by sharing memory; instead, share memory by communicating.”
 Useful for connection handling, critical sections, and pooled operations
 
 * Goroutines
 
 Been there, done that
-Hoare's "Parallel Commands"
+Hoare’s “Parallel Commands”
 
 * Channels
 
@@ -246,7 +254,7 @@ Hoare's "Parallel Commands"
 Buffered (synchronous) or unbuffered (asynchronous + backpressure)
 Concurrent send and receive operations
 [[http://rcrowley.org/2013/04/19/golang-ack-test.html][Faster than mutexes]]
-Hoare's "Input and Output Commands"
+Hoare’s “Input and Output Commands”
 
 * CSP in Go
 
@@ -303,7 +311,7 @@ Not being addressed in Go 1.2
         go server.Serve(listener)
         log.Println(<-ch)
         listener.Close()
-        time.Sleep(1e9)
+        time.Sleep(60e9)
     }
 
 * Zero-downtime restart
@@ -338,19 +346,9 @@ Many others we can talk about over beers
 * Tiger Tonic
 
 Newly open-source!
+Inspired by Dropwizard
 How Betable builds web services in Go
 [[https://github.com/rcrowley/go-tigertonic]]
-
-* Goals for human scalability (TODO MOVE?)
-
-Do boring things for me
-Speak JSON by default
-Any old `http.Handler` can still fit in
-
-* Goals for machine scalability (TODO MOVE?)
-
-Share nothing at macro and micro levels
-Use the best parts of the standard library
 
 * Routing
 
@@ -377,7 +375,7 @@ Responds 404 and 405 appropriately
 
 * JSON in Tiger Tonic
 
-    handler := tigertonic.Marshaled(func(
+    var handler http.Handler = tigertonic.Marshaled(func(
         url.URL,
         http.Header,
         interface{}
@@ -388,6 +386,21 @@ Responds 404 and 405 appropriately
 Responds 400, 406, and 415 appropriately
 Responds with JSON in case of error, too
 Still an `http.Handler`
+
+* Reflection underneath
+
+    decoder := reflect.ValueOf(json.NewDecoder(r.Body))
+    out := decoder.MethodByName("Decode").Call([]reflect.Value{
+        reflect.New(m.v.Type().In(2).Elem()),
+    })
+
+User code expects and receives static types
+
+	if !t.Out(2).Implements(reflect.TypeOf((*Response)(nil)).Elem()) {
+		panic("type ... was %v, not Response", t.Out(2))
+	}
+
+Early runtime enforces fuzzy interfaces
 
 * Middleware chains
 
@@ -417,7 +430,7 @@ Also an `http.Handler`
     )
 
 `If` more naturally wraps any `http.Handler`
-And yes, it's an `http.Handler`
+And yes, it’s an `http.Handler`
 
 * HTTP Basic auth
 
@@ -511,7 +524,7 @@ Replace `crypto/tls` package with `openssl` binding as an optimization
 
 * Waste not
 
-Favor local variables that don't "escape" onto the heap
+Favor local variables that don’t “escape” onto the heap
 Reuse allocated buffers
 A small heap is a fast heap
 
@@ -524,17 +537,17 @@ Fail fast and with details
 * Share nothing
 
 Accepted in the large
-Holds just as true in the small within a Go process
+Holds true in the small within a Go process
 
 * Concurrency primitives
 
 Goroutine-per-connection
-Limit concurrency with a channel when necessary
+Limit concurrency when necessary: one channel, _m_ senders, and _n_ receivers
 
 * Measure everything
 
 Macro statistics from `Counted` and `Timed`
-Micro statistics from `runtime/pprof` and `go tool pprof`
+Micro statistics from `runtime/pprof` and `go`tool`pprof`
 
 * TODO really needs some inspiring summary
 

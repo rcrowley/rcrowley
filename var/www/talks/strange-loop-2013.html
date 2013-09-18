@@ -104,10 +104,7 @@
         
   
   <p>
-    It&#39;s easier to scale performant systems
-<br>
-
-    Theo Schlossnagle: benchmarks are never low so they help you to understand the minimum size of a system (TODO MAYBE SUPERFLUOUS?)
+    It’s easier to scale performant systems
   </p>
   
 
@@ -191,9 +188,6 @@
     Thompson, Pike, Cox, Griesemer
 <br>
 
-    Google
-<br>
-
     Brad Fitz
   </p>
   
@@ -209,10 +203,13 @@
         
   
   <p>
-    It isn&#39;t Java
+    Google
 <br>
 
-    It isn&#39;t running on the JVM
+    It isn’t Java
+<br>
+
+    It isn’t running on the JVM
 <br>
 
     (Guilty)
@@ -230,7 +227,7 @@
         
   
   <p>
-    Your problem won&#39;t tolerate a naive garbage collector
+    Your problem won’t tolerate a naive garbage collector
 <br>
 
     Library immaturity overburdens your team
@@ -306,34 +303,13 @@ func main() {
   
       <article>
       
-        <h3>Go source files</h3>
-        
-  
-  <p>
-    <code>package</code> declaration
-<br>
-
-    <code>import</code> statements
-<br>
-
-    Top level declarations:
-<br>
-
-    <code>const</code>, <code>func</code>, <code>type</code>, <code>var</code>
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
         <h3>Exports</h3>
         
   
   <p>
+    All about capitalization
+<br>
+
     <code>type a</code> is visible to all files in a package
 <br>
 
@@ -372,10 +348,10 @@ func main() {
     All functions are closures
 <br>
 
-    Pass-by-value
+    Zero or more typed parameters
 <br>
 
-    Zero or more typed parameters
+    Parameters are pass-by-value
 <br>
 
     Zero or more typed return values
@@ -515,10 +491,10 @@ type Handler interface {
         
   
   <p>
-    Raise your hand if you&#39;ve been burned by <code>BaseHTTPServer</code> or <code>WEBrick</code>
+    Raise your hand if you’ve been burned by <code>BaseHTTPServer</code> or <code>WEBrick</code>
 <br>
 
-    What&#39;s <code>Serve</code> do, anyway?
+    What’s <code>Serve</code> do, anyway?
 <br>
 
     (For one thing, power <a href="http://dl.google.com" target="_blank">dl.google.com</a>)
@@ -535,8 +511,25 @@ type Handler interface {
         <h3>Echo server</h3>
         
   
+  <div class="code"><pre>func main() {
+    listener, err := net.Listen(&#34;tcp&#34;, &#34;:1234&#34;)
+    if nil != err {
+        log.Fatalln(err)
+    }
+    defer listener.Close()
+    for {
+        conn, err := listener.Accept()
+        if nil != err {
+            log.Fatalln(err)
+        }
+        go handle(conn)
+    }
+}</pre></div>
+  
+
+  
   <p>
-    <code>go</code> makes any function call asynchronous in a &#34;goroutine&#34;
+    <code>go</code> makes any function call asynchronous in a “goroutine”
   </p>
   
 
@@ -609,7 +602,7 @@ type Handler interface {
     Tony Hoare’s <i>Communicating Sequential Processes</i> in CACM volume 21 issue 8
 <br>
 
-    “Do not communicate by sharing memory; instead, share memory by communicating.”
+    Go’s summary: “Do not communicate by sharing memory; instead, share memory by communicating.”
 <br>
 
     Useful for connection handling, critical sections, and pooled operations
@@ -630,7 +623,7 @@ type Handler interface {
     Been there, done that
 <br>
 
-    Hoare&#39;s &#34;Parallel Commands&#34;
+    Hoare’s “Parallel Commands”
   </p>
   
 
@@ -661,7 +654,7 @@ ch &lt;- 47 // send
     <a href="http://rcrowley.org/2013/04/19/golang-ack-test.html" target="_blank">Faster than mutexes</a>
 <br>
 
-    Hoare&#39;s &#34;Input and Output Commands&#34;
+    Hoare’s “Input and Output Commands”
   </p>
   
 
@@ -780,7 +773,7 @@ default:                  //
     go server.Serve(listener)
     log.Println(&lt;-ch)
     listener.Close()
-    time.Sleep(1e9)
+    time.Sleep(60e9)
 }</pre></div>
   
 
@@ -865,49 +858,13 @@ default:                  //
     Newly open-source!
 <br>
 
+    Inspired by Dropwizard
+<br>
+
     How Betable builds web services in Go
 <br>
 
     <a href="https://github.com/rcrowley/go-tigertonic" target="_blank">github.com/rcrowley/go-tigertonic</a>
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Goals for human scalability (TODO MOVE?)</h3>
-        
-  
-  <p>
-    Do boring things for me
-<br>
-
-    Speak JSON by default
-<br>
-
-    Any old <code>http.Handler</code> can still fit in
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Goals for machine scalability (TODO MOVE?)</h3>
-        
-  
-  <p>
-    Share nothing at macro and micro levels
-<br>
-
-    Use the best parts of the standard library
   </p>
   
 
@@ -978,7 +935,7 @@ mux.Handle(&#34;GET&#34;, &#34;/foo/{bar}/baz&#34;, &amp;handler{})</pre></div>
         <h3>JSON in Tiger Tonic</h3>
         
   
-  <div class="code"><pre>handler := tigertonic.Marshaled(func(
+  <div class="code"><pre>var handler http.Handler = tigertonic.Marshaled(func(
     url.URL,
     http.Header,
     interface{}
@@ -996,6 +953,40 @@ mux.Handle(&#34;GET&#34;, &#34;/foo/{bar}/baz&#34;, &amp;handler{})</pre></div>
 <br>
 
     Still an <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Reflection underneath</h3>
+        
+  
+  <div class="code"><pre>decoder := reflect.ValueOf(json.NewDecoder(r.Body))
+out := decoder.MethodByName(&#34;Decode&#34;).Call([]reflect.Value{
+    reflect.New(m.v.Type().In(2).Elem()),
+})</pre></div>
+  
+
+  
+  <p>
+    User code expects and receives static types
+  </p>
+  
+
+  
+  <div class="code"><pre>if !t.Out(2).Implements(reflect.TypeOf((*Response)(nil)).Elem()) {
+    panic(&#34;type ... was %v, not Response&#34;, t.Out(2))
+}</pre></div>
+  
+
+  
+  <p>
+    Early runtime enforces fuzzy interfaces
   </p>
   
 
@@ -1055,7 +1046,7 @@ mux.Handle(&#34;GET&#34;, &#34;/foo/{bar}/baz&#34;, &amp;handler{})</pre></div>
     <code>If</code> more naturally wraps any <code>http.Handler</code>
 <br>
 
-    And yes, it&#39;s an <code>http.Handler</code>
+    And yes, it’s an <code>http.Handler</code>
   </p>
   
 
@@ -1354,7 +1345,7 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
         
   
   <p>
-    Favor local variables that don&#39;t &#34;escape&#34; onto the heap
+    Favor local variables that don’t “escape” onto the heap
 <br>
 
     Reuse allocated buffers
@@ -1399,7 +1390,7 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
     Accepted in the large
 <br>
 
-    Holds just as true in the small within a Go process
+    Holds true in the small within a Go process
   </p>
   
 
@@ -1417,7 +1408,7 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
     Goroutine-per-connection
 <br>
 
-    Limit concurrency with a channel when necessary
+    Limit concurrency when necessary: one channel, <i>m</i> senders, and <i>n</i> receivers
   </p>
   
 
@@ -1435,7 +1426,7 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
     Macro statistics from <code>Counted</code> and <code>Timed</code>
 <br>
 
-    Micro statistics from <code>runtime/pprof</code> and `go tool pprof`
+    Micro statistics from <code>runtime/pprof</code> and <code>go tool pprof</code>
   </p>
   
 
