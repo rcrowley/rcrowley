@@ -315,8 +315,8 @@ div.code {
   margin-bottom: 20px;
   overflow: hidden;
 
-  background: #efefef /*rgb(240, 240, 240)*/;
-  border: 1px solid #ddd /*rgb(224, 224, 224)*/;
+  background: #f8f8f8 /*rgb(240, 240, 240)*/;
+  border: 5px solid #f0f0f0 /*rgb(224, 224, 224)*/;
 }
 pre {
   margin: 0;
