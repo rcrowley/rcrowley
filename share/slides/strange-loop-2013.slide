@@ -196,22 +196,7 @@ What's `Serve` do, anyway?
 
 * Echo server
 
-    func main() {
-        listener, err := net.Listen("tcp", ":1234")
-        if nil != err {
-            log.Fatalln(err)
-        }
-        defer listener.Close()
-        for {
-            conn, err := listener.Accept()
-            if nil != err {
-                log.Fatalln(err)
-            }
-            go handle(conn)
-        }
-    }
-
-`go` makes any function call asynchronous
+`go` makes any function call asynchronous in a "goroutine"
 
 * Echo server
 
@@ -232,6 +217,8 @@ What's `Serve` do, anyway?
         }
     }
 
+No callbacks, no miniature state machines
+
 * Goroutine per connection
 
 Many goroutines are scheduled onto `GOMAXPROCS` operating system threads
@@ -242,7 +229,12 @@ This is how the standard library HTTP server works, too
 
 Tony Hoare’s _Communicating_Sequential_Processes_ in CACM volume 21 issue 8
 “Do not communicate by sharing memory; instead, share memory by communicating.”
-TODO Useful for connection handling, critical sections, and pooled operations
+Useful for connection handling, critical sections, and pooled operations
+
+* Goroutines
+
+Been there, done that
+Hoare's "Parallel Commands"
 
 * Channels
 
@@ -254,6 +246,7 @@ TODO Useful for connection handling, critical sections, and pooled operations
 Buffered (synchronous) or unbuffered (asynchronous + backpressure)
 Concurrent send and receive operations
 [[http://rcrowley.org/2013/04/19/golang-ack-test.html][Faster than mutexes]]
+Hoare's "Input and Output Commands"
 
 * CSP in Go
 
@@ -281,11 +274,12 @@ Concurrent send and receive operations
         return                //
     }                         //
 
-Go `select` statement requires explicit cases
+`select` statement requires explicit cases
 
-* Beware using CSP in OLTP
+* Beware CSP in OLTP
 
-TODO
+Sacrificing shared nothing in the small precludes diagonal scaling
+Non-empty channel buffers are an opportunity for data loss
 
 * Graceful stop
 
@@ -296,17 +290,41 @@ Not being addressed in Go 1.2
 
 * Clumsy stop for HTTP
 
-    TODO func main
+    func main() {
+        mux := http.NewServeMux()
+        mux.Handle("/", &handler{})
+        server := &http.Server{Handler: mux}
+        listener, err := net.Listen("tcp", ":1234")
+        if nil != err {
+            log.Fatalln(err)
+        }
+        ch := make(chan os.Signal)
+        signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+        go server.Serve(listener)
+        log.Println(<-ch)
+        listener.Close()
+        time.Sleep(1e9)
+    }
 
 * Zero-downtime restart
 
-Follows from graceful stop
-TODO `goagain`
+    func main() {
+        // mux ... server ...
+        listener, ppid, err := goagain.GetEnvs()
+        if nil != err {
+            listener, _ = net.Listen("tcp", ":8080")
+            go server.Serve(listener)
+        } else {
+            go server.Serve(listener)
+            goagain.KillParent(ppid)
+        }
+        goagain.AwaitSignals(listener)
+        listener.Close()
+        time.Sleep(60e9)
+    }
+
+`goagain` handles `SIGUSR2`
 Difficult to supervise; `systemd` > Upstart
-
-* Zero-downtime restart for HTTP
-
-    TODO func main
 
 * Higher-level frameworks
 
@@ -453,8 +471,10 @@ In fact, database niceties of any kind
 
 * Testing
 
-TODO call ServeHTTP
-TODO tigertonic/mocking
+Construct a fake `http.Request`
+Construct a fake `url.URL` via `tigertonic/mocking`
+Call `ServeHTTP` with a `httptest.ResponseRecorder`
+Call your `Marshaled` function directly
 
 * Deployment
 
@@ -471,7 +491,7 @@ We `git`push` and build in a
 * Dependency purgatory
 
 Go-specific solutions:
-`go-pack` and `johnny-deps`
+`gopack` and `johnny-deps`
 `git-submodule` is perfectly fine
 Google vendors third-party code
 We vendor third-party code as part of CI
@@ -491,27 +511,42 @@ Replace `crypto/tls` package with `openssl` binding as an optimization
 
 * Waste not
 
-Favor local variables that don't "escape"
-Reuse buffers and other medium-term data structures
-Small heap means fast GC
+Favor local variables that don't "escape" onto the heap
+Reuse allocated buffers
+A small heap is a fast heap
 
-* Shared nothing
+* Small pieces, loosely joined
+
+Use the standard library
+Implement interfaces when you can
+Fail fast and with details
+
+* Share nothing
 
 Accepted in the large
 Holds just as true in the small within a Go process
 
-* Small pieces, loosely joined
+* Concurrency primitives
 
-Controlled deviations from the standard library
+Goroutine-per-connection
+Limit concurrency with a channel when necessary
 
+* Measure everything
 
-
-
+Macro statistics from `Counted` and `Timed`
+Micro statistics from `runtime/pprof` and `go tool pprof`
 
 * TODO really needs some inspiring summary
 
+* Open-source goodness
 
-
+[[https://github.com/d2fn/gopack]]
+[[https://github.com/mihasya/canstop]]
+[[https://github.com/rcrowley/goagain]]
+[[https://github.com/rcrowley/go-metrics]]
+[[https://github.com/rcrowley/go-tigertonic]]
+[[https://github.com/VividCortex/johnny-deps]]
+[[https://github.com/VividCortex/robustly]]
 
 * A word from my sponsors
 
@@ -521,8 +556,6 @@ TODO s/'/’/gc
 TODO s/"/“/gc
 TODO s/"/”/gc
 
-TODO CSP analogies to Hoare's syntax, when to use them, and when not to
 TODO apply and applyCalmly pattern
-TODO go tool pprof
 TODO error handling?
 TODO the last page of my notes might be good summary fodder

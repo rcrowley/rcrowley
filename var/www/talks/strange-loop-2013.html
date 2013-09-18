@@ -535,25 +535,8 @@ type Handler interface {
         <h3>Echo server</h3>
         
   
-  <div class="code"><pre>func main() {
-    listener, err := net.Listen(&#34;tcp&#34;, &#34;:1234&#34;)
-    if nil != err {
-        log.Fatalln(err)
-    }
-    defer listener.Close()
-    for {
-        conn, err := listener.Accept()
-        if nil != err {
-            log.Fatalln(err)
-        }
-        go handle(conn)
-    }
-}</pre></div>
-  
-
-  
   <p>
-    <code>go</code> makes any function call asynchronous
+    <code>go</code> makes any function call asynchronous in a &#34;goroutine&#34;
   </p>
   
 
@@ -583,6 +566,12 @@ type Handler interface {
         }
     }
 }</pre></div>
+  
+
+  
+  <p>
+    No callbacks, no miniature state machines
+  </p>
   
 
       
@@ -623,7 +612,25 @@ type Handler interface {
     “Do not communicate by sharing memory; instead, share memory by communicating.”
 <br>
 
-    TODO Useful for connection handling, critical sections, and pooled operations
+    Useful for connection handling, critical sections, and pooled operations
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Goroutines</h3>
+        
+  
+  <p>
+    Been there, done that
+<br>
+
+    Hoare&#39;s &#34;Parallel Commands&#34;
   </p>
   
 
@@ -652,6 +659,9 @@ ch &lt;- 47 // send
 <br>
 
     <a href="http://rcrowley.org/2013/04/19/golang-ack-test.html" target="_blank">Faster than mutexes</a>
+<br>
+
+    Hoare&#39;s &#34;Input and Output Commands&#34;
   </p>
   
 
@@ -701,7 +711,7 @@ default:                  //
 
   
   <p>
-    Go <code>select</code> statement requires explicit cases
+    <code>select</code> statement requires explicit cases
   </p>
   
 
@@ -712,11 +722,14 @@ default:                  //
   
       <article>
       
-        <h3>Beware using CSP in OLTP</h3>
+        <h3>Beware CSP in OLTP</h3>
         
   
   <p>
-    TODO
+    Sacrificing shared nothing in the small precludes diagonal scaling
+<br>
+
+    Non-empty channel buffers are an opportunity for data loss
   </p>
   
 
@@ -754,7 +767,21 @@ default:                  //
         <h3>Clumsy stop for HTTP</h3>
         
   
-  <div class="code"><pre>TODO func main</pre></div>
+  <div class="code"><pre>func main() {
+    mux := http.NewServeMux()
+    mux.Handle(&#34;/&#34;, &amp;handler{})
+    server := &amp;http.Server{Handler: mux}
+    listener, err := net.Listen(&#34;tcp&#34;, &#34;:1234&#34;)
+    if nil != err {
+        log.Fatalln(err)
+    }
+    ch := make(chan os.Signal)
+    signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+    go server.Serve(listener)
+    log.Println(&lt;-ch)
+    listener.Close()
+    time.Sleep(1e9)
+}</pre></div>
   
 
       
@@ -767,28 +794,29 @@ default:                  //
         <h3>Zero-downtime restart</h3>
         
   
-  <p>
-    Follows from graceful stop
-<br>
+  <div class="code"><pre>func main() {
+    // mux ... server ...
+    listener, ppid, err := goagain.GetEnvs()
+    if nil != err {
+        listener, _ = net.Listen(&#34;tcp&#34;, &#34;:8080&#34;)
+        go server.Serve(listener)
+    } else {
+        go server.Serve(listener)
+        goagain.KillParent(ppid)
+    }
+    goagain.AwaitSignals(listener)
+    listener.Close()
+    time.Sleep(60e9)
+}</pre></div>
+  
 
-    TODO <code>goagain</code>
+  
+  <p>
+    <code>goagain</code> handles <code>SIGUSR2</code>
 <br>
 
     Difficult to supervise; <code>systemd</code> &gt; Upstart
   </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Zero-downtime restart for HTTP</h3>
-        
-  
-  <div class="code"><pre>TODO func main</pre></div>
   
 
       
@@ -1188,10 +1216,16 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
         
   
   <p>
-    TODO call ServeHTTP
+    Construct a fake <code>http.Request</code>
 <br>
 
-    TODO tigertonic/mocking
+    Construct a fake <code>url.URL</code> via <code>tigertonic/mocking</code>
+<br>
+
+    Call <code>ServeHTTP</code> with a <code>httptest.ResponseRecorder</code>
+<br>
+
+    Call your <code>Marshaled</code> function directly
   </p>
   
 
@@ -1251,7 +1285,7 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
     Go-specific solutions:
 <br>
 
-    <code>go-pack</code> and <code>johnny-deps</code>
+    <code>gopack</code> and <code>johnny-deps</code>
 <br>
 
     <code>git-submodule</code> is perfectly fine
@@ -1320,13 +1354,13 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
         
   
   <p>
-    Favor local variables that don&#39;t &#34;escape&#34;
+    Favor local variables that don&#39;t &#34;escape&#34; onto the heap
 <br>
 
-    Reuse buffers and other medium-term data structures
+    Reuse allocated buffers
 <br>
 
-    Small heap means fast GC
+    A small heap is a fast heap
   </p>
   
 
@@ -1337,7 +1371,28 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
   
       <article>
       
-        <h3>Shared nothing</h3>
+        <h3>Small pieces, loosely joined</h3>
+        
+  
+  <p>
+    Use the standard library
+<br>
+
+    Implement interfaces when you can
+<br>
+
+    Fail fast and with details
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Share nothing</h3>
         
   
   <p>
@@ -1355,11 +1410,32 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
   
       <article>
       
-        <h3>Small pieces, loosely joined</h3>
+        <h3>Concurrency primitives</h3>
         
   
   <p>
-    Controlled deviations from the standard library
+    Goroutine-per-connection
+<br>
+
+    Limit concurrency with a channel when necessary
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Measure everything</h3>
+        
+  
+  <p>
+    Macro statistics from <code>Counted</code> and <code>Timed</code>
+<br>
+
+    Micro statistics from <code>runtime/pprof</code> and `go tool pprof`
   </p>
   
 
@@ -1371,6 +1447,39 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
       <article>
       
         <h2>TODO really needs some inspiring summary</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Open-source goodness</h3>
+        
+  
+  <p>
+    <a href="https://github.com/d2fn/gopack" target="_blank">github.com/d2fn/gopack</a>
+<br>
+
+    <a href="https://github.com/mihasya/canstop" target="_blank">github.com/mihasya/canstop</a>
+<br>
+
+    <a href="https://github.com/rcrowley/goagain" target="_blank">github.com/rcrowley/goagain</a>
+<br>
+
+    <a href="https://github.com/rcrowley/go-metrics" target="_blank">github.com/rcrowley/go-metrics</a>
+<br>
+
+    <a href="https://github.com/rcrowley/go-tigertonic" target="_blank">github.com/rcrowley/go-tigertonic</a>
+<br>
+
+    <a href="https://github.com/VividCortex/johnny-deps" target="_blank">github.com/VividCortex/johnny-deps</a>
+<br>
+
+    <a href="https://github.com/VividCortex/robustly" target="_blank">github.com/VividCortex/robustly</a>
+  </p>
+  
+
       
       </article>
   
@@ -1400,13 +1509,7 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
 
   
   <p>
-    TODO CSP analogies to Hoare&#39;s syntax, when to use them, and when not to
-<br>
-
     TODO apply and applyCalmly pattern
-<br>
-
-    TODO go tool pprof
 <br>
 
     TODO error handling?
