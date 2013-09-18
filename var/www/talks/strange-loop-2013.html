@@ -1,0 +1,1447 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Patterns for scalable web services in Go</title>
+    <meta charset='utf-8'>
+    <script src='/static/slides.js'></script>
+  </head>
+
+  <body style='display: none'>
+
+    <section class='slides layout-widescreen'>
+      
+      <article>
+        <h1>Patterns for scalable web services in Go</h1>
+        
+        
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+
+          </div>
+        
+      </article>
+      
+  
+  
+      <article>
+      
+        <h2>Why the %#*@ is everyone using Go?</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Hi, I’m Richard</h3>
+        
+  
+  <p>
+    <a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a> or <a href="https://twitter.com/rcrowley" target="_blank">@rcrowley</a>
+<br>
+
+    2007 Wash U grad
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Betable</h3>
+        
+  
+  <p>
+    Gambling-as-a-service
+<br>
+
+    Licensed and regulated so game developers don’t have to be
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Scalability</h3>
+        
+  
+  <p>
+    Of human resources
+<br>
+
+    Of machine resources
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Scalability and performance</h3>
+        
+  
+  <p>
+    It&#39;s easier to scale performant systems
+<br>
+
+    Theo Schlossnagle: benchmarks are never low so they help you to understand the minimum size of a system (TODO MAYBE SUPERFLUOUS?)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Competing language choices</h3>
+        
+  
+  <p>
+    C
+<br>
+
+    C++
+<br>
+
+    Clojure
+<br>
+
+    Erlang
+<br>
+
+    Java
+<br>
+
+    Scala
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Polls</h3>
+        
+  
+  <p>
+    Who has written at least one Go program?
+<br>
+
+    Who has Go in production?
+<br>
+
+    Who has <b>only</b> Go in production?
+<br>
+
+    TODO REMOVE THIS BUT STILL SAY IT Who thinks Go has gotten too mainstream?
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Good reasons people choose Go</h3>
+        
+  
+  <p>
+    Brevity
+<br>
+
+    Static type system
+<br>
+
+    Compiles to x86, ARM, etc.
+<br>
+
+    CSP
+<br>
+
+    Thompson, Pike, Cox, Griesemer
+<br>
+
+    Google
+<br>
+
+    Brad Fitz
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Bad reasons people choose Go</h3>
+        
+  
+  <p>
+    It isn&#39;t Java
+<br>
+
+    It isn&#39;t running on the JVM
+<br>
+
+    (Guilty)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Good reasons to not choose Go</h3>
+        
+  
+  <p>
+    Your problem won&#39;t tolerate a naive garbage collector
+<br>
+
+    Library immaturity overburdens your team
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Rule #1</h3>
+        
+  
+  <p>
+    Always google it as “golang”
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Hello, world!</h3>
+        
+  
+  <div class="code"><pre>package main
+
+import &#34;fmt&#34;
+
+func main() {
+    fmt.Println(&#34;Hello, world!&#34;)
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Hello, www!</h3>
+        
+  
+  <div class="code"><pre>package main
+
+import (
+    &#34;fmt&#34;
+    &#34;net/http&#34;
+)
+
+func main() {
+    http.HandleFunc(
+        &#34;/&#34;,
+        func(w http.ResponseWriter, r *http.Request) {
+            fmt.Fprintln(w, &#34;Hello, www!&#34;)
+        },
+    )
+    http.ListenAndServe(&#34;:8080&#34;, nil)
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Go source files</h3>
+        
+  
+  <p>
+    <code>package</code> declaration
+<br>
+
+    <code>import</code> statements
+<br>
+
+    Top level declarations:
+<br>
+
+    <code>const</code>, <code>func</code>, <code>type</code>, <code>var</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Exports</h3>
+        
+  
+  <p>
+    <code>type a</code> is visible to all files in a package
+<br>
+
+    <code>type b</code> is not exported beyond its declaring package, <code>p</code>
+<br>
+
+    <code>type C</code> is visible to packages that import <code>p</code>
+<br>
+
+    Other packages must qualify <code>C</code> as <code>p.C</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Functions</h3>
+        
+  
+  <div class="code"><pre>func handler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set(&#34;Content-Type&#34;, &#34;text/plain&#34;)
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, &#34;Hello, www!&#34;)
+})</pre></div>
+  
+
+  
+  <p>
+    May be named or anonymous
+<br>
+
+    All functions are closures
+<br>
+
+    Pass-by-value
+<br>
+
+    Zero or more typed parameters
+<br>
+
+    Zero or more typed return values
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Structs</h3>
+        
+  
+  <div class="code"><pre>type handler struct {
+    counter metrics.Counter
+}
+
+type Authorization struct {
+    Username, Password string
+}</pre></div>
+  
+
+  
+  <p>
+    Structs are types
+<br>
+
+    Zero or more typed fields
+<br>
+
+    Capitalized fields are exported
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Methods</h3>
+        
+  
+  <div class="code"><pre>func (h *handler) ServeHTTP(
+    w http.ResponseWriter,
+    r *http.Request,
+) {
+    w.Header().Set(&#34;Content-Type&#34;, &#34;text/plain&#34;)
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, &#34;Hello, www!&#34;)
+    h.counter.Inc(1)
+}</pre></div>
+  
+
+  
+  <p>
+    Method receiver may be any type in the declaring package
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Interfaces</h3>
+        
+  
+  <div class="code"><pre>// In the standard library&#39;s io/io.go:
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+// In the standard library&#39;s net/http/server.go:
+type Handler interface {
+    ServeHTTP(ResponseWriter, *Request)
+}</pre></div>
+  
+
+  
+  <p>
+    Interfaces are also types
+<br>
+
+    Zero or more method signatures
+<br>
+
+    Types that implement all methods implement the interface implicitly
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>More realistic HTTP</h3>
+        
+  
+  <div class="code"><pre>func main() {
+    mux := http.NewServeMux()
+    mux.Handle(&#34;/&#34;, &amp;handler{})
+    server := &amp;http.Server{Handler: mux}
+    listener, err := net.Listen(&#34;tcp&#34;, &#34;:8080&#34;)
+    if nil != err {
+        log.Fatalln(err)
+    }
+    defer listener.Close()
+    if err := server.Serve(listener); nil != err {
+        log.Fatalln(err)
+    }
+}</pre></div>
+  
+
+  
+  <p>
+    <code>http.ServeMux</code> is another <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Under the hood</h3>
+        
+  
+  <p>
+    Raise your hand if you&#39;ve been burned by <code>BaseHTTPServer</code> or <code>WEBrick</code>
+<br>
+
+    What&#39;s <code>Serve</code> do, anyway?
+<br>
+
+    (For one thing, power <a href="http://dl.google.com" target="_blank">dl.google.com</a>)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Echo server</h3>
+        
+  
+  <div class="code"><pre>func main() {
+    listener, err := net.Listen(&#34;tcp&#34;, &#34;:1234&#34;)
+    if nil != err {
+        log.Fatalln(err)
+    }
+    defer listener.Close()
+    for {
+        conn, err := listener.Accept()
+        if nil != err {
+            log.Fatalln(err)
+        }
+        go handle(conn)
+    }
+}</pre></div>
+  
+
+  
+  <p>
+    <code>go</code> makes any function call asynchronous
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Echo server</h3>
+        
+  
+  <div class="code"><pre>func handle(conn net.Conn) {
+    defer conn.Close()
+    p := make([]byte, 4096)
+    for {
+        n, err := conn.Read(p)
+        if nil != err {
+            log.Println(conn.RemoteAddr(), err)
+            break
+        }
+        log.Printf(&#34;%v p: %s&#34;, conn.RemoteAddr(), p[:n])
+        if _, err := conn.Write(p[:n]); nil != err {
+            log.Println(conn.RemoteAddr(), err)
+            break
+        }
+    }
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Goroutine per connection</h3>
+        
+  
+  <p>
+    Many goroutines are scheduled onto <code>GOMAXPROCS</code> operating system threads
+<br>
+
+    Cheap enough to not worry about pooling
+<br>
+
+    This is how the standard library HTTP server works, too
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>CSP</h3>
+        
+  
+  <p>
+    Tony Hoare’s <i>Communicating Sequential Processes</i> in CACM volume 21 issue 8
+<br>
+
+    “Do not communicate by sharing memory; instead, share memory by communicating.”
+<br>
+
+    TODO Useful for connection handling, critical sections, and pooled operations
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Channels</h3>
+        
+  
+  <div class="code"><pre>ch := make(chan int) // unbuffered
+ch := make(chan int, 1) // buffer length of 1
+ch &lt;- 47 // send
+&lt;-ch // receive</pre></div>
+  
+
+  
+  <p>
+    Buffered (synchronous) or unbuffered (asynchronous + backpressure)
+<br>
+
+    Concurrent send and receive operations
+<br>
+
+    <a href="http://rcrowley.org/2013/04/19/golang-ack-test.html" target="_blank">Faster than mutexes</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>CSP in Go</h3>
+        
+  
+  <div class="code"><pre>cardimage := &lt;-cardreader // cardreader?cardimage
+
+lineprinter &lt;- lineimage  // lineprinter!lineimage
+
+if c, ok := &lt;-west; ok {  // *[c:character;
+    east &lt;- c             //   west?c -&gt; east!c]
+} else {                  //
+    close(east)           //
+}                         //</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>CSP in Go</h3>
+        
+  
+  <div class="code"><pre>select {                  // *[(i:1..10)continue(i);
+case in &lt;- ch0:           //   console(i)?c -&gt;
+    X &lt;- x{0, in.c}       //   X!(i, c);
+    in.ch &lt;- ACK          //   console(i)!ack();
+    if SIGN_OFF == in.c { //   continue(i) := (c != sign off)]
+        ch0 = nil         //
+    }                     //
+// ...                    //
+default:                  //
+    return                //
+}                         //</pre></div>
+  
+
+  
+  <p>
+    Go <code>select</code> statement requires explicit cases
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Beware using CSP in OLTP</h3>
+        
+  
+  <p>
+    TODO
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Graceful stop</h3>
+        
+  
+  <p>
+    The least surprising opportunity to screw things up
+<br>
+
+    <code>http</code> package is annoyingly unhelpful
+<br>
+
+    Not being addressed in Go 1.2
+<br>
+
+    <code>canstop</code> for non-HTTP network services
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Clumsy stop for HTTP</h3>
+        
+  
+  <div class="code"><pre>TODO func main</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Zero-downtime restart</h3>
+        
+  
+  <p>
+    Follows from graceful stop
+<br>
+
+    TODO <code>goagain</code>
+<br>
+
+    Difficult to supervise; <code>systemd</code> &gt; Upstart
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Zero-downtime restart for HTTP</h3>
+        
+  
+  <div class="code"><pre>TODO func main</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Higher-level frameworks</h3>
+        
+  
+  <p>
+    Gorilla, Revel: more ambitious and all-knowing; appropriate for web applications
+<br>
+
+    <code>gorest</code>: hides a lot in struct tags
+<br>
+
+    <code>pat</code>: unopinionated but leaves most concerns unaddressed
+<br>
+
+    Many others we can talk about over beers
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Tiger Tonic</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Tiger Tonic</h3>
+        
+  
+  <p>
+    Newly open-source!
+<br>
+
+    How Betable builds web services in Go
+<br>
+
+    <a href="https://github.com/rcrowley/go-tigertonic" target="_blank">github.com/rcrowley/go-tigertonic</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Goals for human scalability (TODO MOVE?)</h3>
+        
+  
+  <p>
+    Do boring things for me
+<br>
+
+    Speak JSON by default
+<br>
+
+    Any old <code>http.Handler</code> can still fit in
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Goals for machine scalability (TODO MOVE?)</h3>
+        
+  
+  <p>
+    Share nothing at macro and micro levels
+<br>
+
+    Use the best parts of the standard library
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Routing</h3>
+        
+  
+  <div class="code"><pre>mux := http.NewServeMux()
+mux.Handle(&#34;/&#34;, &amp;handler{})</pre></div>
+  
+
+  
+  <p>
+    <code>http.ServeMux</code> only routes prefixes
+  </p>
+  
+
+  
+  <div class="code"><pre>mux := tigertonic.NewTrieServeMux()
+mux.Handle(&#34;GET&#34;, &#34;/foo/{bar}/baz&#34;, &amp;handler{})</pre></div>
+  
+
+  
+  <p>
+    <code>tigertonic.TrieServeMux</code> is method- and wildcard-aware
+<br>
+
+    Responds 404 and 405 appropriately
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>JSON</h3>
+        
+  
+  <div class="code"><pre>func handler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set(&#34;Content-Type&#34;, &#34;application/json&#34;)
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(/* anything */)
+}</pre></div>
+  
+
+  
+  <p>
+    <code>json.Encoder</code> wraps an <code>io.Writer</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>JSON in Tiger Tonic</h3>
+        
+  
+  <div class="code"><pre>handler := tigertonic.Marshaled(func(
+    url.URL,
+    http.Header,
+    interface{}
+) (int, http.Header, *MyResponse, error) {
+    return http.StatusOK, &amp;MyResponse{/* anything */}, nil
+})</pre></div>
+  
+
+  
+  <p>
+    Responds 400, 406, and 415 appropriately
+<br>
+
+    Responds with JSON in case of error, too
+<br>
+
+    Still an <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Middleware chains</h3>
+        
+  
+  <div class="code"><pre>handler = tigertonic.First(
+    http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        if &#34;&#34; == r.Header.Get(&#34;X-Condition&#34;) {
+            w.WriteHeader(http.StatusForbidden)
+            json.NewEncoder(w).Encode(&#34;forbidden&#34;)
+        }
+    }),
+    handler, // from the previous slide
+)</pre></div>
+  
+
+  
+  <p>
+    <code>First</code> stops at the first handler to call <code>w.WriteHeader</code>
+<br>
+
+    Also an <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Conditionals</h3>
+        
+  
+  <div class="code"><pre>handler = tigertonic.If(
+    func(r *http.Request) (http.Header, error) {
+        if &#34;&#34; == r.Header.Get(&#34;X-Condition&#34;) {
+            return nil, Forbidden{errors.New(&#34;forbidden&#34;)}
+        }
+        return nil, nil
+    }),
+    handler, // from two slides ago
+)</pre></div>
+  
+
+  
+  <p>
+    <code>If</code> more naturally wraps any <code>http.Handler</code>
+<br>
+
+    And yes, it&#39;s an <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>HTTP Basic auth</h3>
+        
+  
+  <div class="code"><pre>handler = tigertonic.HTTPBasicAuth(
+    map[string]string{
+        &#34;username&#34;: &#34;password&#34;,
+    },
+    &#34;Tiger Tonic&#34;,
+    handler, // from three slides ago
+)</pre></div>
+  
+
+  
+  <p>
+    <code>HTTPBasicAuth</code> is a special-case of <code>If</code>
+<br>
+
+    And a very normal <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Visibility</h3>
+        
+  
+  <p>
+    Logging via the standard library
+<br>
+
+    Metric collection via <code>go-metrics</code>
+<br>
+
+    <code>http.Handler</code> all the way down
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Logging</h3>
+        
+  
+  <div class="code"><pre>handler = tigertonic.Logged(handler, nil)</pre></div>
+  
+
+  
+  <p>
+    <code>tigertonic.Logged</code> for full (optionally redacted) request and response logs
+  </p>
+  
+
+  
+  <div class="code"><pre>handler = tigertonic.ApacheLogged(handler)</pre></div>
+  
+
+  
+  <p>
+    <code>tigertonic.ApacheLogged</code> for Apache combined logs
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Metrics</h3>
+        
+  
+  <div class="code"><pre>handler = tigertonic.Counted(handler, &#34;my-handler&#34;, nil)
+handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
+  
+
+  
+  <p>
+    <code>tigertonic.Counted</code> and <code>tigertonic.Timed</code> for knowing how many and how fast
+<br>
+
+    We mostly use <code>tigertonic.Timed</code> on each route individually
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Other batteries included</h3>
+        
+  
+  <p>
+    CORS basics
+<br>
+
+    Strongly-typed per-request context
+<br>
+
+    TLS
+<br>
+
+    URL namespaces
+<br>
+
+    Virtual hostnames
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Batteries not included</h3>
+        
+  
+  <p>
+    ORM
+<br>
+
+    In fact, database niceties of any kind
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Testing</h3>
+        
+  
+  <p>
+    TODO call ServeHTTP
+<br>
+
+    TODO tigertonic/mocking
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Deployment</h3>
+        
+  
+  <p>
+    Almost-static binaries make it easy
+<br>
+
+    Just <code>scp</code> the binary
+<br>
+
+    Single-file Debian packages
+<br>
+
+    We <code>git push</code> and build in a
+<br>
+
+    <code>post-receive</code> hook
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Dependency hell</h3>
+        
+  
+  <p>
+    <code>go get</code> tool invites you right in
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Dependency purgatory</h3>
+        
+  
+  <p>
+    Go-specific solutions:
+<br>
+
+    <code>go-pack</code> and <code>johnny-deps</code>
+<br>
+
+    <code>git-submodule</code> is perfectly fine
+<br>
+
+    Google vendors third-party code
+<br>
+
+    We vendor third-party code as part of CI
+<br>
+
+    One <code>GOPATH</code> in development
+<br>
+
+    <code>GOPATH</code> per service in production
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Reverse proxy</h3>
+        
+  
+  <p>
+    TLS termination in Tiger Tonic
+<br>
+
+    No crypto to block Nginx event loop
+<br>
+
+    One fewer hops means lower latency
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>TLS in Go</h3>
+        
+  
+  <p>
+    Always use <code>net.Conn</code> and <code>net.Listener</code> interfaces to serve either TLS and non-TLS
+<br>
+
+    Replace <code>crypto/tls</code> package with <code>openssl</code> binding as an optimization
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Waste not</h3>
+        
+  
+  <p>
+    Favor local variables that don&#39;t &#34;escape&#34;
+<br>
+
+    Reuse buffers and other medium-term data structures
+<br>
+
+    Small heap means fast GC
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Shared nothing</h3>
+        
+  
+  <p>
+    Accepted in the large
+<br>
+
+    Holds just as true in the small within a Go process
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Small pieces, loosely joined</h3>
+        
+  
+  <p>
+    Controlled deviations from the standard library
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>TODO really needs some inspiring summary</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>A word from my sponsors</h3>
+        
+  
+  <p>
+    <a href="mailto:jobs@betable.com" target="_blank">jobs@betable.com</a>
+  </p>
+  
+
+  
+  <p>
+    TODO s/&#39;/’/gc
+<br>
+
+    TODO s/&#34;/“/gc
+<br>
+
+    TODO s/&#34;/”/gc
+  </p>
+  
+
+  
+  <p>
+    TODO CSP analogies to Hoare&#39;s syntax, when to use them, and when not to
+<br>
+
+    TODO apply and applyCalmly pattern
+<br>
+
+    TODO go tool pprof
+<br>
+
+    TODO error handling?
+<br>
+
+    TODO the last page of my notes might be good summary fodder
+  </p>
+  
+
+      
+      </article>
+  
+  
+
+      <article>
+        <h3>Thank you</h1>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+  
+  <p>
+    Betable operations
+  </p>
+  
+<p class="link"><a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a></p><p class="link"><a href="#ZgotmplZ" target="_blank"><a href="http://rcrowley.org/talks/strange-loop-2013.html" target="_blank">rcrowley.org/talks/strange-loop-2013.html</a></a></p><p class="link"><a href="http://twitter.com/rcrowley" target="_blank">@rcrowley</a></p>
+          </div>
+        
+      </article>
+
+  </body>
+  
+</html>

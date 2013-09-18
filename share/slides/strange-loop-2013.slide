@@ -1,0 +1,528 @@
+Patterns for scalable web services in Go
+
+Richard Crowley
+Betable operations
+r@rcrowley.org
+[[http://rcrowley.org/talks/strange-loop-2013.html]]
+@rcrowley
+
+* Why the %#*@ is everyone using Go?
+
+* Hi, I’m Richard
+
+[[mailto:r@rcrowley.org]] or [[https://twitter.com/rcrowley][@rcrowley]]
+2007 Wash U grad
+
+* Betable
+
+Gambling-as-a-service
+Licensed and regulated so game developers don’t have to be
+
+* Scalability
+
+Of human resources
+Of machine resources
+
+* Scalability and performance
+
+It's easier to scale performant systems
+Theo Schlossnagle: benchmarks are never low so they help you to understand the minimum size of a system (TODO MAYBE SUPERFLUOUS?)
+
+* Competing language choices
+
+C
+C++
+Clojure
+Erlang
+Java
+Scala
+
+* Polls
+
+Who has written at least one Go program?
+Who has Go in production?
+Who has *only* Go in production?
+TODO REMOVE THIS BUT STILL SAY IT Who thinks Go has gotten too mainstream?
+
+* Good reasons people choose Go
+
+Brevity
+Static type system
+Compiles to x86, ARM, etc.
+CSP
+Thompson, Pike, Cox, Griesemer
+Google
+Brad Fitz
+
+* Bad reasons people choose Go
+
+It isn't Java
+It isn't running on the JVM
+(Guilty)
+
+* Good reasons to not choose Go
+
+Your problem won't tolerate a naive garbage collector
+Library immaturity overburdens your team
+
+* Rule #1
+
+Always google it as “golang”
+
+* Hello, world!
+
+    package main
+
+    import "fmt"
+
+    func main() {
+        fmt.Println("Hello, world!")
+    }
+
+* Hello, www!
+
+    package main
+
+    import (
+        "fmt"
+        "net/http"
+    )
+
+    func main() {
+        http.HandleFunc(
+            "/",
+            func(w http.ResponseWriter, r *http.Request) {
+                fmt.Fprintln(w, "Hello, www!")
+            },
+        )
+        http.ListenAndServe(":8080", nil)
+    }
+
+* Go source files
+
+`package` declaration
+`import` statements
+Top level declarations:
+`const`, `func`, `type`, `var`
+
+* Exports
+
+`type`a` is visible to all files in a package
+`type`b` is not exported beyond its declaring package, `p`
+`type`C` is visible to packages that import `p`
+Other packages must qualify `C` as `p.C`
+
+* Functions
+
+    func handler(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "text/plain")
+        w.WriteHeader(http.StatusOK)
+        fmt.Fprintln(w, "Hello, www!")
+    })
+
+May be named or anonymous
+All functions are closures
+Pass-by-value
+Zero or more typed parameters
+Zero or more typed return values
+
+* Structs
+
+    type handler struct {
+        counter metrics.Counter
+    }
+
+    type Authorization struct {
+        Username, Password string
+    }
+
+Structs are types
+Zero or more typed fields
+Capitalized fields are exported
+
+* Methods
+
+    func (h *handler) ServeHTTP(
+        w http.ResponseWriter,
+        r *http.Request,
+    ) {
+        w.Header().Set("Content-Type", "text/plain")
+        w.WriteHeader(http.StatusOK)
+        fmt.Fprintln(w, "Hello, www!")
+        h.counter.Inc(1)
+    }
+
+Method receiver may be any type in the declaring package
+
+* Interfaces
+
+    // In the standard library's io/io.go:
+    type Reader interface {
+        Read(p []byte) (n int, err error)
+    }
+
+    // In the standard library's net/http/server.go:
+    type Handler interface {
+        ServeHTTP(ResponseWriter, *Request)
+    }
+
+Interfaces are also types
+Zero or more method signatures
+Types that implement all methods implement the interface implicitly
+
+* More realistic HTTP
+
+    func main() {
+        mux := http.NewServeMux()
+        mux.Handle("/", &handler{})
+        server := &http.Server{Handler: mux}
+        listener, err := net.Listen("tcp", ":8080")
+        if nil != err {
+            log.Fatalln(err)
+        }
+        defer listener.Close()
+        if err := server.Serve(listener); nil != err {
+            log.Fatalln(err)
+        }
+    }
+
+`http.ServeMux` is another `http.Handler`
+
+* Under the hood
+
+Raise your hand if you've been burned by `BaseHTTPServer` or `WEBrick`
+What's `Serve` do, anyway?
+(For one thing, power [[http://dl.google.com]])
+
+* Echo server
+
+    func main() {
+        listener, err := net.Listen("tcp", ":1234")
+        if nil != err {
+            log.Fatalln(err)
+        }
+        defer listener.Close()
+        for {
+            conn, err := listener.Accept()
+            if nil != err {
+                log.Fatalln(err)
+            }
+            go handle(conn)
+        }
+    }
+
+`go` makes any function call asynchronous
+
+* Echo server
+
+    func handle(conn net.Conn) {
+        defer conn.Close()
+        p := make([]byte, 4096)
+        for {
+            n, err := conn.Read(p)
+            if nil != err {
+                log.Println(conn.RemoteAddr(), err)
+                break
+            }
+            log.Printf("%v p: %s", conn.RemoteAddr(), p[:n])
+            if _, err := conn.Write(p[:n]); nil != err {
+                log.Println(conn.RemoteAddr(), err)
+                break
+            }
+        }
+    }
+
+* Goroutine per connection
+
+Many goroutines are scheduled onto `GOMAXPROCS` operating system threads
+Cheap enough to not worry about pooling
+This is how the standard library HTTP server works, too
+
+* CSP
+
+Tony Hoare’s _Communicating_Sequential_Processes_ in CACM volume 21 issue 8
+“Do not communicate by sharing memory; instead, share memory by communicating.”
+TODO Useful for connection handling, critical sections, and pooled operations
+
+* Channels
+
+    ch := make(chan int) // unbuffered
+    ch := make(chan int, 1) // buffer length of 1
+    ch <- 47 // send
+    <-ch // receive
+
+Buffered (synchronous) or unbuffered (asynchronous + backpressure)
+Concurrent send and receive operations
+[[http://rcrowley.org/2013/04/19/golang-ack-test.html][Faster than mutexes]]
+
+* CSP in Go
+
+    cardimage := <-cardreader // cardreader?cardimage
+
+    lineprinter <- lineimage  // lineprinter!lineimage
+
+    if c, ok := <-west; ok {  // *[c:character;
+        east <- c             //   west?c -> east!c]
+    } else {                  //
+        close(east)           //
+    }                         //
+
+* CSP in Go
+
+    select {                  // *[(i:1..10)continue(i);
+    case in <- ch0:           //   console(i)?c ->
+        X <- x{0, in.c}       //   X!(i, c);
+        in.ch <- ACK          //   console(i)!ack();
+        if SIGN_OFF == in.c { //   continue(i) := (c != sign off)]
+            ch0 = nil         //
+        }                     //
+    // ...                    //
+    default:                  //
+        return                //
+    }                         //
+
+Go `select` statement requires explicit cases
+
+* Beware using CSP in OLTP
+
+TODO
+
+* Graceful stop
+
+The least surprising opportunity to screw things up
+`http` package is annoyingly unhelpful
+Not being addressed in Go 1.2
+`canstop` for non-HTTP network services
+
+* Clumsy stop for HTTP
+
+    TODO func main
+
+* Zero-downtime restart
+
+Follows from graceful stop
+TODO `goagain`
+Difficult to supervise; `systemd` > Upstart
+
+* Zero-downtime restart for HTTP
+
+    TODO func main
+
+* Higher-level frameworks
+
+Gorilla, Revel: more ambitious and all-knowing; appropriate for web applications
+`gorest`: hides a lot in struct tags
+`pat`: unopinionated but leaves most concerns unaddressed
+Many others we can talk about over beers
+
+* Tiger Tonic
+
+* Tiger Tonic
+
+Newly open-source!
+How Betable builds web services in Go
+[[https://github.com/rcrowley/go-tigertonic]]
+
+* Goals for human scalability (TODO MOVE?)
+
+Do boring things for me
+Speak JSON by default
+Any old `http.Handler` can still fit in
+
+* Goals for machine scalability (TODO MOVE?)
+
+Share nothing at macro and micro levels
+Use the best parts of the standard library
+
+* Routing
+
+    mux := http.NewServeMux()
+    mux.Handle("/", &handler{})
+
+`http.ServeMux` only routes prefixes
+
+    mux := tigertonic.NewTrieServeMux()
+    mux.Handle("GET", "/foo/{bar}/baz", &handler{})
+
+`tigertonic.TrieServeMux` is method- and wildcard-aware
+Responds 404 and 405 appropriately
+
+* JSON
+
+    func handler(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        json.NewEncoder(w).Encode(/* anything */)
+    }
+
+`json.Encoder` wraps an `io.Writer`
+
+* JSON in Tiger Tonic
+
+    handler := tigertonic.Marshaled(func(
+        url.URL,
+        http.Header,
+        interface{}
+    ) (int, http.Header, *MyResponse, error) {
+        return http.StatusOK, &MyResponse{/* anything */}, nil
+    })
+
+Responds 400, 406, and 415 appropriately
+Responds with JSON in case of error, too
+Still an `http.Handler`
+
+* Middleware chains
+
+    handler = tigertonic.First(
+        http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+            if "" == r.Header.Get("X-Condition") {
+                w.WriteHeader(http.StatusForbidden)
+                json.NewEncoder(w).Encode("forbidden")
+            }
+        }),
+        handler, // from the previous slide
+    )
+
+`First` stops at the first handler to call `w.WriteHeader`
+Also an `http.Handler`
+
+* Conditionals
+
+    handler = tigertonic.If(
+        func(r *http.Request) (http.Header, error) {
+            if "" == r.Header.Get("X-Condition") {
+                return nil, Forbidden{errors.New("forbidden")}
+            }
+            return nil, nil
+        }),
+        handler, // from two slides ago
+    )
+
+`If` more naturally wraps any `http.Handler`
+And yes, it's an `http.Handler`
+
+* HTTP Basic auth
+
+    handler = tigertonic.HTTPBasicAuth(
+        map[string]string{
+            "username": "password",
+        },
+        "Tiger Tonic",
+        handler, // from three slides ago
+    )
+
+`HTTPBasicAuth` is a special-case of `If`
+And a very normal `http.Handler`
+
+* Visibility
+
+Logging via the standard library
+Metric collection via `go-metrics`
+`http.Handler` all the way down
+
+* Logging
+
+    handler = tigertonic.Logged(handler, nil)
+
+`tigertonic.Logged` for full (optionally redacted) request and response logs
+
+    handler = tigertonic.ApacheLogged(handler)
+
+`tigertonic.ApacheLogged` for Apache combined logs
+
+* Metrics
+
+    handler = tigertonic.Counted(handler, "my-handler", nil)
+    handler = tigertonic.Timed(handler, "my-handler", nil)
+
+`tigertonic.Counted` and `tigertonic.Timed` for knowing how many and how fast
+We mostly use `tigertonic.Timed` on each route individually
+
+* Other batteries included
+
+CORS basics
+Strongly-typed per-request context
+TLS
+URL namespaces
+Virtual hostnames
+
+* Batteries not included
+
+ORM
+In fact, database niceties of any kind
+
+* Testing
+
+TODO call ServeHTTP
+TODO tigertonic/mocking
+
+* Deployment
+
+Almost-static binaries make it easy
+Just `scp` the binary
+Single-file Debian packages
+We `git`push` and build in a
+`post-receive` hook
+
+* Dependency hell
+
+`go`get` tool invites you right in
+
+* Dependency purgatory
+
+Go-specific solutions:
+`go-pack` and `johnny-deps`
+`git-submodule` is perfectly fine
+Google vendors third-party code
+We vendor third-party code as part of CI
+One `GOPATH` in development
+`GOPATH` per service in production
+
+* Reverse proxy
+
+TLS termination in Tiger Tonic
+No crypto to block Nginx event loop
+One fewer hops means lower latency
+
+* TLS in Go
+
+Always use `net.Conn` and `net.Listener` interfaces to serve either TLS and non-TLS
+Replace `crypto/tls` package with `openssl` binding as an optimization
+
+* Waste not
+
+Favor local variables that don't "escape"
+Reuse buffers and other medium-term data structures
+Small heap means fast GC
+
+* Shared nothing
+
+Accepted in the large
+Holds just as true in the small within a Go process
+
+* Small pieces, loosely joined
+
+Controlled deviations from the standard library
+
+
+
+
+
+* TODO really needs some inspiring summary
+
+
+
+
+* A word from my sponsors
+
+[[mailto:jobs@betable.com]]
+
+TODO s/'/’/gc
+TODO s/"/“/gc
+TODO s/"/”/gc
+
+TODO CSP analogies to Hoare's syntax, when to use them, and when not to
+TODO apply and applyCalmly pattern
+TODO go tool pprof
+TODO error handling?
+TODO the last page of my notes might be good summary fodder
