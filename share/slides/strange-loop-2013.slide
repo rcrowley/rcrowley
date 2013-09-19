@@ -21,15 +21,6 @@ Licensed and regulated so game developers don’t have to be
 Of human resources
 Of machine resources
 
-* Competing language choices
-
-C
-C++
-Clojure
-Erlang
-Java
-Scala
-
 * Polls
 
 Who has written at least one Go program?
@@ -94,6 +85,17 @@ All functions are closures
 Zero or more typed parameters
 Parameters are pass-by-value
 Zero or more typed return values
+
+* Errors
+
+    func fail() error { return errors.New("fail") }
+    func multifail() (*Win, error) {
+        return nil, errors.New("multifail")
+    }
+
+Conventionally return an `error` last
+There are no exceptions because errors are not exceptional
+Use `error` to communicate what happened to the caller
 
 * Structs
 

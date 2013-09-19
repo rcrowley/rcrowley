@@ -92,36 +92,6 @@
   
       <article>
       
-        <h3>Competing language choices</h3>
-        
-  
-  <p>
-    C
-<br>
-
-    C++
-<br>
-
-    Clojure
-<br>
-
-    Erlang
-<br>
-
-    Java
-<br>
-
-    Scala
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
         <h3>Polls</h3>
         
   
@@ -286,6 +256,34 @@ func main() {
 <br>
 
     Zero or more typed return values
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Errors</h3>
+        
+  
+  <div class="code"><pre>func fail() error { return errors.New(&#34;fail&#34;) }
+func multifail() (*Win, error) {
+    return nil, errors.New(&#34;multifail&#34;)
+}</pre></div>
+  
+
+  
+  <p>
+    Conventionally return an <code>error</code> last
+<br>
+
+    There are no exceptions because errors are not exceptional
+<br>
+
+    Use <code>error</code> to communicate what happened to the caller
   </p>
   
 
