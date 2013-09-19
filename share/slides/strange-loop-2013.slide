@@ -451,7 +451,10 @@ Limit concurrency when necessary: one channel, _m_ senders, and _n_ receivers
 Macro statistics from `Counted` and `Timed`
 Micro statistics from `runtime/pprof` and `go`tool`pprof`
 
-* TODO really needs some inspiring summary
+* Parting advice
+
+Beware the novel features for boring tasks
+Use the work-a-day features to great effect
 
 * Open-source goodness
 
@@ -464,9 +467,3 @@ Micro statistics from `runtime/pprof` and `go`tool`pprof`
 * A word from my sponsors
 
 [[mailto:jobs@betable.com]]
-
-TODO s/'/’/gc
-TODO s/"/“/gc
-TODO s/"/”/gc
-
-TODO the last page of my notes might be good summary fodder
