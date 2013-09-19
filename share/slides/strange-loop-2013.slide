@@ -6,8 +6,6 @@ r@rcrowley.org
 [[http://rcrowley.org/talks/strange-loop-2013.html]]
 @rcrowley
 
-* Why the %#*@ is everyone using Go?
-
 * Hi, I’m Richard
 
 [[mailto:r@rcrowley.org]] or [[https://twitter.com/rcrowley][@rcrowley]]
@@ -22,10 +20,6 @@ Licensed and regulated so game developers don’t have to be
 
 Of human resources
 Of machine resources
-
-* Scalability and performance
-
-It’s easier to scale performant systems
 
 * Competing language choices
 
@@ -54,7 +48,6 @@ Brad Fitz
 
 * Bad reasons people choose Go
 
-Google
 It isn’t Java
 It isn’t running on the JVM
 (Guilty)
@@ -67,16 +60,6 @@ Library immaturity overburdens your team
 * Rule #1
 
 Always google it as “golang”
-
-* Hello, world!
-
-    package main
-
-    import "fmt"
-
-    func main() {
-        fmt.Println("Hello, world!")
-    }
 
 * Hello, www!
 
@@ -97,13 +80,7 @@ Always google it as “golang”
         http.ListenAndServe(":8080", nil)
     }
 
-* Exports
-
-All about capitalization
-`type`a` is visible to all files in a package
-`type`b` is not exported beyond its declaring package, `p`
-`type`C` is visible to packages that import `p`
-Other packages must qualify `C` as `p.C`
+“Hello, world!” is too easy
 
 * Functions
 
@@ -173,7 +150,6 @@ Types that implement all methods implement the interface implicitly
         if nil != err {
             log.Fatalln(err)
         }
-        defer listener.Close()
         if err := server.Serve(listener); nil != err {
             log.Fatalln(err)
         }
@@ -194,7 +170,6 @@ What’s `Serve` do, anyway?
         if nil != err {
             log.Fatalln(err)
         }
-        defer listener.Close()
         for {
             conn, err := listener.Accept()
             if nil != err {
@@ -256,34 +231,6 @@ Concurrent send and receive operations
 [[http://rcrowley.org/2013/04/19/golang-ack-test.html][Faster than mutexes]]
 Hoare’s “Input and Output Commands”
 
-* CSP in Go
-
-    cardimage := <-cardreader // cardreader?cardimage
-
-    lineprinter <- lineimage  // lineprinter!lineimage
-
-    if c, ok := <-west; ok {  // *[c:character;
-        east <- c             //   west?c -> east!c]
-    } else {                  //
-        close(east)           //
-    }                         //
-
-* CSP in Go
-
-    select {                  // *[(i:1..10)continue(i);
-    case in <- ch0:           //   console(i)?c ->
-        X <- x{0, in.c}       //   X!(i, c);
-        in.ch <- ACK          //   console(i)!ack();
-        if SIGN_OFF == in.c { //   continue(i) := (c != sign off)]
-            ch0 = nil         //
-        }                     //
-    // ...                    //
-    default:                  //
-        return                //
-    }                         //
-
-`select` statement requires explicit cases
-
 * Beware CSP in OLTP
 
 Sacrificing shared nothing in the small precludes diagonal scaling
@@ -293,8 +240,7 @@ Non-empty channel buffers are an opportunity for data loss
 
 The least surprising opportunity to screw things up
 `http` package is annoyingly unhelpful
-Not being addressed in Go 1.2
-`canstop` for non-HTTP network services
+Not being addressed in Go 1.2 so we take matters into our own hands
 
 * Clumsy stop for HTTP
 
@@ -311,7 +257,7 @@ Not being addressed in Go 1.2
         go server.Serve(listener)
         log.Println(<-ch)
         listener.Close()
-        time.Sleep(60e9)
+        time.Sleep(60e9) // FIXME!
     }
 
 * Zero-downtime restart
@@ -328,7 +274,7 @@ Not being addressed in Go 1.2
         }
         goagain.AwaitSignals(listener)
         listener.Close()
-        time.Sleep(60e9)
+        time.Sleep(60e9) // FIXME!
     }
 
 `goagain` handles `SIGUSR2`
@@ -365,24 +311,14 @@ Responds 404 and 405 appropriately
 
 * JSON
 
-    func handler(w http.ResponseWriter, r *http.Request) {
-        w.Header().Set("Content-Type", "application/json")
-        w.WriteHeader(http.StatusOK)
-        json.NewEncoder(w).Encode(/* anything */)
-    }
-
-`json.Encoder` wraps an `io.Writer`
-
-* JSON in Tiger Tonic
-
     var handler http.Handler = tigertonic.Marshaled(func(
-        url.URL,
-        http.Header,
-        interface{}
+        url.URL, http.Header, *MyRequest,
     ) (int, http.Header, *MyResponse, error) {
         return http.StatusOK, &MyResponse{/* anything */}, nil
     })
 
+Static request and response types
+No hassling with `json.Encoder`
 Responds 400, 406, and 415 appropriately
 Responds with JSON in case of error, too
 Still an `http.Handler`
@@ -394,28 +330,13 @@ Still an `http.Handler`
         reflect.New(m.v.Type().In(2).Elem()),
     })
 
-User code expects and receives static types
+User code deals only with static types
 
-	if !t.Out(2).Implements(reflect.TypeOf((*Response)(nil)).Elem()) {
-		panic("type ... was %v, not Response", t.Out(2))
-	}
+    if !t.Out(2).Implements(reflect.TypeOf((*Response)(nil)).Elem()) {
+        panic("type ... was %v, not Response", t.Out(2))
+    }
 
-Early runtime enforces fuzzy interfaces
-
-* Middleware chains
-
-    handler = tigertonic.First(
-        http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-            if "" == r.Header.Get("X-Condition") {
-                w.WriteHeader(http.StatusForbidden)
-                json.NewEncoder(w).Encode("forbidden")
-            }
-        }),
-        handler, // from the previous slide
-    )
-
-`First` stops at the first handler to call `w.WriteHeader`
-Also an `http.Handler`
+Runtime enforces fuzzy interfaces
 
 * Conditionals
 
@@ -429,21 +350,9 @@ Also an `http.Handler`
         handler, // from two slides ago
     )
 
-`If` more naturally wraps any `http.Handler`
+`If` naturally wraps any `http.Handler`
+Special case of `First` middleware chains
 And yes, it’s an `http.Handler`
-
-* HTTP Basic auth
-
-    handler = tigertonic.HTTPBasicAuth(
-        map[string]string{
-            "username": "password",
-        },
-        "Tiger Tonic",
-        handler, // from three slides ago
-    )
-
-`HTTPBasicAuth` is a special-case of `If`
-And a very normal `http.Handler`
 
 * Visibility
 
@@ -471,31 +380,20 @@ We mostly use `tigertonic.Timed` on each route individually
 
 * Other batteries included
 
-CORS basics
 Strongly-typed per-request context
-TLS
+Middleware chains
 URL namespaces
 Virtual hostnames
-
-* Batteries not included
-
-ORM
-In fact, database niceties of any kind
+HTTP Basic auth
+CORS basics
+TLS
 
 * Testing
 
 Construct a fake `http.Request`
-Construct a fake `url.URL` via `tigertonic/mocking`
-Call `ServeHTTP` with a `httptest.ResponseRecorder`
+Call `ServeHTTP`
+Use `httptest.ResponseRecorder`
 Call your `Marshaled` function directly
-
-* Deployment
-
-Almost-static binaries make it easy
-Just `scp` the binary
-Single-file Debian packages
-We `git`push` and build in a
-`post-receive` hook
 
 * Dependency hell
 
@@ -508,8 +406,6 @@ Go-specific solutions:
 `git-submodule` is perfectly fine
 Google vendors third-party code
 We vendor third-party code as part of CI
-One `GOPATH` in development
-`GOPATH` per service in production
 
 * Reverse proxy
 
@@ -518,6 +414,12 @@ No crypto to block Nginx event loop
 One fewer hops means lower latency
 
 * TLS in Go
+
+    c, _ := tls.LoadX509KeyPair(certPathname, keyPathname)
+    listener, err := tls.Listen("tcp", ":4443", &tls.Config{
+        Certificates: []tls.Certificate{c},
+        CipherSuites: []uint16{tls.TLS_RSA_WITH_RC4_128_SHA},
+    })
 
 Always use `net.Conn` and `net.Listener` interfaces to serve either TLS and non-TLS
 Replace `crypto/tls` package with `openssl` binding as an optimization
@@ -554,12 +456,10 @@ Micro statistics from `runtime/pprof` and `go`tool`pprof`
 * Open-source goodness
 
 [[https://github.com/d2fn/gopack]]
-[[https://github.com/mihasya/canstop]]
 [[https://github.com/rcrowley/goagain]]
 [[https://github.com/rcrowley/go-metrics]]
 [[https://github.com/rcrowley/go-tigertonic]]
 [[https://github.com/VividCortex/johnny-deps]]
-[[https://github.com/VividCortex/robustly]]
 
 * A word from my sponsors
 
@@ -569,6 +469,4 @@ TODO s/'/’/gc
 TODO s/"/“/gc
 TODO s/"/”/gc
 
-TODO apply and applyCalmly pattern
-TODO error handling?
 TODO the last page of my notes might be good summary fodder

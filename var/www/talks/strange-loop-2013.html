@@ -38,14 +38,6 @@
   
       <article>
       
-        <h2>Why the %#*@ is everyone using Go?</h2>
-      
-      </article>
-  
-  
-  
-      <article>
-      
         <h3>Hi, I’m Richard</h3>
         
   
@@ -90,21 +82,6 @@
 <br>
 
     Of machine resources
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Scalability and performance</h3>
-        
-  
-  <p>
-    It’s easier to scale performant systems
   </p>
   
 
@@ -203,9 +180,6 @@
         
   
   <p>
-    Google
-<br>
-
     It isn’t Java
 <br>
 
@@ -256,25 +230,6 @@
   
       <article>
       
-        <h3>Hello, world!</h3>
-        
-  
-  <div class="code"><pre>package main
-
-import &#34;fmt&#34;
-
-func main() {
-    fmt.Println(&#34;Hello, world!&#34;)
-}</pre></div>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
         <h3>Hello, www!</h3>
         
   
@@ -296,30 +251,9 @@ func main() {
 }</pre></div>
   
 
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Exports</h3>
-        
   
   <p>
-    All about capitalization
-<br>
-
-    <code>type a</code> is visible to all files in a package
-<br>
-
-    <code>type b</code> is not exported beyond its declaring package, <code>p</code>
-<br>
-
-    <code>type C</code> is visible to packages that import <code>p</code>
-<br>
-
-    Other packages must qualify <code>C</code> as <code>p.C</code>
+    “Hello, world!” is too easy
   </p>
   
 
@@ -467,7 +401,6 @@ type Handler interface {
     if nil != err {
         log.Fatalln(err)
     }
-    defer listener.Close()
     if err := server.Serve(listener); nil != err {
         log.Fatalln(err)
     }
@@ -516,7 +449,6 @@ type Handler interface {
     if nil != err {
         log.Fatalln(err)
     }
-    defer listener.Close()
     for {
         conn, err := listener.Accept()
         if nil != err {
@@ -665,56 +597,6 @@ ch &lt;- 47 // send
   
       <article>
       
-        <h3>CSP in Go</h3>
-        
-  
-  <div class="code"><pre>cardimage := &lt;-cardreader // cardreader?cardimage
-
-lineprinter &lt;- lineimage  // lineprinter!lineimage
-
-if c, ok := &lt;-west; ok {  // *[c:character;
-    east &lt;- c             //   west?c -&gt; east!c]
-} else {                  //
-    close(east)           //
-}                         //</pre></div>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>CSP in Go</h3>
-        
-  
-  <div class="code"><pre>select {                  // *[(i:1..10)continue(i);
-case in &lt;- ch0:           //   console(i)?c -&gt;
-    X &lt;- x{0, in.c}       //   X!(i, c);
-    in.ch &lt;- ACK          //   console(i)!ack();
-    if SIGN_OFF == in.c { //   continue(i) := (c != sign off)]
-        ch0 = nil         //
-    }                     //
-// ...                    //
-default:                  //
-    return                //
-}                         //</pre></div>
-  
-
-  
-  <p>
-    <code>select</code> statement requires explicit cases
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
         <h3>Beware CSP in OLTP</h3>
         
   
@@ -743,10 +625,7 @@ default:                  //
     <code>http</code> package is annoyingly unhelpful
 <br>
 
-    Not being addressed in Go 1.2
-<br>
-
-    <code>canstop</code> for non-HTTP network services
+    Not being addressed in Go 1.2 so we take matters into our own hands
   </p>
   
 
@@ -773,7 +652,7 @@ default:                  //
     go server.Serve(listener)
     log.Println(&lt;-ch)
     listener.Close()
-    time.Sleep(60e9)
+    time.Sleep(60e9) // FIXME!
 }</pre></div>
   
 
@@ -799,7 +678,7 @@ default:                  //
     }
     goagain.AwaitSignals(listener)
     listener.Close()
-    time.Sleep(60e9)
+    time.Sleep(60e9) // FIXME!
 }</pre></div>
   
 
@@ -912,33 +791,8 @@ mux.Handle(&#34;GET&#34;, &#34;/foo/{bar}/baz&#34;, &amp;handler{})</pre></div>
         <h3>JSON</h3>
         
   
-  <div class="code"><pre>func handler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set(&#34;Content-Type&#34;, &#34;application/json&#34;)
-    w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(/* anything */)
-}</pre></div>
-  
-
-  
-  <p>
-    <code>json.Encoder</code> wraps an <code>io.Writer</code>
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>JSON in Tiger Tonic</h3>
-        
-  
   <div class="code"><pre>var handler http.Handler = tigertonic.Marshaled(func(
-    url.URL,
-    http.Header,
-    interface{}
+    url.URL, http.Header, *MyRequest,
 ) (int, http.Header, *MyResponse, error) {
     return http.StatusOK, &amp;MyResponse{/* anything */}, nil
 })</pre></div>
@@ -946,6 +800,12 @@ mux.Handle(&#34;GET&#34;, &#34;/foo/{bar}/baz&#34;, &amp;handler{})</pre></div>
 
   
   <p>
+    Static request and response types
+<br>
+
+    No hassling with <code>json.Encoder</code>
+<br>
+
     Responds 400, 406, and 415 appropriately
 <br>
 
@@ -974,7 +834,7 @@ out := decoder.MethodByName(&#34;Decode&#34;).Call([]reflect.Value{
 
   
   <p>
-    User code expects and receives static types
+    User code deals only with static types
   </p>
   
 
@@ -986,37 +846,7 @@ out := decoder.MethodByName(&#34;Decode&#34;).Call([]reflect.Value{
 
   
   <p>
-    Early runtime enforces fuzzy interfaces
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Middleware chains</h3>
-        
-  
-  <div class="code"><pre>handler = tigertonic.First(
-    http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        if &#34;&#34; == r.Header.Get(&#34;X-Condition&#34;) {
-            w.WriteHeader(http.StatusForbidden)
-            json.NewEncoder(w).Encode(&#34;forbidden&#34;)
-        }
-    }),
-    handler, // from the previous slide
-)</pre></div>
-  
-
-  
-  <p>
-    <code>First</code> stops at the first handler to call <code>w.WriteHeader</code>
-<br>
-
-    Also an <code>http.Handler</code>
+    Runtime enforces fuzzy interfaces
   </p>
   
 
@@ -1043,38 +873,13 @@ out := decoder.MethodByName(&#34;Decode&#34;).Call([]reflect.Value{
 
   
   <p>
-    <code>If</code> more naturally wraps any <code>http.Handler</code>
+    <code>If</code> naturally wraps any <code>http.Handler</code>
+<br>
+
+    Special case of <code>First</code> middleware chains
 <br>
 
     And yes, it’s an <code>http.Handler</code>
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>HTTP Basic auth</h3>
-        
-  
-  <div class="code"><pre>handler = tigertonic.HTTPBasicAuth(
-    map[string]string{
-        &#34;username&#34;: &#34;password&#34;,
-    },
-    &#34;Tiger Tonic&#34;,
-    handler, // from three slides ago
-)</pre></div>
-  
-
-  
-  <p>
-    <code>HTTPBasicAuth</code> is a special-case of <code>If</code>
-<br>
-
-    And a very normal <code>http.Handler</code>
   </p>
   
 
@@ -1162,37 +967,25 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
         
   
   <p>
-    CORS basics
-<br>
-
     Strongly-typed per-request context
 <br>
 
-    TLS
+    Middleware chains
 <br>
 
     URL namespaces
 <br>
 
     Virtual hostnames
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Batteries not included</h3>
-        
-  
-  <p>
-    ORM
 <br>
 
-    In fact, database niceties of any kind
+    HTTP Basic auth
+<br>
+
+    CORS basics
+<br>
+
+    TLS
   </p>
   
 
@@ -1210,40 +1003,13 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
     Construct a fake <code>http.Request</code>
 <br>
 
-    Construct a fake <code>url.URL</code> via <code>tigertonic/mocking</code>
+    Call <code>ServeHTTP</code>
 <br>
 
-    Call <code>ServeHTTP</code> with a <code>httptest.ResponseRecorder</code>
+    Use <code>httptest.ResponseRecorder</code>
 <br>
 
     Call your <code>Marshaled</code> function directly
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Deployment</h3>
-        
-  
-  <p>
-    Almost-static binaries make it easy
-<br>
-
-    Just <code>scp</code> the binary
-<br>
-
-    Single-file Debian packages
-<br>
-
-    We <code>git push</code> and build in a
-<br>
-
-    <code>post-receive</code> hook
   </p>
   
 
@@ -1286,12 +1052,6 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
 <br>
 
     We vendor third-party code as part of CI
-<br>
-
-    One <code>GOPATH</code> in development
-<br>
-
-    <code>GOPATH</code> per service in production
   </p>
   
 
@@ -1325,6 +1085,14 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
       
         <h3>TLS in Go</h3>
         
+  
+  <div class="code"><pre>c, _ := tls.LoadX509KeyPair(certPathname, keyPathname)
+listener, err := tls.Listen(&#34;tcp&#34;, &#34;:4443&#34;, &amp;tls.Config{
+    Certificates: []tls.Certificate{c},
+    CipherSuites: []uint16{tls.TLS_RSA_WITH_RC4_128_SHA},
+})</pre></div>
+  
+
   
   <p>
     Always use <code>net.Conn</code> and <code>net.Listener</code> interfaces to serve either TLS and non-TLS
@@ -1452,9 +1220,6 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
     <a href="https://github.com/d2fn/gopack" target="_blank">github.com/d2fn/gopack</a>
 <br>
 
-    <a href="https://github.com/mihasya/canstop" target="_blank">github.com/mihasya/canstop</a>
-<br>
-
     <a href="https://github.com/rcrowley/goagain" target="_blank">github.com/rcrowley/goagain</a>
 <br>
 
@@ -1465,9 +1230,6 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
 <br>
 
     <a href="https://github.com/VividCortex/johnny-deps" target="_blank">github.com/VividCortex/johnny-deps</a>
-<br>
-
-    <a href="https://github.com/VividCortex/robustly" target="_blank">github.com/VividCortex/robustly</a>
   </p>
   
 
@@ -1500,12 +1262,6 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
 
   
   <p>
-    TODO apply and applyCalmly pattern
-<br>
-
-    TODO error handling?
-<br>
-
     TODO the last page of my notes might be good summary fodder
   </p>
   
