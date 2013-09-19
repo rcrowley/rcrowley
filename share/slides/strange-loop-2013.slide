@@ -109,7 +109,6 @@ Use `error` to communicate what happened to the caller
 
 Structs are types
 Zero or more typed fields
-Capitalized fields are exported
 
 * Methods
 
