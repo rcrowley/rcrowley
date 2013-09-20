@@ -16,7 +16,7 @@ var/www/%.html: share/templates/%.html
 	build page <$< >$@
 
 var/www/%.xml: var/www/%.html
-	grep \<li\>\<time <$< | sort -r | head -n15 | cut -d\" -f4 | cut -c2- | python build.py feed >$@
+	grep \<li\>\<time <$< | sort -r | head -n15 | cut -d\" -f4 | cut -c2- | build feed >$@
 
 var/www/talks/%.html: share/slides/%.slide
 	presentme $< >$@
