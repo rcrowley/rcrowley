@@ -14,16 +14,17 @@ from xml.etree import ElementTree
 NS = 'http://www.w3.org/2005/Atom'
 ElementTree._namespace_map[NS] = 'atom'
 
+TEMPLATE_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                             '..',
+                                             'share',
+                                             'templates'))
 settings.configure(DEBUG=True,
                    TEMPLATE_DEBUG=True,
                    TEMPLATE_LOADERS=(
                        'django.template.loaders.filesystem.Loader',
                    ),
                    TEMPLATE_DIRS=(
-                       os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                                     '..',
-                                                     'share',
-                                                     'templates')),
+                        TEMPLATE_DIR,
                    ))
 
 def qname(name):
@@ -133,7 +134,7 @@ def feed(pathnames):
         pathname = pathname.rstrip()
         url = 'http://{0}/{1}'.format(server_name, pathname)
         try:
-            source = open(os.path.join('templates', pathname)).read()
+            source = open(os.path.join(TEMPLATE_DIR, pathname)).read()
             a.entry(title=title(source),
                     alternate=url,
                     id=url,
