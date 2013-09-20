@@ -70,8 +70,6 @@ Always google it as “golang”
         http.ListenAndServe(":8080", nil)
     }
 
-“Hello, world!” is too easy
-
 * Functions
 
     func handler(w http.ResponseWriter, r *http.Request) {
@@ -453,8 +451,10 @@ Micro statistics from `runtime/pprof` and `go`tool`pprof`
 
 * Parting advice
 
-Beware the novel features for boring tasks
-Use the work-a-day features to great effect
+Use `http.Handler` for web services
+Use concurrency primitives for concurrent or pipelined tasks
+Bridge the gap cautiously
+Remember that errors are not exceptional
 
 * Open-source goodness
 
