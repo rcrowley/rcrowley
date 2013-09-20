@@ -780,7 +780,7 @@ mux.Handle(&#34;GET&#34;, &#34;/foo/{bar}/baz&#34;, &amp;handler{})</pre></div>
   <div class="code"><pre>var handler http.Handler = tigertonic.Marshaled(func(
     url.URL, http.Header, *MyRequest,
 ) (int, http.Header, *MyResponse, error) {
-    return http.StatusOK, &amp;MyResponse{/* anything */}, nil
+    return http.StatusOK, nil, &amp;MyResponse{}, nil
 })</pre></div>
   
 

@@ -312,7 +312,7 @@ Responds 404 and 405 appropriately
     var handler http.Handler = tigertonic.Marshaled(func(
         url.URL, http.Header, *MyRequest,
     ) (int, http.Header, *MyResponse, error) {
-        return http.StatusOK, &MyResponse{/* anything */}, nil
+        return http.StatusOK, nil, &MyResponse{}, nil
     })
 
 Static request and response types
