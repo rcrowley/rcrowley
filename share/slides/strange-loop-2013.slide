@@ -224,7 +224,7 @@ Hoare’s “Parallel Commands”
     ch <- 47 // send
     <-ch // receive
 
-Buffered (synchronous) or unbuffered (asynchronous + backpressure)
+Buffered (asynchronous + backpressure) or unbuffered (synchronous)
 Concurrent send and receive operations
 [[http://rcrowley.org/2013/04/19/golang-ack-test.html][Faster than mutexes]]
 Hoare’s “Input and Output Commands”
