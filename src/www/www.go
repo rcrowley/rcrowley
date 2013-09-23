@@ -39,10 +39,10 @@ func init() {
 	)
 	mux.Handle(
 		"GET",
-		"/metrics",
+		"/metrics.json",
 		tigertonic.Timed(
 			tigertonic.Marshaled(metricsJSON),
-			"GET-metrics",
+			"GET-metrics-json",
 			nil,
 		),
 	)
