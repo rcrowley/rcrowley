@@ -3,6 +3,7 @@
 [user]
 	name = Richard Crowley
 	email = r@rcrowley.org
+	signingkey = 53D2F050
 [color]
 	diff = auto
 	status = auto
