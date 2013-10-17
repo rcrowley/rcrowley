@@ -41,8 +41,9 @@ and a datastore modeled as a distributed, replicated state machine.
 Founder & CTO
 DevStructure [3], San Francisco, CA
 February 2010 - April 2012
-Built Blueprint, a configuration management tool that reverse-engineers servers and generates shell, Puppet, or Chef code.  Built a hosted platform for users
-of Blueprint to backup, share, and deploy blueprints.
+Built Blueprint, a configuration management tool that reverse-engineers
+servers and generates shell, Puppet, or Chef code.  Built a hosted platform
+for users of Blueprint to backup, share, and deploy blueprints.
 
 Engineer
 OpenDNS [4], San Francisco, CA

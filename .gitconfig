@@ -1,16 +1,23 @@
+[alias]
+	ci = commit
+	co = checkout
+	lg = log --abbrev-commit --all --date=relative --graph --pretty='format:%C(yellow)%h%d%Creset %s %C(cyan)%cr%Creset'
+	stat = status
+[color]
+    ui = auto
+[color "branch"]
+    current = magenta
+    remote = blue
+[color "diff"]
+    frag = cyan
+    meta = blue
+    whitespace = red reverse
+[color "status"]
+    changed = yellow
+    untracked = red
 [core]
 	editor = vi
 [user]
 	name = Richard Crowley
 	email = r@rcrowley.org
 	signingkey = 53D2F050
-[color]
-	diff = auto
-	status = auto
-	branch = auto
-[alias]
-	ci = commit
-	co = checkout
-	lg = log --all --graph --abbrev-commit --date=relative --pretty=format:'%h -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset'
-	stat = status
-	up = !sh -c 'git pull && git log --pretty=format:\"%Cred%ae %Creset- %C(yellow)%s %Creset(%ar)\" HEAD@{1}..'
