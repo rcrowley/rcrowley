@@ -30,8 +30,8 @@ rsync -av "rcrowley.org":"var/backups" "var"
 rsync -av "rcrowley.org":"var/lib/Papers2" "var/lib"
 rsync -Hav "rcrowley.org":"var/lib/freight" "var/lib"
 rsync -av "rcrowley.org":"var/lib/git" "var/lib"
-rsync -av "rcrowley.org":"var/www/arch" "var/www"
-rsync -av "rcrowley.org":"var/www/work" "var/www"
+rsync -av "rcrowley.org":"var/www/arch" "var/www" || :
+rsync -av "rcrowley.org":"var/www/work" "var/www" || :
 
 # Add our Debian archive to APT.
 cat >"/etc/apt/sources.list.d/rcrowley.list" <<EOF
@@ -43,7 +43,7 @@ apt-get update
 apt-get -y upgrade
 
 # Install dependencies.
-apt-get -y install "freight" "gnupg-agent" "pinentry-curses" "ruby" "rubygems"
+apt-get -y install "freight" "gnupg-agent" "pinentry-curses" "ruby" "rubygems" "tmux" "vim"
 apt-get -y remove "pinentry-gtk2"
 which "fpm" || gem install --no-rdoc --no-ri "fpm"
 

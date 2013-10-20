@@ -98,7 +98,7 @@ func main() {
 	}
 }
 
-func metricsJSON(*url.URL, http.Header, interface{}) (int, http.Header, *metrics.StandardRegistry, error) {
+func metricsJSON(*url.URL, http.Header, interface{}) (int, http.Header, metrics.Registry, error) {
 	return http.StatusOK, nil, metrics.DefaultRegistry, nil
 }
 
