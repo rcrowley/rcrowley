@@ -57,6 +57,14 @@ func init() {
 	)
 	hMux = tigertonic.NewHostServeMux()
 	hMux.Handle(
+		"arch.rcrowley.org",
+		tigertonic.Timed(
+			http.FileServer(http.Dir("var/www/arch")),
+			"arch.rcrowley.org",
+			nil,
+		),
+	)
+	hMux.Handle(
 		"packages.devstructure.com",
 		tigertonic.Timed(
 			http.FileServer(http.Dir("var/cache/freight")),

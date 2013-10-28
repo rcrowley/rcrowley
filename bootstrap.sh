@@ -30,6 +30,7 @@ rsync -av "rcrowley.org":"var/backups" "var"
 rsync -av "rcrowley.org":"var/lib/Papers2" "var/lib"
 rsync -Hav "rcrowley.org":"var/lib/freight" "var/lib"
 rsync -av "rcrowley.org":"var/lib/git" "var/lib"
+rsync -av "rcrowley.org":"var/www/arch" "var/www"
 rsync -av "rcrowley.org":"var/www/work" "var/www"
 
 # Add our Debian archive to APT.
