@@ -16,10 +16,10 @@ fi
 scp "rcrowley.org":".ssh/authorized_keys" ".ssh"
 
 # Copy GPG key pairs from the old rcrowley.org.
-ssh "rcrowley.org" gpg --armor --export --secret "packages@rcrowley.org" | gpg --import
-ssh "rcrowley.org" gpg --armor --export-secret-key "packages@rcrowley.org" | gpg --import || :
-ssh "rcrowley.org" gpg --armor --export --secret "r@rcrowley.org" | gpg --import
-ssh "rcrowley.org" gpg --armor --export-secret-key "r@rcrowley.org" | gpg --import || :
+ssh "rcrowley.org" gpg --armor --export "packages@rcrowley.org" | gpg --import
+ssh "rcrowley.org" gpg --armor --export-secret-keys "packages@rcrowley.org" | gpg --import || :
+ssh "rcrowley.org" gpg --armor --export "r@rcrowley.org" | gpg --import
+ssh "rcrowley.org" gpg --armor --export-secret-keys "r@rcrowley.org" | gpg --import || :
 
 # Copy files from the old rcrowley.org.
 mkdir -p "src" "var/cache/freight" "var/lib" "var/www"
