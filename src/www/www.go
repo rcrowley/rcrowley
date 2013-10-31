@@ -88,7 +88,7 @@ func init() {
 func main() {
 	flag.Parse()
 	server := tigertonic.NewServer(*listen, tigertonic.ApacheLogged(hMux))
-	server.WriteTimeout = 60 * time.Minute
+	server.WriteTimeout = time.Hour
 	var err error
 	if "" != *cert && "" != *key {
 		err = server.ListenAndServeTLS(*cert, *key)
