@@ -106,6 +106,7 @@ start on runlevel [2345]
 stop on runlevel [!2345]
 respawn
 chdir /root
+env GOMAXPROCS="4"
 env GOPATH="/root"
 env GOROOT="/usr/go"
 env PATH="/root/bin:/usr/bin:/bin:/usr/go/bin"
