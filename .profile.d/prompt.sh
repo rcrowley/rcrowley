@@ -1,9 +1,14 @@
 [ -f "/etc/bash_completion.d/git" ] && . "/etc/bash_completion.d/git"
 
 PS1="\[\e[1;31m\]█\[\e[0m\] $(
-	cat /etc/redhat-release 2>"/dev/null" || lsb_release -sc 2>"/dev/null"
-)\[\e[1;31m\]-\[\e[0m\]$(
-	dpkg --print-architecture 2>"/dev/null" || rpm --eval "%_arch" 2>"/dev/null"
+    if [ -s "/etc/arch-release" ]
+    then cat "/etc/arch-release"
+    elif [ -f "/etc/arch-release" ]
+    then echo "Arch"
+    elif [ -s "/etc/redhat-release" ]
+    then cat "/etc/redhat-release"
+    else lsb_release -sc 2>"/dev/null"
+    fi
 ) \h$(
 	[ -f "/.lxcme" ] && {
 		echo -n "\[\e[1;31m\]/\[\e[0m\]"
