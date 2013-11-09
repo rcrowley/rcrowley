@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Regarding retries and restarts</title>
+    <meta charset='utf-8'>
+    <script src='/static/slides.js'></script>
+  </head>
+
+  <body style='display: none'>
+
+    <section class='slides layout-widescreen'>
+      
+      <article>
+        <h1>Regarding retries and restarts</h1>
+        
+        
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+          </div>
+        
+      </article>
+      
+  
+  
+      <article>
+      
+        <h3>At the margin</h3>
+        
+  
+  <p>
+    We can choose to
+<br>
+
+    accept another connection,
+<br>
+
+    read another request,
+<br>
+
+    or do nothing
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Suppose we accept</h3>
+        
+  
+  <p>
+    We also accept the risk of failure
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>All failures are not created equal</h3>
+        
+  
+  <p>
+    Some are atomic
+<br>
+
+    Some are idempotent
+<br>
+
+    Some leave leases or locks to expire
+<br>
+
+    Some can be retried
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Retry policy</h3>
+        
+  
+  <p>
+    Retry reads
+<br>
+
+    Retry atomic writes that we know failed
+<br>
+
+    Retry two-phase writes we know will expire
+<br>
+
+    Do not retry timeouts
+<br>
+
+    Retry at most once
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Nginx configuration</h3>
+        
+  
+  <div class="code"><pre>location / {
+    error_page 500 502 503 = @retry;
+    error_page 504 /504.json;
+    proxy_intercept_errors on;
+    proxy_next_upstream off;
+    proxy_pass http://app;
+}
+location @retry {
+    error_page 500 /500.json;
+    error_page 502 /502.json;
+    error_page 503 /503.json;
+    error_page 504 /504.json;
+    proxy_intercept_errors on;
+    proxy_next_upstream off;
+    proxy_pass http://app;
+}
+upstream app {
+    # ...
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Man-made failures</h3>
+        
+  
+  <p>
+    We call them deploys
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Deploys are for the future</h3>
+        
+  
+  <p>
+    They shouldn’t affect the present
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>At the margin</h3>
+        
+  
+  <p>
+    We can choose to
+<br>
+
+    accept another connection,
+<br>
+
+    read another request,
+<br>
+
+    or do nothing
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Suppose we do nothing</h3>
+        
+  
+  <p>
+    We can’t do nothing for very long
+<br>
+
+    or Kyle will call us unavailable
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>The past</h3>
+        
+  
+  <p>
+    It’s rude to interrupt requests we can’t retry
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Graceful stop</h3>
+        
+  
+  <div class="code"><pre>func main() {
+    l, err := net.Listen(&#34;tcp&#34;, &#34;127.0.0.1:48879&#34;)
+    if nil != err {
+        log.Fatalln(err)
+    }
+    wg := &amp;sync.WaitGroup{}
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        for {
+            // ...
+        }
+    }()
+    ch := make(chan os.Signal)
+    signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+    log.Println(&lt;-ch)
+    l.Close()
+    wg.Wait()
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Graceful stop, continued</h3>
+        
+  
+  <div class="code"><pre>c, err := l.Accept()
+if nil != err {
+    log.Println(err)
+    return
+}
+wg.Add(1)
+go func() {
+    defer wg.Done()
+    p := make([]byte, 4096)
+    n, err := c.Read(p)
+    if nil != err {
+        log.Println(err)
+    }
+    if _, err := c.Write(p[:n]); nil != err {
+        log.Println(err)
+    }
+}()</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>The future</h3>
+        
+  
+  <p>
+    It may already be in
+<br>
+
+    our socket’s listen queue
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Zero-downtime restart</h3>
+        
+  
+  <div class="code"><pre>TODO goagain/example/inherit/main.go</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Ugh, Upstart</h3>
+        
+  
+  <div class="code"><pre>TODO goagain/inherit-forfeit/main.go</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>File descriptors for everyone</h3>
+        
+  
+  <div class="code"><pre>TODO sendmsg.go</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>One more thing: “the symlink trick”</h3>
+        
+  
+  <p>
+    Is not a trick
+<br>
+
+    And probably isn’t atomic
+  </p>
+  
+
+  
+  <div class="code"><pre>ln -s &#34;$SHA&#34; &#34;current&#43;&#34;
+mv -T &#34;current&#43;&#34; &#34;current&#34;</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Cliff’s notes</h3>
+        
+  
+  <p>
+    Retries paper over most transient failures
+<br>
+
+    Graceful stop and zero-downtime restart together prevent man-made failures
+  </p>
+  
+
+      
+      </article>
+  
+  
+
+      <article>
+        <h3>Thank you</h1>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+<p class="link"><a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a></p><p class="link"><a href="#ZgotmplZ" target="_blank"><a href="http://rcrowley.org/talks/opsmatic-2013-11-19.html" target="_blank">rcrowley.org/talks/opsmatic-2013-11-19.html</a></a></p><p class="link"><a href="http://twitter.com/rcrowley" target="_blank">@rcrowley</a></p>
+          </div>
+        
+      </article>
+
+  </body>
+  
+</html>

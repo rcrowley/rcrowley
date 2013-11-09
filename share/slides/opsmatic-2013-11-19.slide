@@ -1,0 +1,150 @@
+Regarding retries and restarts
+
+Richard Crowley
+r@rcrowley.org
+[[http://rcrowley.org/talks/opsmatic-2013-11-19.html]]
+@rcrowley
+
+* At the margin
+
+We can choose to
+accept another connection,
+read another request,
+or do nothing
+
+* Suppose we accept
+
+We also accept the risk of failure
+
+* All failures are not created equal
+
+Some are atomic
+Some are idempotent
+Some leave leases or locks to expire
+Some can be retried
+
+* Retry policy
+
+Retry reads
+Retry atomic writes that we know failed
+Retry two-phase writes we know will expire
+Do not retry timeouts
+Retry at most once
+
+* Nginx configuration
+
+    location / {
+        error_page 500 502 503 = @retry;
+        error_page 504 /504.json;
+        proxy_intercept_errors on;
+        proxy_next_upstream off;
+        proxy_pass http://app;
+    }
+    location @retry {
+        error_page 500 /500.json;
+        error_page 502 /502.json;
+        error_page 503 /503.json;
+        error_page 504 /504.json;
+        proxy_intercept_errors on;
+        proxy_next_upstream off;
+        proxy_pass http://app;
+    }
+    upstream app {
+        # ...
+    }
+
+* Man-made failures
+
+We call them deploys
+
+* Deploys are for the future
+
+They shouldn’t affect the present
+
+* At the margin
+
+We can choose to
+accept another connection,
+read another request,
+or do nothing
+
+* Suppose we do nothing
+
+We can’t do nothing for very long
+or Kyle will call us unavailable
+
+* The past
+
+It’s rude to interrupt requests we can’t retry
+
+* Graceful stop
+
+    func main() {
+        l, err := net.Listen("tcp", "127.0.0.1:48879")
+        if nil != err {
+            log.Fatalln(err)
+        }
+        wg := &sync.WaitGroup{}
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            for {
+                // ...
+            }
+        }()
+        ch := make(chan os.Signal)
+        signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+        log.Println(<-ch)
+        l.Close()
+        wg.Wait()
+    }
+
+* Graceful stop, continued
+
+    c, err := l.Accept()
+    if nil != err {
+        log.Println(err)
+        return
+    }
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        p := make([]byte, 4096)
+        n, err := c.Read(p)
+        if nil != err {
+            log.Println(err)
+        }
+        if _, err := c.Write(p[:n]); nil != err {
+            log.Println(err)
+        }
+    }()
+
+* The future
+
+It may already be in
+our socket’s listen queue
+
+* Zero-downtime restart
+
+    TODO goagain/example/inherit/main.go
+
+* Ugh, Upstart
+
+    TODO goagain/inherit-forfeit/main.go
+
+* File descriptors for everyone
+
+    TODO sendmsg.go
+
+* One more thing: “the symlink trick”
+
+Is not a trick
+And probably isn’t atomic
+
+    ln -s "$SHA" "current+"
+    mv -T "current+" "current"
+
+* Cliff’s notes
+
+Retries paper over most transient failures
+Graceful stop and zero-downtime restart together prevent man-made failures
