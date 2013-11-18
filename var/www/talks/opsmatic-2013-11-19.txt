@@ -1,0 +1,42 @@
+Regarding retries and restarts
+==============================
+
+(Introduce self, thank Pancakes, etc.)  Pancakes asked us to talk about building reliable systems tonight.  There's a particular aspect of this enormous and complex task that has been a long-running fascination of mine both as an engineer and as an armchair UNIX history nerd.  So I'm here to talk about building reliable systems that can still be restarted.
+
+I lived with a bunch of economists in college and enjoy appropriating economic terms for computer science.  Decisions "at the margin" and their effects on cost and utility are particularly applicable.  I liken these decisions to an iterative process of discrete tasks performed repeatedly until some condition is met.  In a request processing system, I think of the margin as the moment between responding to one request and accepting another when each thread of execution can decide whether to proceed or not.
+
+When we make the decision to accept a connection or read a request we're also accepting a risk that we'll fail to respond in an appropriate or timely manner.  This failure is a direct consequence of our decision to accept the request so that decision should not be made lightly.
+
+But many of the failures we risk by accepting a request aren't all that bad and in a sort of "ask for forgiveness, not permission" way we can tolerate them without impacting our users.
+
+We thought a lot about our system's retry policy at Betable and I'm pretty happy with how it's played out.  First and foremost, the policy is implemented only by the outermost load balancer.  This, coupled with our policy to retry only once protects us from exponential fanout - the so-called "query of death."  We do not retry in case of timeout because we can't be sure the request won't finish later and thus be made twice or was already successful but failed to respond.
+
+We use Nginx to implement this policy because we absolutely need TLS support and we know it really well.  proxy_intercept_errors being on and proxy_next_upstream being off are the important directives here.  I'm sure you can accomplish the same thing with other tools.
+
+A retry policy lets us trade latency for reliability for some failure modes but we already see that it isn't a silver bullet and doesn't even apply to requests that aren't atomic or idempotent.  So when we bring failures on ourselves, as we may each time we deploy new code, we should think carefully about that decision we make at the margin.
+
+To complicate matters, concurrent systems don't make just one decision at the margin but many, spread across the recent past and near future.  The code we're trying to deploy is to brighten that future and should not pull the plug on the past and present.
+
+So we find ourselves back at the margin deciding whether to accept a request but this time knowing failure is imminent - the deploy train's rolling and SIGTERM is coming.
+
+I believe the responsible decision is to do nothing.  There are qualifications, of course, because our system still has to appear available, but I think it's easier to reason about delaying accepting a request until we don't know we can't respond.
+
+In the meantime, we have the past to deal with: requests we accepted to which we have not yet responded.  We can lean on our retry policy but either have to guarantee every request can be retried or accept that deploys cause failures.
+
+Or we can program our systems to stop gracefully.  This is Go code but you could write it in any language.  When the process receives SIGTERM it changes its decision from accepting requests to doing nothing.  Then we wait until we have responded to all requests we accepted before exiting.
+
+(Graceful stop, continued)
+
+The rabbit hole goes deeper, though, because while we're responding to past requests, future requests are piling up in the kernel, or worse being turned away entirely.  This won't do.
+
+This brings us to zero-downtime restarts, which would be a very sexy topic if the techniques weren't literally older than me.  Here's how it works in Nginx, Unicorn, and lots of other tools.  A process begins business as usual, listening, accepting connections, reading requests, and writing responses.  When it receives SIGUSR2, it forks, execs, and allows the child to inherit the listening file descriptor.  The child skips straight to accepting connections and, once it's there, sends the parent SIGQUIT to stop gracefully.  At the margin the parent process decides not to accept further requests while the child process decides to accept.  The kernel's always listening so (queue length notwithstanding) no one is turned away.  Our service is available past, present, and future.
+
+This was pretty cool in 1983 but thirty years later has a major weakness.  For the better, Linux init schemes have come around to what I call direct parent supervision.  Tools like Upstart are not checking /proc every 5 seconds to see if a process is alive, they're notified immediately when one exits by the kernel waking up their wait4 system call.  The speed with which we can recover from failures in this scheme is part of what makes fail-fast a viable design decision.
+
+So I set out to have my cake and eat it, too - to devise a generic way for a UNIX process to load new code without losing its listening socket or its process ID.
+
+The zero-downtime double restart strategy begins just like before...
+
+...but the child sends the parent SIGUSR2.  While the child is accepting requests the parent responds to requests in-flight and execs so it, too, has received the deploy.  Finally, the parent sends SIGQUIT to the child, which stops gracefully.  The end result is the same as before plus the process being supervised by Upstart never dies.  The details are all in the goagain library and are portable to any language that doesn't editorialize libc too much.
+
+Techniques aside, though, the point is to care about our availability before, during, and after deploying new code.  A retry policy that makes sense for you might be all you need but building systems that can stop gracefully opens the door to zero-downtime restarts, and that means we really can deploy whenever we want.

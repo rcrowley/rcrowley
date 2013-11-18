@@ -21,7 +21,7 @@ We also accept the risk of failure
 Some are atomic
 Some are idempotent
 Some leave leases or locks to expire
-Some can be retried
+Maybe these can be retried
 
 * Retry policy
 
@@ -53,7 +53,7 @@ Retry at most once
         # ...
     }
 
-* Man-made failures
+* Self-inflicted failures
 
 We call them deploys
 
@@ -101,23 +101,25 @@ It’s rude to interrupt requests we can’t retry
 
 * Graceful stop, continued
 
-    c, err := l.Accept()
-    if nil != err {
-        log.Println(err)
-        return
-    }
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        p := make([]byte, 4096)
-        n, err := c.Read(p)
+    for {
+        c, err := l.Accept()
         if nil != err {
             log.Println(err)
+            return
         }
-        if _, err := c.Write(p[:n]); nil != err {
-            log.Println(err)
-        }
-    }()
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            p := make([]byte, 4096)
+            n, err := c.Read(p)
+            if nil != err {
+                log.Println(err)
+            }
+            if _, err := c.Write(p[:n]); nil != err {
+                log.Println(err)
+            }
+        }()
+    }
 
 * The future
 
@@ -126,25 +128,42 @@ our socket’s listen queue
 
 * Zero-downtime restart
 
-    TODO goagain/example/inherit/main.go
+Parent `listen(2)`, `accept(2)`, etc.
+Parent receive `SIGUSR2`
+Parent `setenv(3)` listening file descriptor
+Parent `fork(2)` and child `execve(2)`
+Child `getenv(3)` instead of `listen(2)`
+Child `accept(2)` just like before
+Child send `SIGQUIT` to parent
 
 * Ugh, Upstart
 
-    TODO goagain/inherit-forfeit/main.go
+Upstart thinks our service died
+and tries to start it again
 
-* File descriptors for everyone
+* If at first you don't succeed, add more system calls
 
-    TODO sendmsg.go
+This is _experimental_
+(I finished the code Saturday)
 
-* One more thing: “the symlink trick”
+* Zero-downtime double restart
 
-Is not a trick
-And probably isn’t atomic
+Parent `listen(2)`, `accept(2)`, etc.
+Parent receive `SIGUSR2`
+Parent `setenv(3)` listening file descriptor
+Parent `fork(2)` and child `execve(2)`
+Child `getenv(3)` instead of `listen(2)`
+Child `accept(2)` just like before
 
-    ln -s "$SHA" "current+"
-    mv -T "current+" "current"
+* Zero-downtime double restart, continued
+
+Child send `SIGUSR2` to parent
+Parent `execve(2)`
+Parent `getenv(3)` instead of `listen(2)`
+Parent `accept(2)` just like before
+Parent send `SIGQUIT` to child
 
 * Cliff’s notes
 
 Retries paper over most transient failures
-Graceful stop and zero-downtime restart together prevent man-made failures
+Graceful stop and zero-downtime restart together prevent self-inflicted failures

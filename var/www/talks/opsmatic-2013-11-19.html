@@ -84,7 +84,7 @@
     Some leave leases or locks to expire
 <br>
 
-    Some can be retried
+    Maybe these can be retried
   </p>
   
 
@@ -153,7 +153,7 @@ upstream app {
   
       <article>
       
-        <h3>Man-made failures</h3>
+        <h3>Self-inflicted failures</h3>
         
   
   <p>
@@ -274,23 +274,25 @@ upstream app {
         <h3>Graceful stop, continued</h3>
         
   
-  <div class="code"><pre>c, err := l.Accept()
-if nil != err {
-    log.Println(err)
-    return
-}
-wg.Add(1)
-go func() {
-    defer wg.Done()
-    p := make([]byte, 4096)
-    n, err := c.Read(p)
+  <div class="code"><pre>for {
+    c, err := l.Accept()
     if nil != err {
         log.Println(err)
+        return
     }
-    if _, err := c.Write(p[:n]); nil != err {
-        log.Println(err)
-    }
-}()</pre></div>
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        p := make([]byte, 4096)
+        n, err := c.Read(p)
+        if nil != err {
+            log.Println(err)
+        }
+        if _, err := c.Write(p[:n]); nil != err {
+            log.Println(err)
+        }
+    }()
+}</pre></div>
   
 
       
@@ -321,7 +323,27 @@ go func() {
         <h3>Zero-downtime restart</h3>
         
   
-  <div class="code"><pre>TODO goagain/example/inherit/main.go</pre></div>
+  <p>
+    Parent <code>listen(2)</code>, <code>accept(2)</code>, etc.
+<br>
+
+    Parent receive <code>SIGUSR2</code>
+<br>
+
+    Parent <code>setenv(3)</code> listening file descriptor
+<br>
+
+    Parent <code>fork(2)</code> and child <code>execve(2)</code>
+<br>
+
+    Child <code>getenv(3)</code> instead of <code>listen(2)</code>
+<br>
+
+    Child <code>accept(2)</code> just like before
+<br>
+
+    Child send <code>SIGQUIT</code> to parent
+  </p>
   
 
       
@@ -334,43 +356,87 @@ go func() {
         <h3>Ugh, Upstart</h3>
         
   
-  <div class="code"><pre>TODO goagain/inherit-forfeit/main.go</pre></div>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>File descriptors for everyone</h3>
-        
-  
-  <div class="code"><pre>TODO sendmsg.go</pre></div>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>One more thing: “the symlink trick”</h3>
-        
-  
   <p>
-    Is not a trick
+    Upstart thinks our service died
 <br>
 
-    And probably isn’t atomic
+    and tries to start it again
   </p>
   
 
+      
+      </article>
   
-  <div class="code"><pre>ln -s &#34;$SHA&#34; &#34;current&#43;&#34;
-mv -T &#34;current&#43;&#34; &#34;current&#34;</pre></div>
+  
+  
+      <article>
+      
+        <h3>If at first you don&#39;t succeed, add more system calls</h3>
+        
+  
+  <p>
+    This is <i>experimental</i>
+<br>
+
+    (I finished the code Saturday)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Zero-downtime double restart</h3>
+        
+  
+  <p>
+    Parent <code>listen(2)</code>, <code>accept(2)</code>, etc.
+<br>
+
+    Parent receive <code>SIGUSR2</code>
+<br>
+
+    Parent <code>setenv(3)</code> listening file descriptor
+<br>
+
+    Parent <code>fork(2)</code> and child <code>execve(2)</code>
+<br>
+
+    Child <code>getenv(3)</code> instead of <code>listen(2)</code>
+<br>
+
+    Child <code>accept(2)</code> just like before
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Zero-downtime double restart, continued</h3>
+        
+  
+  <p>
+    Child send <code>SIGUSR2</code> to parent
+<br>
+
+    Parent <code>execve(2)</code>
+<br>
+
+    Parent <code>getenv(3)</code> instead of <code>listen(2)</code>
+<br>
+
+    Parent <code>accept(2)</code> just like before
+<br>
+
+    Parent send <code>SIGQUIT</code> to child
+  </p>
   
 
       
@@ -387,7 +453,7 @@ mv -T &#34;current&#43;&#34; &#34;current&#34;</pre></div>
     Retries paper over most transient failures
 <br>
 
-    Graceful stop and zero-downtime restart together prevent man-made failures
+    Graceful stop and zero-downtime restart together prevent self-inflicted failures
   </p>
   
 
