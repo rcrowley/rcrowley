@@ -60,7 +60,10 @@
         
   
   <p>
-    We also accept the risk of failure
+    We also accept the risk of and
+<br>
+
+    responsibility for failure
   </p>
   
 
@@ -157,7 +160,7 @@ upstream app {
         
   
   <p>
-    We call them deploys
+    Deploys, for example
   </p>
   
 
@@ -172,7 +175,7 @@ upstream app {
         
   
   <p>
-    They shouldn’t affect the present
+    It’s too late to change the past
   </p>
   
 
@@ -212,9 +215,6 @@ upstream app {
   
   <p>
     We can’t do nothing for very long
-<br>
-
-    or Kyle will call us unavailable
   </p>
   
 
@@ -229,7 +229,7 @@ upstream app {
         
   
   <p>
-    It’s rude to interrupt requests we can’t retry
+    Don&#39;t interrupt requests you can’t retry
   </p>
   
 
@@ -253,7 +253,7 @@ upstream app {
     go func() {
         defer wg.Done()
         for {
-            // ...
+            // (on the next slide)
         }
     }()
     ch := make(chan os.Signal)
@@ -450,10 +450,13 @@ upstream app {
         
   
   <p>
-    Retries paper over most transient failures
+    Think about reliability per-request
 <br>
 
-    Graceful stop and zero-downtime restart together prevent self-inflicted failures
+    Use retries to mask some failures
+<br>
+
+    Stop gracefully and restart without downtime to prevent self-inflicted failures
   </p>
   
 

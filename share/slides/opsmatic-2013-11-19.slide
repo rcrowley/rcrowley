@@ -14,7 +14,8 @@ or do nothing
 
 * Suppose we accept
 
-We also accept the risk of failure
+We also accept the risk of and
+responsibility for failure
 
 * All failures are not created equal
 
@@ -55,11 +56,11 @@ Retry at most once
 
 * Self-inflicted failures
 
-We call them deploys
+Deploys, for example
 
 * Deploys are for the future
 
-They shouldn’t affect the present
+It’s too late to change the past
 
 * At the margin
 
@@ -71,11 +72,10 @@ or do nothing
 * Suppose we do nothing
 
 We can’t do nothing for very long
-or Kyle will call us unavailable
 
 * The past
 
-It’s rude to interrupt requests we can’t retry
+Don't interrupt requests you can’t retry
 
 * Graceful stop
 
@@ -89,7 +89,7 @@ It’s rude to interrupt requests we can’t retry
         go func() {
             defer wg.Done()
             for {
-                // ...
+                // (on the next slide)
             }
         }()
         ch := make(chan os.Signal)
@@ -165,5 +165,6 @@ Parent send `SIGQUIT` to child
 
 * Cliff’s notes
 
-Retries paper over most transient failures
-Graceful stop and zero-downtime restart together prevent self-inflicted failures
+Think about reliability per-request
+Use retries to mask some failures
+Stop gracefully and restart without downtime to prevent self-inflicted failures
