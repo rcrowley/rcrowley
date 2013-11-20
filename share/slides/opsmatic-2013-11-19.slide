@@ -75,7 +75,7 @@ We can’t do nothing for very long
 
 * The past
 
-Don't interrupt requests you can’t retry
+Don’t interrupt requests you can’t retry
 
 * Graceful stop
 
@@ -141,7 +141,7 @@ Child send `SIGQUIT` to parent
 Upstart thinks our service died
 and tries to start it again
 
-* If at first you don't succeed, add more system calls
+* If at first you don’t succeed, add more system calls
 
 This is _experimental_
 (I finished the code Saturday)
