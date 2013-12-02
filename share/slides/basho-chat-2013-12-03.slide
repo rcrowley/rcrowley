@@ -84,12 +84,10 @@ Efficient in terms of network I/O
 Scale horizontally
 1000 bingo card strawman
 
-* Are we really going to build this?
+* Custom DB, NBD
 
-Existing storage engines lack expressiveness
+Nothing more permanent than a temporary solution
 Small scale makes a custom solution plausible
-YAGNI?
-Nothing more permanent than a temporary solution?
 
 * Design
 
