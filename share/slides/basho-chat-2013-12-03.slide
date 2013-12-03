@@ -34,8 +34,7 @@ Most events are asynchronous from a player’s perspective
 * WebSockets
 
 [[http://www.ietf.org/rfc/rfc6455.txt]]
-Beginning to see widely-deployed support
-Providing useful semantics on top of WebSockets would be an interesting talk in its own right
+Not completely busted anymore!
 
 * Storage
 
