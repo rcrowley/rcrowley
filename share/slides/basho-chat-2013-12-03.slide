@@ -54,7 +54,7 @@ Don’t sell any after the first ball is drawn
 
 Doubly-linked list
 Optimistic concurrency control
-Two column families: `entries` and `pointers` (with `LongType` columns)
+Two column families: `items` and `pointers` (with `LongType` columns)
 Death by roundtrip
 
 * Cassandra 1 algorithm
