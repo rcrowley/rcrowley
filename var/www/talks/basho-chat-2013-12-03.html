@@ -920,30 +920,6 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
   
       <article>
       
-        <h3>Language choices</h3>
-        
-  
-  <p>
-    Java: even fluent Java tastes bad to us
-<br>
-
-    Scala: scary, C++-like amount of syntax
-<br>
-
-    C: it’s a nice hammer to have in a pinch
-<br>
-
-    Go: all but garbage collector maturity
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
         <h3>Go</h3>
         
   
@@ -997,20 +973,14 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
   
       <article>
       
-        <h3>Co-implementation</h3>
+        <h3>One service, two Git repositories</h3>
         
   
   <p>
-    One service spread across two
+    Entities and transitions declared in the datastore
 <br>
 
-    Git repositories
-<br>
-
-    No one had ever worked with stored procedures, much less ones with this
-<br>
-
-    much power
+    This made for an awkward development workflow
   </p>
   
 
@@ -1032,30 +1002,6 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
 <br>
 
     Jump through hoops to test network errors
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
-        <h3>Runtime metrics lock contention</h3>
-        
-  
-  <p>
-    Sporadic timeouts that didn’t show up
-<br>
-
-    in metrics
-<br>
-
-    Very busy lock in a <code>metrics.Registry</code>
-<br>
-
-    Fixed the bug in <code>go-metrics</code>
   </p>
   
 
@@ -1126,10 +1072,16 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
         
   
   <p>
-    High-availability coordinators
+    Replication improvements
 <br>
 
     Next-generation secondary indexes
+<br>
+
+    Declaring entities and transitions outside the datastore
+<br>
+
+    High-availability coordinators
   </p>
   
 

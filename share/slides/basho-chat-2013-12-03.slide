@@ -299,13 +299,6 @@ It’s easy to create protocol buffer-like versioning and extensibility by being
 `go-bson` nicely mirrors `encoding/json`
 `go-bson` actually feels more naturally Go than `goprotobuf`
 
-* Language choices
-
-Java: even fluent Java tastes bad to us
-Scala: scary, C++-like amount of syntax
-C: it’s a nice hammer to have in a pinch
-Go: all but garbage collector maturity
-
 * Go
 
 Always google it as “golang”
@@ -321,25 +314,16 @@ Brad Fitz
 
 * Errata
 
-* Co-implementation
+* One service, two Git repositories
 
-One service spread across two
-Git repositories
-No one had ever worked with stored procedures, much less ones with this
-much power
+Entities and transitions declared in the datastore
+This made for an awkward development workflow
 
 * Testing
 
 Can test each side of distribution/replication as units
 Start 3 services in one Go process and sleep a bit to test together
 Jump through hoops to test network errors
-
-* Runtime metrics lock contention
-
-Sporadic timeouts that didn’t show up
-in metrics
-Very busy lock in a `metrics.Registry`
-Fixed the bug in `go-metrics`
 
 * Replicating dispatched transitions
 
@@ -359,8 +343,10 @@ It’s less of a brain teaser each time
 
 * Future work
 
-High-availability coordinators
+Replication improvements
 Next-generation secondary indexes
+Declaring entities and transitions outside the datastore
+High-availability coordinators
 
 * A word from my sponsors
 
