@@ -47,6 +47,7 @@ Naturally, we tried this first
 Sell 1000 bingo cards “instantly”
 Don’t sell more than 1000
 Don’t sell more than 4 to any player
+Don't sell two identical cards
 Don’t sell any after the first ball is drawn
 
 * Cassandra 1
