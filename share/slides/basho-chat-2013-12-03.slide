@@ -145,7 +145,8 @@ Examples: `CreateRouletteTable`, `CreateRouletteRound`, `CreateRouletteBet`, and
 Dispatch other transitions
 Generate data
 Mutate the transition
-`PrepareContext` has `Dispatch`, `Load`, and more but not `Store`, `LoadExcl`, or `StoreExcl`
+`PrepareContext` has `Dispatch`, `Load`, and more but not `Store`, `LoadExcl`,
+or `StoreExcl`
 
 * Dispatched transitions
 
@@ -186,25 +187,27 @@ Durability: `fsync(2)` the write-ahead log
 
 * CAP properties
 
-Consistency: transitions always applied by the coordinator
-Availability: requests hashed to non-failing coordinators respond but no second-choice coordinators
+Consistency: transitions always applied by their coordinator
+Availability: no second-choice coordinators
 Partition tolerance: unreachable coordinators don’t make reachable coordinators unavailable
 
 * Guarantees not made
 
 Atomicity of entity-spanning operations
 Locality of any two entities
-Pat Helland’s _Life_beyond_Distributed_Transactions:_an_Apostate’s_Opinion_ in CIDR 2007
+See Pat Helland’s _Life_beyond_Distributed_Transactions:_an_Apostate’s_Opinion_ in CIDR 2007
 
 * Coordinators
 
 Transitions declare a distribution key
-Distribution key conventionally identifies an entity
+Distribution key conventionally identifies
+an entity
 Consistent hash function maps transitions to a coordinator process
 
 * Peers
 
-Command-line flags easily configured by Puppet
+Command-line flags easily configured
+by Puppet
 Declare peers on your consistent hash ring
 Declare masters from which to replicate
 
@@ -247,7 +250,8 @@ Declare fields to be indexed
 
 * Secondary indexes
 
-Automatically updated during `Store` and `StoreExcl`
+Automatically updated during
+`Store` and `StoreExcl`
 Eventually consistent via replication
 Not atomic with entity storage
 
@@ -264,8 +268,10 @@ The key is prefixed with the object’s type
 
 * Storage engine
 
-`FileBlobStore` stores blobs on the filesystem
-`Store` and `StoreExcl` are atomic via `rename(2)`
+`FileBlobStore` stores blobs
+on the filesystem
+`Store` and `StoreExcl` are atomic
+via `rename(2)`
 `LoadExcl` and `StoreExcl` use `flock(2)`
 
 * Disk protocol
@@ -284,7 +290,7 @@ The key is prefixed with the object’s type
     |          | +------------+ |
     +----------+----------------+
 
-Naming the type outside of the JSON facilitates deserialization
+Type prefix facilitates deserialization
 Naive and expensive
 
 * BSON over the alternatives
@@ -313,8 +319,10 @@ CSP primitives as syntax
 
 * Co-implementation
 
-One service spread across two Git repositories
-No one had ever worked with stored procedures, much less ones with this much power
+One service spread across two
+Git repositories
+No one had ever worked with stored procedures, much less ones with this
+much power
 
 * Testing
 
@@ -324,7 +332,8 @@ Jump through hoops to test network errors
 
 * Runtime metrics lock contention
 
-Sporadic timeouts that didn’t show up in metrics
+Sporadic timeouts that didn’t show up
+in metrics
 Very busy lock in a `metrics.Registry`
 Fixed the bug in `go-metrics`
 
@@ -333,7 +342,9 @@ Fixed the bug in `go-metrics`
 Used to allow `Dispatch` in `Apply` methods
 Prevent double-applying in replication
 Non-deterministic replication
-Eliot Moss’s _Nested_Transactions:_An_Approach_to_Reliable_Distributed_Computing_
+Eliot Moss’s _Nested_Transactions:_
+_An_Approach_to_Reliable_
+_Distributed_Computing_
 
 * Would we do it again?
 

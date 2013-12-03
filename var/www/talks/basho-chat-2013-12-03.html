@@ -452,7 +452,10 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
     Mutate the transition
 <br>
 
-    <code>PrepareContext</code> has <code>Dispatch</code>, <code>Load</code>, and more but not <code>Store</code>, <code>LoadExcl</code>, or <code>StoreExcl</code>
+    <code>PrepareContext</code> has <code>Dispatch</code>, <code>Load</code>, and more but not <code>Store</code>, <code>LoadExcl</code>,
+<br>
+
+    or <code>StoreExcl</code>
   </p>
   
 
@@ -570,10 +573,10 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
         
   
   <p>
-    Consistency: transitions always applied by the coordinator
+    Consistency: transitions always applied by their coordinator
 <br>
 
-    Availability: requests hashed to non-failing coordinators respond but no second-choice coordinators
+    Availability: no second-choice coordinators
 <br>
 
     Partition tolerance: unreachable coordinators don’t make reachable coordinators unavailable
@@ -597,7 +600,7 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
     Locality of any two entities
 <br>
 
-    Pat Helland’s <i>Life beyond Distributed Transactions: an Apostate’s Opinion</i> in CIDR 2007
+    See Pat Helland’s <i>Life beyond Distributed Transactions: an Apostate’s Opinion</i> in CIDR 2007
   </p>
   
 
@@ -615,7 +618,10 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
     Transitions declare a distribution key
 <br>
 
-    Distribution key conventionally identifies an entity
+    Distribution key conventionally identifies
+<br>
+
+    an entity
 <br>
 
     Consistent hash function maps transitions to a coordinator process
@@ -633,7 +639,10 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
         
   
   <p>
-    Command-line flags easily configured by Puppet
+    Command-line flags easily configured
+<br>
+
+    by Puppet
 <br>
 
     Declare peers on your consistent hash ring
@@ -770,7 +779,10 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
         
   
   <p>
-    Automatically updated during <code>Store</code> and <code>StoreExcl</code>
+    Automatically updated during
+<br>
+
+    <code>Store</code> and <code>StoreExcl</code>
 <br>
 
     Eventually consistent via replication
@@ -830,10 +842,16 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
         
   
   <p>
-    <code>FileBlobStore</code> stores blobs on the filesystem
+    <code>FileBlobStore</code> stores blobs
 <br>
 
-    <code>Store</code> and <code>StoreExcl</code> are atomic via <code>rename(2)</code>
+    on the filesystem
+<br>
+
+    <code>Store</code> and <code>StoreExcl</code> are atomic
+<br>
+
+    via <code>rename(2)</code>
 <br>
 
     <code>LoadExcl</code> and <code>StoreExcl</code> use <code>flock(2)</code>
@@ -867,7 +885,7 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
 
   
   <p>
-    Naming the type outside of the JSON facilitates deserialization
+    Type prefix facilitates deserialization
 <br>
 
     Naive and expensive
@@ -968,10 +986,16 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
         
   
   <p>
-    One service spread across two Git repositories
+    One service spread across two
 <br>
 
-    No one had ever worked with stored procedures, much less ones with this much power
+    Git repositories
+<br>
+
+    No one had ever worked with stored procedures, much less ones with this
+<br>
+
+    much power
   </p>
   
 
@@ -1007,7 +1031,10 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
         
   
   <p>
-    Sporadic timeouts that didn’t show up in metrics
+    Sporadic timeouts that didn’t show up
+<br>
+
+    in metrics
 <br>
 
     Very busy lock in a <code>metrics.Registry</code>
@@ -1037,7 +1064,13 @@ func (ct *CreateTable) Apply(ac ApplyContext) (*Table, error) {
     Non-deterministic replication
 <br>
 
-    Eliot Moss’s <i>Nested Transactions: An Approach to Reliable Distributed Computing</i>
+    Eliot Moss’s <i>Nested Transactions:</i>
+<br>
+
+    <i>An Approach to Reliable</i>
+<br>
+
+    <i>Distributed Computing</i>
   </p>
   
 
