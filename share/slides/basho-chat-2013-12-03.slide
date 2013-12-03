@@ -309,11 +309,15 @@ Go: all but garbage collector maturity
 * Go
 
 Always google it as “golang”
-Approaching four years old
+
+* Reasons to choose Go
+
+Brevity
+Static type system
+Compiles to x86, ARM, etc.
+CSP
 Thompson, Pike, Cox, Griesemer
-Statically typed
-Not classically object-oriented
-CSP primitives as syntax
+Brad Fitz
 
 * Errata
 
@@ -345,6 +349,8 @@ Non-deterministic replication
 Eliot Moss’s _Nested_Transactions:_
 _An_Approach_to_Reliable_
 _Distributed_Computing_
+
+* Would we do it again?
 
 * Would we do it again?
 
