@@ -316,8 +316,9 @@ Brad Fitz
 
 * One service, two Git repositories
 
-Entities and transitions declared in the datastore
-This made for an awkward development workflow
+Entities and transitions are declared
+in the datastore
+Awkward development workflow
 
 * Testing
 
