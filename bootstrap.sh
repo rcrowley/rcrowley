@@ -43,7 +43,7 @@ apt-get update
 apt-get -y upgrade
 
 # Install dependencies.
-apt-get -y install "freight" "gnupg-agent" "mercurial" "pinentry-curses" "ruby" "rubygems" "tmux" "vim"
+apt-get -y install "freight" "gnupg-agent" "mercurial" "pinentry-curses" "python-django" "ruby" "rubygems" "tmux" "vim"
 apt-get -y remove "pinentry-gtk2"
 which "fpm" || gem install --no-rdoc --no-ri "fpm"
 
