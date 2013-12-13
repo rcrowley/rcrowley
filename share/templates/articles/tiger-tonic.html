@@ -1,0 +1,106 @@
+{% block content %}
+<article>
+<header>
+	<time datetime="2013-12-13" pubdate>2013-12-13</time>
+	<h1>{% block title %}Go web services with Tiger Tonic{% endblock %}</h1>
+</header>
+
+<p><em>Cross-posted from <a href="http://blog.gopheracademy.com/day-13-tiger-tonic">Go Advent Day 13 - Go web services with Tiger Tonic</a>.</em></p>
+
+<p>Go is unique among mainstream programming languages in that its standard library web server is not a complete afterthought.  The Go language is well-suited for engineering complex networked services and Go&#8217;s standard library recognizes that many (if not most) of those services communicate via HTTP.  Sprinkle some <a href="https://groups.google.com/forum/#!msg/golang-nuts/BNUNbKSypE0/E4qSfpx9qI8J">Google scale</a> on it and your web applications and services can really hit the ground running.</p>
+
+<p>The standard library sets the tone but it&#8217;s far from the end of the story of how to effectively build web services in Go.  And as most Go stories do, ours begins with an interface:</p>
+
+<p><pre><code>type Handler interface {
+    ServeHTTP(ResponseWriter, *Request)
+}</code></pre>
+
+<p><code>http.Handler</code> may not look like much but its simplicity is the key to its universality.  The standard library provides a number of powerful implementations of this interface but most serious web applications and services are quick to find shortcomings, differences of opinion, and higher-level abstractions that require us to implement <code>http.Handler</code> ourselves.</p>
+
+<h2>Introducing Tiger Tonic</h2>
+
+<p><a href="https://github.com/rcrowley/go-tigertonic">Tiger Tonic</a> packages several <code>http.Handler</code> implementations that make engineering web services easier.  They strive to be orthogonal like the features of the Go language itself.  And because everything is an <code>http.Handler</code> it&#8217;s possible and even easy to use Tiger Tonic in conjunction with your own or anyone else&#8217;s handlers.</p>
+
+<p>Tiger Tonic eschews HTML templates, JavaScript and CSS asset pipelines, cookies, and the like to remain squarely focused on building JSON web services.  Why JSON?  It&#8217;s become the lingua franca for serialization in web services everywhere.  Why the focus on web services?  The authors love <a href="http://dropwizard.codahale.com">Dropwizard</a> and missed all it brought to the Java community so they worked to reproduce that feeling in Go.</p>
+
+<h2>Multiplexing requests</h2>
+
+<p>Most web services respond differently to requests for different URLs so they reach for the standard <code>http.ServeMux</code>.  Then these web services start handling requests like <code>POST /games/{id}/bet</code> (an example from <a href="https://developers.betable.com">Betable</a>) and <code>http.ServeMux</code> gets in the way.  <code>tigertonic.TrieServeMux</code> is here to help.</p>
+
+<pre><code>mux := tigertonic.NewTrieServeMux()
+mux.Handle("POST", "/games/{id}/bet", handler)</code></pre>
+
+<p><code>tigertonic.TrieServeMux</code> multiplexes requests differently than the standard <code>http.ServeMux</code>.  URL components surrounded by braces like <code>{id}</code> above are wildcards added to <code>r.URL.Query</code> and otherwise the request must match the method and path of the matching handler exactly.  In the author&#8217;s experience this is the least surprising thing to do.  Plus it gives the framework the opportunity to respond 404 and 405 to requests it cannot fulfill.  See?  Your web service is already a good HTTP citizen!</p>
+
+<p>And as cool as that is it&#8217;s even cooler that your web service is still an <code>http.Handler</code> that you can <code>http.ListenAndServe</code> without a second thought.</p>
+
+<h2>JSON in, JSON out</h2>
+
+<p>So now the question is how we respond to all the requests we&#8217;re now multiplexing.  This is where we start to specialize on web services.  Once again, the standard library has giant shoulders on which to stand.  Import <code>encoding/json</code> and you&#8217;re off to the races, right?  Well:</p>
+
+<pre><code>func handlerFunc(w http.ResponseWriter, r *http.Request) {
+    err := json.NewEncoder(w).Encode(&MyResponse{/*...*/})
+    if nil != err {
+        fmt.Fprintln(w, err)
+    }
+}</code></pre>
+
+<p>That&#8217;s a bit clumsy.  <code>tigertonic.Marshaled</code> allows you to construct handlers from functions that automatically deserialize request bodies according to the type of the final argument and serialize response bodies from the error or response object returned.</p>
+
+<pre><code>var handler http.Handler = tigertonic.Marshaled(func(
+    url.URL, http.Header, *MyRequest,
+) (int, http.Header, *MyResponse, error) {
+    return http.StatusOK, nil, &MyResponse{/*...*/}, nil
+})</code></pre>
+
+<p>This proves to be a powerful higher-level abstraction that removes JSON serialization from the web service programmer&#8217;s long list of concerns.  And just as before, handlers returned by <code>tigertonic.Marshaled</code> understand how to respond 400, 406, and 415 like Roy Fielding intended.</p>
+
+<h2>Testing</h2>
+
+<p>Perhaps the best feature of this new abstraction is its effects on testing web services.  No disrespect to the <code>net/http/httptest</code> package or <code>httptest.ResponseRecorder</code> but Go web services should test their responses not their serializations.  For example:</p>
+
+<pre><code>func TestAdvent(t *testing.T) {
+    s, _, rs, err := handler(
+        mocking.URL(mux, "POST", "/games/ID/bet"),
+        mocking.Header(nil),
+        nil,
+    )
+    if nil != err {
+        t.Fatal(err)
+    }
+    if http.StatusOK != s {
+        t.Fatal(s)
+    }
+    if "win" != rs.Outcome { // Merry Christmas!
+        t.Fatal(rs)
+    }
+}</code></pre>
+
+<p>That&#8217;s far more precise than matching strings with regular expressions and far less verbose than deserializing the JSON response.</p>
+
+<p>For those keeping score at home: yes, <code>tigertonic.Marshaled</code> also returns an <code>http.Handler</code>.</p>
+
+<h2>Extra batteries</h2>
+
+<p>Though <code>tigertonic.TrieServeMux</code> and <code>tigertonic.Marshaled</code> are the main attractions, Tiger Tonic packages a number of other useful handlers that make building web services with Go easier:</p>
+
+<ul>
+<li><code>tigertonic.TrieServeMux</code> has <code>HandleNamespace</code> to match and remove prefixes from requested URLs.</li>
+<li><code>tigertonic.HostServeMux</code> supports virtual hosting of many domains in a single Go process.</li>
+<li><code>tigertonic.First</code> and <code>tigertonic.If</code> enable handler chaining a la Rack or WSGI middleware.</li>
+<li><code>tigertonic.Counted</code> and <code>tigertonic.Timed</code> emit metrics about all your requests via <a href="https://github.com/rcrowley/go-metrics"><code>go-metrics</code></a>.</li>
+<li><code>tigertonic.WithContext</code> and <code>tigertonic.Context</code> add support for strongly-typed per-request context.</li>
+<li><code>tigertonic.HTTPBasicAuth</code> is a specialization of <code>tigertonic.If</code> that conditionally handles requests if an acceptable <code>Authorization</code> header is present.</li>
+<li><code>tigertonic.CORSBuilder</code> and <code>tigertonic.CORSHandler</code> facilitate setting the basic CORS response headers.</li>
+<li><code>tigertonic.Server</code> has <code>CA</code> and <code>TLS</code> methods that simplify listening for TLS connections.</li>
+<li><code>tigertonic.Configure</code>, in conjunction with method values, makes it easy to read configuration files.</li>
+</ul>
+
+<h2>Go forth</h2>
+
+<p><a href="https://github.com/rcrowley/go-tigertonic">Tiger Tonic</a> is available on GitHub an includes a complete <a href="https://github.com/rcrowley/go-tigertonic/tree/master/example">example</a> that covers all the handlers included.</p>
+
+<p><code>http.Handler</code> is the common currency for Go web frameworks of all shapes and sizes.  The handlers in the <code>tigertonic</code> package are meant to make engineering web services more correct, more efficient, and more testable but because they&#8217;re handlers they&#8217;re at your service and up to the challenge just as long as you stick to the humble little <code>http.Handler</code> interface.</p>
+
+</article>
+{% endblock %}

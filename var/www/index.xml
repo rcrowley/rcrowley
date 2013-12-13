@@ -1,5 +1,112 @@
-<atom:feed xmlns:atom="http://www.w3.org/2005/Atom"><atom:title type="html">Richard Crowley&amp;#8217;s blog</atom:title><atom:link href="http://rcrowley.org/index.xml" rel="self" /><atom:link href="http://rcrowley.org/" rel="alternate" /><id>http://rcrowley.org/index.xml</id><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:entry><atom:title type="html">talks/basho-chat-2013-12-03.html</atom:title><atom:link href="http://rcrowley.org/talks/basho-chat-2013-12-03.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/basho-chat-2013-12-03.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/basho-chat-2013-12-03.html"&gt;http://rcrowley.org/talks/basho-chat-2013-12-03.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/opsmatic-2013-11-19.html</atom:title><atom:link href="http://rcrowley.org/talks/opsmatic-2013-11-19.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/opsmatic-2013-11-19.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/opsmatic-2013-11-19.html"&gt;http://rcrowley.org/talks/opsmatic-2013-11-19.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/strange-loop-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/strange-loop-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/strange-loop-2013.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/strange-loop-2013.html"&gt;http://rcrowley.org/talks/strange-loop-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/surge-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/surge-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/surge-2013.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/surge-2013.html"&gt;http://rcrowley.org/talks/surge-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/puppetconf-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/puppetconf-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/puppetconf-2013.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/puppetconf-2013.html"&gt;http://rcrowley.org/talks/puppetconf-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/agile-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/agile-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/agile-2013.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/agile-2013.html"&gt;http://rcrowley.org/talks/agile-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Graceful stopping in Go
-</atom:title><atom:link href="http://rcrowley.org/articles/golang-graceful-stop.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/golang-graceful-stop.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom"><atom:title type="html">Richard Crowley&amp;#8217;s blog</atom:title><atom:link href="http://rcrowley.org/index.xml" rel="self" /><atom:link href="http://rcrowley.org/" rel="alternate" /><id>http://rcrowley.org/index.xml</id><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:entry><atom:title type="html">Go web services with Tiger Tonic
+</atom:title><atom:link href="http://rcrowley.org/articles/tiger-tonic.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/tiger-tonic.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2013-12-13" pubdate&gt;2013-12-13&lt;/time&gt;
+	&lt;h1&gt;Go web services with Tiger Tonic&lt;/h1&gt;
+&lt;/header&gt;
+
+&lt;p&gt;&lt;em&gt;Cross-posted from &lt;a href="http://blog.gopheracademy.com/day-13-tiger-tonic"&gt;Go Advent Day 13 - Go web services with Tiger Tonic&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Go is unique among mainstream programming languages in that its standard library web server is not a complete afterthought.  The Go language is well-suited for engineering complex networked services and Go&amp;#8217;s standard library recognizes that many (if not most) of those services communicate via HTTP.  Sprinkle some &lt;a href="https://groups.google.com/forum/#!msg/golang-nuts/BNUNbKSypE0/E4qSfpx9qI8J"&gt;Google scale&lt;/a&gt; on it and your web applications and services can really hit the ground running.&lt;/p&gt;
+
+&lt;p&gt;The standard library sets the tone but it&amp;#8217;s far from the end of the story of how to effectively build web services in Go.  And as most Go stories do, ours begins with an interface:&lt;/p&gt;
+
+&lt;p&gt;&lt;pre&gt;&lt;code&gt;type Handler interface {
+    ServeHTTP(ResponseWriter, *Request)
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;http.Handler&lt;/code&gt; may not look like much but its simplicity is the key to its universality.  The standard library provides a number of powerful implementations of this interface but most serious web applications and services are quick to find shortcomings, differences of opinion, and higher-level abstractions that require us to implement &lt;code&gt;http.Handler&lt;/code&gt; ourselves.&lt;/p&gt;
+
+&lt;h2&gt;Introducing Tiger Tonic&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/rcrowley/go-tigertonic"&gt;Tiger Tonic&lt;/a&gt; packages several &lt;code&gt;http.Handler&lt;/code&gt; implementations that make engineering web services easier.  They strive to be orthogonal like the features of the Go language itself.  And because everything is an &lt;code&gt;http.Handler&lt;/code&gt; it&amp;#8217;s possible and even easy to use Tiger Tonic in conjunction with your own or anyone else&amp;#8217;s handlers.&lt;/p&gt;
+
+&lt;p&gt;Tiger Tonic eschews HTML templates, JavaScript and CSS asset pipelines, cookies, and the like to remain squarely focused on building JSON web services.  Why JSON?  It&amp;#8217;s become the lingua franca for serialization in web services everywhere.  Why the focus on web services?  The authors love &lt;a href="http://dropwizard.codahale.com"&gt;Dropwizard&lt;/a&gt; and missed all it brought to the Java community so they worked to reproduce that feeling in Go.&lt;/p&gt;
+
+&lt;h2&gt;Multiplexing requests&lt;/h2&gt;
+
+&lt;p&gt;Most web services respond differently to requests for different URLs so they reach for the standard &lt;code&gt;http.ServeMux&lt;/code&gt;.  Then these web services start handling requests like &lt;code&gt;POST /games/{id}/bet&lt;/code&gt; (an example from &lt;a href="https://developers.betable.com"&gt;Betable&lt;/a&gt;) and &lt;code&gt;http.ServeMux&lt;/code&gt; gets in the way.  &lt;code&gt;tigertonic.TrieServeMux&lt;/code&gt; is here to help.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mux := tigertonic.NewTrieServeMux()
+mux.Handle("POST", "/games/{id}/bet", handler)&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;tigertonic.TrieServeMux&lt;/code&gt; multiplexes requests differently than the standard &lt;code&gt;http.ServeMux&lt;/code&gt;.  URL components surrounded by braces like &lt;code&gt;{id}&lt;/code&gt; above are wildcards added to &lt;code&gt;r.URL.Query&lt;/code&gt; and otherwise the request must match the method and path of the matching handler exactly.  In the author&amp;#8217;s experience this is the least surprising thing to do.  Plus it gives the framework the opportunity to respond 404 and 405 to requests it cannot fulfill.  See?  Your web service is already a good HTTP citizen!&lt;/p&gt;
+
+&lt;p&gt;And as cool as that is it&amp;#8217;s even cooler that your web service is still an &lt;code&gt;http.Handler&lt;/code&gt; that you can &lt;code&gt;http.ListenAndServe&lt;/code&gt; without a second thought.&lt;/p&gt;
+
+&lt;h2&gt;JSON in, JSON out&lt;/h2&gt;
+
+&lt;p&gt;So now the question is how we respond to all the requests we&amp;#8217;re now multiplexing.  This is where we start to specialize on web services.  Once again, the standard library has giant shoulders on which to stand.  Import &lt;code&gt;encoding/json&lt;/code&gt; and you&amp;#8217;re off to the races, right?  Well:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;func handlerFunc(w http.ResponseWriter, r *http.Request) {
+    err := json.NewEncoder(w).Encode(&amp;MyResponse{/*...*/})
+    if nil != err {
+        fmt.Fprintln(w, err)
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;#8217;s a bit clumsy.  &lt;code&gt;tigertonic.Marshaled&lt;/code&gt; allows you to construct handlers from functions that automatically deserialize request bodies according to the type of the final argument and serialize response bodies from the error or response object returned.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var handler http.Handler = tigertonic.Marshaled(func(
+    url.URL, http.Header, *MyRequest,
+) (int, http.Header, *MyResponse, error) {
+    return http.StatusOK, nil, &amp;MyResponse{/*...*/}, nil
+})&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This proves to be a powerful higher-level abstraction that removes JSON serialization from the web service programmer&amp;#8217;s long list of concerns.  And just as before, handlers returned by &lt;code&gt;tigertonic.Marshaled&lt;/code&gt; understand how to respond 400, 406, and 415 like Roy Fielding intended.&lt;/p&gt;
+
+&lt;h2&gt;Testing&lt;/h2&gt;
+
+&lt;p&gt;Perhaps the best feature of this new abstraction is its effects on testing web services.  No disrespect to the &lt;code&gt;net/http/httptest&lt;/code&gt; package or &lt;code&gt;httptest.ResponseRecorder&lt;/code&gt; but Go web services should test their responses not their serializations.  For example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;func TestAdvent(t *testing.T) {
+    s, _, rs, err := handler(
+        mocking.URL(mux, "POST", "/games/ID/bet"),
+        mocking.Header(nil),
+        nil,
+    )
+    if nil != err {
+        t.Fatal(err)
+    }
+    if http.StatusOK != s {
+        t.Fatal(s)
+    }
+    if "win" != rs.Outcome { // Merry Christmas!
+        t.Fatal(rs)
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;#8217;s far more precise than matching strings with regular expressions and far less verbose than deserializing the JSON response.&lt;/p&gt;
+
+&lt;p&gt;For those keeping score at home: yes, &lt;code&gt;tigertonic.Marshaled&lt;/code&gt; also returns an &lt;code&gt;http.Handler&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Extra batteries&lt;/h2&gt;
+
+&lt;p&gt;Though &lt;code&gt;tigertonic.TrieServeMux&lt;/code&gt; and &lt;code&gt;tigertonic.Marshaled&lt;/code&gt; are the main attractions, Tiger Tonic packages a number of other useful handlers that make building web services with Go easier:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.TrieServeMux&lt;/code&gt; has &lt;code&gt;HandleNamespace&lt;/code&gt; to match and remove prefixes from requested URLs.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.HostServeMux&lt;/code&gt; supports virtual hosting of many domains in a single Go process.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.First&lt;/code&gt; and &lt;code&gt;tigertonic.If&lt;/code&gt; enable handler chaining a la Rack or WSGI middleware.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.Counted&lt;/code&gt; and &lt;code&gt;tigertonic.Timed&lt;/code&gt; emit metrics about all your requests via &lt;a href="https://github.com/rcrowley/go-metrics"&gt;&lt;code&gt;go-metrics&lt;/code&gt;&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.WithContext&lt;/code&gt; and &lt;code&gt;tigertonic.Context&lt;/code&gt; add support for strongly-typed per-request context.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.HTTPBasicAuth&lt;/code&gt; is a specialization of &lt;code&gt;tigertonic.If&lt;/code&gt; that conditionally handles requests if an acceptable &lt;code&gt;Authorization&lt;/code&gt; header is present.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.CORSBuilder&lt;/code&gt; and &lt;code&gt;tigertonic.CORSHandler&lt;/code&gt; facilitate setting the basic CORS response headers.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.Server&lt;/code&gt; has &lt;code&gt;CA&lt;/code&gt; and &lt;code&gt;TLS&lt;/code&gt; methods that simplify listening for TLS connections.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tigertonic.Configure&lt;/code&gt;, in conjunction with method values, makes it easy to read configuration files.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Go forth&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/rcrowley/go-tigertonic"&gt;Tiger Tonic&lt;/a&gt; is available on GitHub an includes a complete &lt;a href="https://github.com/rcrowley/go-tigertonic/tree/master/example"&gt;example&lt;/a&gt; that covers all the handlers included.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;http.Handler&lt;/code&gt; is the common currency for Go web frameworks of all shapes and sizes.  The handlers in the &lt;code&gt;tigertonic&lt;/code&gt; package are meant to make engineering web services more correct, more efficient, and more testable but because they&amp;#8217;re handlers they&amp;#8217;re at your service and up to the challenge just as long as you stick to the humble little &lt;code&gt;http.Handler&lt;/code&gt; interface.&lt;/p&gt;
+
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/basho-chat-2013-12-03.html</atom:title><atom:link href="http://rcrowley.org/talks/basho-chat-2013-12-03.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/basho-chat-2013-12-03.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/basho-chat-2013-12-03.html"&gt;http://rcrowley.org/talks/basho-chat-2013-12-03.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/opsmatic-2013-11-19.html</atom:title><atom:link href="http://rcrowley.org/talks/opsmatic-2013-11-19.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/opsmatic-2013-11-19.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/opsmatic-2013-11-19.html"&gt;http://rcrowley.org/talks/opsmatic-2013-11-19.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/strange-loop-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/strange-loop-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/strange-loop-2013.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/strange-loop-2013.html"&gt;http://rcrowley.org/talks/strange-loop-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/surge-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/surge-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/surge-2013.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/surge-2013.html"&gt;http://rcrowley.org/talks/surge-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/puppetconf-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/puppetconf-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/puppetconf-2013.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/puppetconf-2013.html"&gt;http://rcrowley.org/talks/puppetconf-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/agile-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/agile-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/agile-2013.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/agile-2013.html"&gt;http://rcrowley.org/talks/agile-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Graceful stopping in Go
+</atom:title><atom:link href="http://rcrowley.org/articles/golang-graceful-stop.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/golang-graceful-stop.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2013-04-27" pubdate&gt;2013-04-27&lt;/time&gt;
@@ -16,7 +123,7 @@
 &lt;/article&gt;
 
 </atom:content></atom:entry><atom:entry><atom:title type="html">Go acknowledgement test
-</atom:title><atom:link href="http://rcrowley.org/2013/04/19/golang-ack-test.html" rel="alternate" /><atom:id>http://rcrowley.org/2013/04/19/golang-ack-test.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:title><atom:link href="http://rcrowley.org/2013/04/19/golang-ack-test.html" rel="alternate" /><atom:id>http://rcrowley.org/2013/04/19/golang-ack-test.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2013-04-19" pubdate&gt;2013-04-19&lt;/time&gt;
@@ -27,8 +134,8 @@
 &lt;script src="https://gist.github.com/rcrowley/5423530.js"&gt;&lt;/script&gt;
 &lt;/article&gt;
 
-</atom:content></atom:entry><atom:entry><atom:title type="html">talks/nodejs-2013-02-19/</atom:title><atom:link href="http://rcrowley.org/talks/nodejs-2013-02-19/" rel="alternate" /><atom:id>http://rcrowley.org/talks/nodejs-2013-02-19/</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/nodejs-2013-02-19/"&gt;http://rcrowley.org/talks/nodejs-2013-02-19/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Federated Graphite
-</atom:title><atom:link href="http://rcrowley.org/articles/federated-graphite.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/federated-graphite.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/nodejs-2013-02-19/</atom:title><atom:link href="http://rcrowley.org/talks/nodejs-2013-02-19/" rel="alternate" /><atom:id>http://rcrowley.org/talks/nodejs-2013-02-19/</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/nodejs-2013-02-19/"&gt;http://rcrowley.org/talks/nodejs-2013-02-19/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Federated Graphite
+</atom:title><atom:link href="http://rcrowley.org/articles/federated-graphite.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/federated-graphite.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2012-08-03" pubdate&gt;2012-08-03&lt;/time&gt;
@@ -110,7 +217,7 @@ $destinations = related_nodes(Graphite::Carbon::Cache, true)&lt;/code&gt;&lt;/pr
 &lt;/article&gt;
 
 </atom:content></atom:entry><atom:entry><atom:title type="html">Developing Operability
-</atom:title><atom:link href="http://rcrowley.org/2012/02/25/superconf.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/02/25/superconf.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:title><atom:link href="http://rcrowley.org/2012/02/25/superconf.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/02/25/superconf.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2012-02-25" pubdate&gt;2012-02-25&lt;/time&gt;
@@ -186,7 +293,7 @@ $destinations = related_nodes(Graphite::Carbon::Cache, true)&lt;/code&gt;&lt;/pr
 &lt;/article&gt;
 
 </atom:content></atom:entry><atom:entry><atom:title type="html">Square
-</atom:title><atom:link href="http://rcrowley.org/2012/01/03/square.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/01/03/square.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:title><atom:link href="http://rcrowley.org/2012/01/03/square.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/01/03/square.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2012-01-03" pubdate&gt;2012-01-03&lt;/time&gt;
@@ -204,7 +311,7 @@ $destinations = related_nodes(Graphite::Carbon::Cache, true)&lt;/code&gt;&lt;/pr
 &lt;/article&gt;
 
 </atom:content></atom:entry><atom:entry><atom:title type="html">Blueprints in the new AWS CloudFormation
-</atom:title><atom:link href="http://rcrowley.org/2011/10/04/aws-cloudformation.html" rel="alternate" /><atom:id>http://rcrowley.org/2011/10/04/aws-cloudformation.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:title><atom:link href="http://rcrowley.org/2011/10/04/aws-cloudformation.html" rel="alternate" /><atom:id>http://rcrowley.org/2011/10/04/aws-cloudformation.html</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2011-10-03" pubdate&gt;2011-10-03&lt;/time&gt;
@@ -270,18 +377,4 @@ $destinations = related_nodes(Graphite::Carbon::Cache, true)&lt;/code&gt;&lt;/pr
 
 &lt;/article&gt;
 
-</atom:content></atom:entry><atom:entry><atom:title type="html">talks/rubyconf-2011/</atom:title><atom:link href="http://rcrowley.org/talks/rubyconf-2011/" rel="alternate" /><atom:id>http://rcrowley.org/talks/rubyconf-2011/</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/rubyconf-2011/"&gt;http://rcrowley.org/talks/rubyconf-2011/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Monads without pretension
-</atom:title><atom:link href="http://rcrowley.org/2011/09/21/monads.html" rel="alternate" /><atom:id>http://rcrowley.org/2011/09/21/monads.html</atom:id><atom:published>2013-12-07T00:27:30Z</atom:published><atom:updated>2013-12-07T00:27:30Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
-&lt;article&gt;
-&lt;header&gt;
-	&lt;time datetime="2011-09-21" pubdate&gt;2011-09-21&lt;/time&gt;
-	&lt;h1&gt;Monads without pretension&lt;/h1&gt;
-&lt;/header&gt;
-&lt;p&gt;The Strange Loop conference this week took a slight detour from its usual celebration of programming languages no one uses to really highlight Lisp in all its abstract glory.&amp;nbsp; Suddenly, Scala seemed like the most mainstream topic of discussion and monads were everywhere except within the understanding of most attendees.&lt;/p&gt;
-&lt;p&gt;I read &lt;a href="http://homepages.inf.ed.ac.uk/wadler/topics/monads.html#essence"&gt;The Essence of Functional Programming&lt;/a&gt; for the second or third time on the plane and am not a professor or language author so I'd like to take a stab at explaining monads to folks accustomed to imperative programming languages.&lt;/p&gt;
-&lt;p&gt;This is not an exhaustive discussion of monads.&amp;nbsp; This is what I consider to be the prerequisite material that no one bothered to cover in their talks.&amp;nbsp; These are the three monad laws implemented and tested in Python.&lt;/p&gt;
-&lt;script src="https://gist.github.com/1232809.js"&gt; &lt;/script&gt;
-&lt;p&gt;Such contrived code has no place in a real Python application but now with monads solved your only problem is homoiconic syntax.&amp;nbsp; To take monads to the next level, reimplement &lt;code&gt;M&lt;/code&gt;, &lt;code&gt;unitM&lt;/code&gt;, and &lt;code&gt;bindM&lt;/code&gt; to encapsulate side effects (such as the primitive logging above), propagate error messages and statistics (both as demonstrated in the paper), or perhaps automatically memoize &lt;code&gt;k&lt;/code&gt;.&lt;/p&gt;
-&lt;/article&gt;
-
-</atom:content></atom:entry></atom:feed>
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/rubyconf-2011/</atom:title><atom:link href="http://rcrowley.org/talks/rubyconf-2011/" rel="alternate" /><atom:id>http://rcrowley.org/talks/rubyconf-2011/</atom:id><atom:published>2013-12-13T18:20:19Z</atom:published><atom:updated>2013-12-13T18:20:19Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/rubyconf-2011/"&gt;http://rcrowley.org/talks/rubyconf-2011/&lt;/a&gt;</atom:content></atom:entry></atom:feed>
