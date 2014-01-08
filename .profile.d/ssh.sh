@@ -1,8 +1,13 @@
-for PATHNAME in $(find "/tmp" -name "agent.*" -user "$USER" 2>"/dev/null")
+for PATHNAME in "/tmp/ssh-"*"/agent."*
 do
+    if [ ! -w "$PATHNAME" ]
+    then continue
+    fi
     if SSH_AUTH_SOCK="$PATHNAME" ssh-add -l >"/dev/null"
     then export SSH_AUTH_SOCK="$PATHNAME"
-    else rm -f "$PATHNAME" && rmdir "$(dirname "$PATHNAME")" || :
+    else
+        rm -f "$PATHNAME"
+        rmdir --ignore-fail-on-non-empty "$(dirname "$PATHNAME")"
     fi
 done
 if [ -z "$SSH_AUTH_SOCK" ]
