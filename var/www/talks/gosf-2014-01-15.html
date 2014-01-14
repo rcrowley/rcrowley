@@ -1,0 +1,967 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Building web services in Go</title>
+    <meta charset='utf-8'>
+    <script src='/static/slides.js'></script>
+  </head>
+
+  <body style='display: none'>
+
+    <section class='slides layout-widescreen'>
+      
+      <article>
+        <h1>Building web services in Go</h1>
+        
+        
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+          </div>
+        
+      </article>
+      
+  
+  
+      <article>
+      
+        <h3>Hi, I’m Richard</h3>
+        
+  
+  <p>
+    <a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a> or <a href="https://twitter.com/rcrowley" target="_blank">@rcrowley</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Betable</h3>
+        
+  
+  <p>
+    Gambling-as-a-Service
+<br>
+
+    Licensed and regulated so game developers don’t have to be
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Web services</h3>
+        
+  
+  <p>
+    Data and a set of operations on that data
+<br>
+
+    Networked using the HTTP protocol
+<br>
+
+    Structured and machine-parseable requests and responses
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Polls</h3>
+        
+  
+  <p>
+    Who has written at least one Go program?
+<br>
+
+    Who has Go in production?
+<br>
+
+    Who has <b>only</b> Go in production?
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Hello, www!</h3>
+        
+  
+  <div class="code"><pre>package main
+
+import (
+    &#34;fmt&#34;
+    &#34;net/http&#34;
+)
+
+func main() {
+    http.HandleFunc(
+        &#34;/&#34;,
+        func(w http.ResponseWriter, r *http.Request) {
+            fmt.Fprintln(w, &#34;Hello, www!&#34;)
+        },
+    )
+    http.ListenAndServe(&#34;:8080&#34;, nil)
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Noteworthy signature</h3>
+        
+  
+  <div class="code"><pre>func(w http.ResponseWriter, r *http.Request)</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Reminds me of a certain interface</h3>
+        
+  
+  <div class="code"><pre>// In the standard library&#39;s net/http/server.go:
+type Handler interface {
+    ServeHTTP(ResponseWriter, *Request)
+}</pre></div>
+  
+
+  
+  <p>
+    This is the lowest common denominator
+<br>
+
+    Embrace it
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Implement http.Handler</h3>
+        
+  
+  <div class="code"><pre>type handler struct{}
+
+func (h *handler) ServeHTTP(
+    w http.ResponseWriter,
+    r *http.Request,
+) {
+    w.Header().Set(&#34;Content-Type&#34;, &#34;text/plain&#34;)
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, &#34;Hello, www!&#34;)
+}</pre></div>
+  
+
+  
+  <p>
+    This time, set the status code and <code>Content-Type</code> header explicitly
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Respond with JSON</h3>
+        
+  
+  <div class="code"><pre>func (h *handler) ServeHTTP(
+    w http.ResponseWriter,
+    r *http.Request,
+) {
+    w.Header().Set(&#34;Content-Type&#34;, &#34;application/json&#34;)
+    w.WriteHeader(http.StatusOK)
+    enc := json.NewEncoder(w)
+    if err := enc.Encode(&amp;MyResponse{}); nil != err {
+        fmt.Fprintf(w, `{&#34;error&#34;:&#34;%s&#34;}`, err)
+    }
+}</pre></div>
+  
+
+  
+  <p>
+    Suddenly, things are a lot more verbose
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Error responses</h3>
+        
+  
+  <div class="code"><pre>type notFoundHandler struct{}
+
+func (h *notFoundHandler) ServeHTTP(
+    w http.ResponseWriter,
+    r *http.Request,
+) {
+    w.Header().Set(&#34;Content-Type&#34;, &#34;text/plain&#34;)
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintln(w, &#34;404 Not Found&#34;)
+}</pre></div>
+  
+
+  
+  <p>
+    Responding with an error is too similar to responding normally
+<br>
+
+    There’s no <code>error</code> anywhere
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Errors in idiomatic Go</h3>
+        
+  
+  <div class="code"><pre>func fail() error { return errors.New(&#34;fail&#34;) }
+func multifail() (*Win, error) {
+    return nil, errors.New(&#34;multifail&#34;)
+}</pre></div>
+  
+
+  
+  <p>
+    Conventionally return an <code>error</code> last
+<br>
+
+    There are no exceptions because errors are not exceptional
+<br>
+
+    Use <code>error</code> to communicate what happened to the caller
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Handlers all the way down</h3>
+        
+  
+  <p>
+    Handlers often call other handlers
+<br>
+
+    Some handlers multiplex requests to several other handlers
+<br>
+
+    Some handlers serve static content
+<br>
+
+    Some handlers transform requests or responses
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>More realistic web server</h3>
+        
+  
+  <div class="code"><pre>func main() {
+    mux := http.NewServeMux()
+    mux.Handle(&#34;/&#34;, &amp;handler{})
+    server := &amp;http.Server{Handler: mux}
+    listener, err := net.Listen(&#34;tcp&#34;, &#34;:8080&#34;)
+    if nil != err {
+        log.Fatalln(err)
+    }
+    if err := server.Serve(listener); nil != err {
+        log.Fatalln(err)
+    }
+}</pre></div>
+  
+
+  
+  <p>
+    <code>http.ServeMux</code> is another <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Under the hood</h3>
+        
+  
+  <p>
+    Raise your hand if you’ve been burned by <code>BaseHTTPServer</code> or <code>WEBrick</code>
+<br>
+
+    What’s <code>Serve</code> do, anyway?
+<br>
+
+    (For one thing, power <a href="http://dl.google.com" target="_blank">dl.google.com</a>)
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Echo server</h3>
+        
+  
+  <div class="code"><pre>func main() {
+    listener, err := net.Listen(&#34;tcp&#34;, &#34;:1234&#34;)
+    if nil != err {
+        log.Fatalln(err)
+    }
+    for {
+        conn, err := listener.Accept()
+        if nil != err {
+            log.Fatalln(err)
+        }
+        go handle(conn)
+    }
+}</pre></div>
+  
+
+  
+  <p>
+    Goroutine-per-connection is how it’s done
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Echo server</h3>
+        
+  
+  <div class="code"><pre>func handle(conn net.Conn) {
+    defer conn.Close()
+    p := make([]byte, 4096)
+    for {
+        n, err := conn.Read(p)
+        if nil != err {
+            log.Println(conn.RemoteAddr(), err)
+            break
+        }
+        log.Printf(&#34;%v p: %s&#34;, conn.RemoteAddr(), p[:n])
+        if _, err := conn.Write(p[:n]); nil != err {
+            log.Println(conn.RemoteAddr(), err)
+            break
+        }
+    }
+}</pre></div>
+  
+
+  
+  <p>
+    No callbacks, no miniature state machines
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>A word about frameworks</h3>
+        
+  
+  <p>
+    They keep us from repeating ourselves
+<br>
+
+    They provide powerful abstractions
+<br>
+
+    They’re often conceptually greedy
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Higher-level frameworks</h3>
+        
+  <ul>
+  
+    <li>Gorilla</li>
+  
+    <li>Martini</li>
+  
+    <li>Revel</li>
+  
+    <li>...</li>
+  
+  </ul>
+
+  
+  <p>
+    Often incompatible with <code>http.Handler</code>
+<br>
+
+    Full of magic
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h2>Tiger Tonic</h2>
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Tiger Tonic</h3>
+        
+  
+  <p>
+    Inspired by Dropwizard
+<br>
+
+    How Betable builds web services in Go
+<br>
+
+    <a href="https://github.com/rcrowley/go-tigertonic" target="_blank">github.com/rcrowley/go-tigertonic</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Request multiplexing</h3>
+        
+  
+  <div class="code"><pre>mux := http.NewServeMux()
+mux.Handle(&#34;/&#34;, &amp;handler{})</pre></div>
+  
+
+  
+  <p>
+    <code>http.ServeMux</code> only routes prefixes
+  </p>
+  
+
+  
+  <div class="code"><pre>mux := tigertonic.NewTrieServeMux()
+mux.Handle(&#34;GET&#34;, &#34;/foo/{bar}/baz&#34;, &amp;handler{})</pre></div>
+  
+
+  
+  <p>
+    <code>tigertonic.TrieServeMux</code> is method- and wildcard-aware
+<br>
+
+    Responds 404 and 405 appropriately
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Recursion underneath</h3>
+        
+  
+  <div class="code"><pre>type TrieServeMux struct {
+    methods map[string]http.Handler
+    param   *string
+    paths   map[string]*TrieServeMux
+    pattern string
+}</pre></div>
+  
+
+  
+  <p>
+    <code>Handle</code> produces a tree of <code>TrieServeMux</code>
+<br>
+
+    Your handlers are the leaves in <code>methods</code>
+<br>
+
+    Wildcards are added to <code>r.URL.Query</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>JSON in, JSON out</h3>
+        
+  
+  <div class="code"><pre>handler := tigertonic.Marshaled(func(
+    url.URL, http.Header, *MyRequest,
+) (int, http.Header, *MyResponse, error) {
+    return http.StatusOK, nil, &amp;MyResponse{}, nil
+})</pre></div>
+  
+
+  
+  <p>
+    Static request and response types
+<br>
+
+    No hassling with <code>json.Encoder</code>
+<br>
+
+    Responds 400, 406, and 415 appropriately
+<br>
+
+    Responds with JSON in case of error, too
+<br>
+
+    Still an <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Not quite an interface</h3>
+        
+  
+  <div class="code"><pre>handler := tigertonic.Marshaled(func(
+    url.URL, http.Header, *MyRequest,
+) (int, http.Header, *MyResponse, error) {
+    return http.StatusOK, nil, &amp;MyResponse{}, nil
+})</pre></div>
+  
+
+  
+  <p>
+    Verify the function arity and parameter types at early runtime
+<br>
+
+    Accept arbitrary types for the request and response bodies
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Request unmarshaling</h3>
+        
+  
+  <div class="code"><pre>decoder := reflect.ValueOf(json.NewDecoder(r.Body))
+out := decoder.MethodByName(&#34;Decode&#34;).Call([]reflect.Value{
+    reflect.New(m.v.Type().In(2).Elem()),
+})</pre></div>
+  
+
+  
+  <p>
+    Your code only sees static types
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Response marshaling</h3>
+        
+  
+  <div class="code"><pre>json.NewEncoder(w).Encode(response)</pre></div>
+  
+
+  
+  <p>
+    Just like earlier but handled by the framework
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Error marshaling</h3>
+        
+  
+  <div class="code"><pre>func writeJSONError(w http.ResponseWriter, err error) {
+    w.Header().Set(&#34;Content-Type&#34;, &#34;application/json&#34;)
+    w.WriteHeader(errorStatusCode(err))
+    if jsonErr := json.NewEncoder(w).Encode(map[string]string{
+        &#34;description&#34;: err.Error(),
+        &#34;error&#34;:       errorName(err, &#34;error&#34;),
+    }); nil != err {
+        log.Println(jsonErr)
+    }
+}</pre></div>
+  
+
+  
+  <p>
+    Status code from <code>StatusCode()</code> or 500
+<br>
+
+    <code>&#34;error&#34;</code> from <code>Name()</code> or type
+<br>
+
+    <code>&#34;description&#34;</code> is the error itself
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Conditionals</h3>
+        
+  
+  <div class="code"><pre>handler := tigertonic.If(
+    func(r *http.Request) (http.Header, error) {
+        if &#34;&#34; == r.Header.Get(&#34;X-Condition&#34;) {
+            return nil, Forbidden{errors.New(&#34;forbidden&#34;)}
+        }
+        return nil, nil
+    }),
+    protectedHandler,
+)</pre></div>
+  
+
+  
+  <p>
+    <code>If</code> naturally wraps any <code>http.Handler</code>
+<br>
+
+    Special case of <code>First</code> middleware chains
+<br>
+
+    And yes, it’s an <code>http.Handler</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Middleware chains</h3>
+        
+  
+  <div class="code"><pre>handler := tigertonic.First(
+    enforceRateLimit,
+    checkAuthorization,
+    doActualWork,
+)</pre></div>
+  
+
+  
+  <p>
+    Call <code>ServeHTTP</code> on a list of handlers
+<br>
+
+    The first handler to call <code>w.WriteHeader(...)</code> ends the process
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Visibility</h3>
+        
+  
+  <p>
+    The real problem for production-ready web services
+<br>
+
+    <code>http.Handler</code> through and through
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Logging</h3>
+        
+  
+  <div class="code"><pre>handler = tigertonic.Logged(handler, nil)</pre></div>
+  
+
+  
+  <p>
+    <code>tigertonic.Logged</code> for full (optionally redacted) request and response logs
+  </p>
+  
+
+  
+  <div class="code"><pre>handler = tigertonic.ApacheLogged(handler)</pre></div>
+  
+
+  
+  <p>
+    <code>tigertonic.ApacheLogged</code> for Apache combined logs
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Metrics</h3>
+        
+  
+  <div class="code"><pre>handler = tigertonic.Counted(handler, &#34;my-handler&#34;, nil)
+handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
+  
+
+  
+  <p>
+    <code>tigertonic.Counted</code> and <code>tigertonic.Timed</code> for knowing how many and how fast
+<br>
+
+    We mostly use <code>tigertonic.Timed</code> on each route individually
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Other batteries included</h3>
+        
+  
+  <p>
+    URL namespaces
+<br>
+
+    Virtual hostnames
+<br>
+
+    HTTP Basic auth
+<br>
+
+    CORS basics
+<br>
+
+    TLS
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Testing</h3>
+        
+  
+  <div class="code"><pre>code, header, response, err := create(
+    mocking.URL(mux, &#34;POST&#34;, &#34;http://example.com/1.0/stuff&#34;),
+    mocking.Header(nil),
+    &amp;MyRequest{&#34;ID&#34;, &#34;STUFF&#34;},
+)
+// Now make assertions!</pre></div>
+  
+
+  
+  <p>
+    Construct a fake request
+<br>
+
+    Call your <code>Marshaled</code> function directly
+<br>
+
+    Or call <code>ServeHTTP</code> with an <code>httptest.ResponseRecorder</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Parting advice</h3>
+        
+  
+  <p>
+    Embrace <code>http.Handler</code>
+<br>
+
+    Provide abstractions within
+<br>
+
+    Remember that errors are not exceptional
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Links</h3>
+        
+  
+  <p>
+    <a href="https://github.com/rcrowley/go-metrics" target="_blank">github.com/rcrowley/go-metrics</a>
+<br>
+
+    <a href="https://github.com/rcrowley/go-tigertonic" target="_blank">github.com/rcrowley/go-tigertonic</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>A word from my sponsors</h3>
+        
+  
+  <p>
+    <a href="mailto:jobs@betable.com" target="_blank">jobs@betable.com</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+
+      <article>
+        <h3>Thank you</h1>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+<p class="link"><a href="mailto:r@rcrowley.org" target="_blank">r@rcrowley.org</a></p><p class="link"><a href="#ZgotmplZ" target="_blank"><a href="http://rcrowley.org/talks/gosf-2014-01-15.html" target="_blank">rcrowley.org/talks/gosf-2014-01-15.html</a></a></p><p class="link"><a href="http://twitter.com/rcrowley" target="_blank">@rcrowley</a></p>
+          </div>
+        
+      </article>
+
+  </body>
+  
+</html>

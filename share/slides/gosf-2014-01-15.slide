@@ -1,0 +1,380 @@
+Building web services in Go
+
+Richard Crowley
+r@rcrowley.org
+[[http://rcrowley.org/talks/gosf-2014-01-15.html]]
+@rcrowley
+
+* Hi, I’m Richard
+
+[[mailto:r@rcrowley.org]] or [[https://twitter.com/rcrowley][@rcrowley]]
+
+* Betable
+
+Gambling-as-a-Service
+Licensed and regulated so game developers don’t have to be
+
+* Web services
+
+Data and a set of operations on that data
+Networked using the HTTP protocol
+Structured and machine-parseable requests and responses
+
+* Polls
+
+Who has written at least one Go program?
+Who has Go in production?
+Who has *only* Go in production?
+
+* Hello, www!
+
+    package main
+
+    import (
+        "fmt"
+        "net/http"
+    )
+
+    func main() {
+        http.HandleFunc(
+            "/",
+            func(w http.ResponseWriter, r *http.Request) {
+                fmt.Fprintln(w, "Hello, www!")
+            },
+        )
+        http.ListenAndServe(":8080", nil)
+    }
+
+* Noteworthy signature
+
+    func(w http.ResponseWriter, r *http.Request)
+
+* Reminds me of a certain interface
+
+    // In the standard library's net/http/server.go:
+    type Handler interface {
+        ServeHTTP(ResponseWriter, *Request)
+    }
+
+This is the lowest common denominator
+Embrace it
+
+* Implement http.Handler
+
+    type handler struct{}
+
+    func (h *handler) ServeHTTP(
+        w http.ResponseWriter,
+        r *http.Request,
+    ) {
+        w.Header().Set("Content-Type", "text/plain")
+        w.WriteHeader(http.StatusOK)
+        fmt.Fprintln(w, "Hello, www!")
+    }
+
+This time, set the status code and `Content-Type` header explicitly
+
+* Respond with JSON
+
+    func (h *handler) ServeHTTP(
+        w http.ResponseWriter,
+        r *http.Request,
+    ) {
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        enc := json.NewEncoder(w)
+        if err := enc.Encode(&MyResponse{}); nil != err {
+            fmt.Fprintf(w, `{"error":"%s"}`, err)
+        }
+    }
+
+Suddenly, things are a lot more verbose
+
+* Error responses
+
+    type notFoundHandler struct{}
+
+    func (h *notFoundHandler) ServeHTTP(
+        w http.ResponseWriter,
+        r *http.Request,
+    ) {
+        w.Header().Set("Content-Type", "text/plain")
+        w.WriteHeader(http.StatusNotFound)
+        fmt.Fprintln(w, "404 Not Found")
+    }
+
+Responding with an error is too similar to responding normally
+There’s no `error` anywhere
+
+* Errors in idiomatic Go
+
+    func fail() error { return errors.New("fail") }
+    func multifail() (*Win, error) {
+        return nil, errors.New("multifail")
+    }
+
+Conventionally return an `error` last
+There are no exceptions because errors are not exceptional
+Use `error` to communicate what happened to the caller
+
+* Handlers all the way down
+
+Handlers often call other handlers
+Some handlers multiplex requests to several other handlers
+Some handlers serve static content
+Some handlers transform requests or responses
+
+* More realistic web server
+
+    func main() {
+        mux := http.NewServeMux()
+        mux.Handle("/", &handler{})
+        server := &http.Server{Handler: mux}
+        listener, err := net.Listen("tcp", ":8080")
+        if nil != err {
+            log.Fatalln(err)
+        }
+        if err := server.Serve(listener); nil != err {
+            log.Fatalln(err)
+        }
+    }
+
+`http.ServeMux` is another `http.Handler`
+
+* Under the hood
+
+Raise your hand if you’ve been burned by `BaseHTTPServer` or `WEBrick`
+What’s `Serve` do, anyway?
+(For one thing, power [[http://dl.google.com]])
+
+* Echo server
+
+    func main() {
+        listener, err := net.Listen("tcp", ":1234")
+        if nil != err {
+            log.Fatalln(err)
+        }
+        for {
+            conn, err := listener.Accept()
+            if nil != err {
+                log.Fatalln(err)
+            }
+            go handle(conn)
+        }
+    }
+
+Goroutine-per-connection is how it’s done
+
+* Echo server
+
+    func handle(conn net.Conn) {
+        defer conn.Close()
+        p := make([]byte, 4096)
+        for {
+            n, err := conn.Read(p)
+            if nil != err {
+                log.Println(conn.RemoteAddr(), err)
+                break
+            }
+            log.Printf("%v p: %s", conn.RemoteAddr(), p[:n])
+            if _, err := conn.Write(p[:n]); nil != err {
+                log.Println(conn.RemoteAddr(), err)
+                break
+            }
+        }
+    }
+
+No callbacks, no miniature state machines
+
+* A word about frameworks
+
+They keep us from repeating ourselves
+They provide powerful abstractions
+They’re often conceptually greedy
+
+* Higher-level frameworks
+
+- Gorilla
+- Martini
+- Revel
+- ...
+
+Often incompatible with `http.Handler`
+Full of magic
+
+* Tiger Tonic
+
+* Tiger Tonic
+
+Inspired by Dropwizard
+How Betable builds web services in Go
+[[https://github.com/rcrowley/go-tigertonic]]
+
+* Request multiplexing
+
+    mux := http.NewServeMux()
+    mux.Handle("/", &handler{})
+
+`http.ServeMux` only routes prefixes
+
+    mux := tigertonic.NewTrieServeMux()
+    mux.Handle("GET", "/foo/{bar}/baz", &handler{})
+
+`tigertonic.TrieServeMux` is method- and wildcard-aware
+Responds 404 and 405 appropriately
+
+* Recursion underneath
+
+    type TrieServeMux struct {
+        methods map[string]http.Handler
+        param   *string
+        paths   map[string]*TrieServeMux
+        pattern string
+    }
+
+`Handle` produces a tree of `TrieServeMux`
+Your handlers are the leaves in `methods`
+Wildcards are added to `r.URL.Query`
+
+* JSON in, JSON out
+
+    handler := tigertonic.Marshaled(func(
+        url.URL, http.Header, *MyRequest,
+    ) (int, http.Header, *MyResponse, error) {
+        return http.StatusOK, nil, &MyResponse{}, nil
+    })
+
+Static request and response types
+No hassling with `json.Encoder`
+Responds 400, 406, and 415 appropriately
+Responds with JSON in case of error, too
+Still an `http.Handler`
+
+* Not quite an interface
+
+    handler := tigertonic.Marshaled(func(
+        url.URL, http.Header, *MyRequest,
+    ) (int, http.Header, *MyResponse, error) {
+        return http.StatusOK, nil, &MyResponse{}, nil
+    })
+
+Verify the function arity and parameter types at early runtime
+Accept arbitrary types for the request and response bodies
+
+* Request unmarshaling
+
+    decoder := reflect.ValueOf(json.NewDecoder(r.Body))
+    out := decoder.MethodByName("Decode").Call([]reflect.Value{
+        reflect.New(m.v.Type().In(2).Elem()),
+    })
+
+Your code only sees static types
+
+* Response marshaling
+
+    json.NewEncoder(w).Encode(response)
+
+Just like earlier but handled by the framework
+
+* Error marshaling
+
+    func writeJSONError(w http.ResponseWriter, err error) {
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(errorStatusCode(err))
+        if jsonErr := json.NewEncoder(w).Encode(map[string]string{
+            "description": err.Error(),
+            "error":       errorName(err, "error"),
+        }); nil != err {
+            log.Println(jsonErr)
+        }
+    }
+
+Status code from `StatusCode()` or 500
+`"error"` from `Name()` or type
+`"description"` is the error itself
+
+* Conditionals
+
+    handler := tigertonic.If(
+        func(r *http.Request) (http.Header, error) {
+            if "" == r.Header.Get("X-Condition") {
+                return nil, Forbidden{errors.New("forbidden")}
+            }
+            return nil, nil
+        }),
+        protectedHandler,
+    )
+
+`If` naturally wraps any `http.Handler`
+Special case of `First` middleware chains
+And yes, it’s an `http.Handler`
+
+* Middleware chains
+
+    handler := tigertonic.First(
+        enforceRateLimit,
+        checkAuthorization,
+        doActualWork,
+    )
+
+Call `ServeHTTP` on a list of handlers
+The first handler to call `w.WriteHeader(...)` ends the process
+
+* Visibility
+
+The real problem for production-ready web services
+`http.Handler` through and through
+
+* Logging
+
+    handler = tigertonic.Logged(handler, nil)
+
+`tigertonic.Logged` for full (optionally redacted) request and response logs
+
+    handler = tigertonic.ApacheLogged(handler)
+
+`tigertonic.ApacheLogged` for Apache combined logs
+
+* Metrics
+
+    handler = tigertonic.Counted(handler, "my-handler", nil)
+    handler = tigertonic.Timed(handler, "my-handler", nil)
+
+`tigertonic.Counted` and `tigertonic.Timed` for knowing how many and how fast
+We mostly use `tigertonic.Timed` on each route individually
+
+* Other batteries included
+
+URL namespaces
+Virtual hostnames
+HTTP Basic auth
+CORS basics
+TLS
+
+* Testing
+
+    code, header, response, err := create(
+        mocking.URL(mux, "POST", "http://example.com/1.0/stuff"),
+        mocking.Header(nil),
+        &MyRequest{"ID", "STUFF"},
+    )
+    // Now make assertions!
+
+Construct a fake request
+Call your `Marshaled` function directly
+Or call `ServeHTTP` with an `httptest.ResponseRecorder`
+
+* Parting advice
+
+Embrace `http.Handler`
+Provide abstractions within
+Remember that errors are not exceptional
+
+* Links
+
+[[https://github.com/rcrowley/go-metrics]]
+[[https://github.com/rcrowley/go-tigertonic]]
+
+* A word from my sponsors
+
+[[mailto:jobs@betable.com]]
