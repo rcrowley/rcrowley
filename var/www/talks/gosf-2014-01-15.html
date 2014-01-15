@@ -450,26 +450,14 @@ func multifail() (*Win, error) {
   
       <article>
       
-        <h3>Higher-level frameworks</h3>
+        <h3>Typical frameworks</h3>
         
-  <ul>
-  
-    <li>Gorilla</li>
-  
-    <li>Martini</li>
-  
-    <li>Revel</li>
-  
-    <li>...</li>
-  
-  </ul>
-
   
   <p>
-    Often incompatible with <code>http.Handler</code>
+    Full of magic
 <br>
 
-    Full of magic
+    Often incompatible with <code>http.Handler</code>
   </p>
   
 
@@ -772,7 +760,7 @@ out := decoder.MethodByName(&#34;Decode&#34;).Call([]reflect.Value{
         
   
   <p>
-    The real problem for production-ready web services
+    This is the real problem for production-ready web services
 <br>
 
     <code>http.Handler</code> through and through
@@ -838,33 +826,6 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
   
       <article>
       
-        <h3>Other batteries included</h3>
-        
-  
-  <p>
-    URL namespaces
-<br>
-
-    Virtual hostnames
-<br>
-
-    HTTP Basic auth
-<br>
-
-    CORS basics
-<br>
-
-    TLS
-  </p>
-  
-
-      
-      </article>
-  
-  
-  
-      <article>
-      
         <h3>Testing</h3>
         
   
@@ -885,6 +846,54 @@ handler = tigertonic.Timed(handler, &#34;my-handler&#34;, nil)</pre></div>
 <br>
 
     Or call <code>ServeHTTP</code> with an <code>httptest.ResponseRecorder</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Other batteries included</h3>
+        
+  
+  <p>
+    URL namespaces
+<br>
+
+    Virtual hostnames
+<br>
+
+    HTTP Basic auth
+<br>
+
+    CORS basics
+<br>
+
+    TLS defaults
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Graceful stop</h3>
+        
+  
+  <p>
+    <a href="https://github.com/rcrowley/go-tigertonic/pull/54" target="_blank">github.com/rcrowley/go-tigertonic/pull/54</a>
+<br>
+
+    Adds a <code>sync.WaitGroup</code> to <code>net.Listener</code> and <code>net.Conn</code>
+<br>
+
+    Adds <code>Connection: close</code> to responses written after the listener is closed
   </p>
   
 

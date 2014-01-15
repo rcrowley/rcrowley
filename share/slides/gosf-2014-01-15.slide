@@ -192,15 +192,10 @@ They keep us from repeating ourselves
 They provide powerful abstractions
 They’re often conceptually greedy
 
-* Higher-level frameworks
+* Typical frameworks
 
-- Gorilla
-- Martini
-- Revel
-- ...
-
-Often incompatible with `http.Handler`
 Full of magic
+Often incompatible with `http.Handler`
 
 * Tiger Tonic
 
@@ -322,7 +317,7 @@ The first handler to call `w.WriteHeader(...)` ends the process
 
 * Visibility
 
-The real problem for production-ready web services
+This is the real problem for production-ready web services
 `http.Handler` through and through
 
 * Logging
@@ -343,14 +338,6 @@ The real problem for production-ready web services
 `tigertonic.Counted` and `tigertonic.Timed` for knowing how many and how fast
 We mostly use `tigertonic.Timed` on each route individually
 
-* Other batteries included
-
-URL namespaces
-Virtual hostnames
-HTTP Basic auth
-CORS basics
-TLS
-
 * Testing
 
     code, header, response, err := create(
@@ -363,6 +350,20 @@ TLS
 Construct a fake request
 Call your `Marshaled` function directly
 Or call `ServeHTTP` with an `httptest.ResponseRecorder`
+
+* Other batteries included
+
+URL namespaces
+Virtual hostnames
+HTTP Basic auth
+CORS basics
+TLS defaults
+
+* Graceful stop
+
+[[https://github.com/rcrowley/go-tigertonic/pull/54]]
+Adds a `sync.WaitGroup` to `net.Listener` and `net.Conn`
+Adds `Connection:`close` to responses written after the listener is closed
 
 * Parting advice
 
