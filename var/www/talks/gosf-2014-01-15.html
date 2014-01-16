@@ -219,8 +219,8 @@ func (h *notFoundHandler) ServeHTTP(
     r *http.Request,
 ) {
     w.Header().Set(&#34;Content-Type&#34;, &#34;text/plain&#34;)
-    w.WriteHeader(http.StatusNotFound)
-    fmt.Fprintln(w, &#34;404 Not Found&#34;)
+    w.WriteHeader(http.StatusInternalServerError)
+    fmt.Fprintln(w, &#34;500 Internal Server Error&#34;)
 }</pre></div>
   
 

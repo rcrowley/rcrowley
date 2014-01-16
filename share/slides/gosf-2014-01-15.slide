@@ -93,8 +93,8 @@ Suddenly, things are a lot more verbose
         r *http.Request,
     ) {
         w.Header().Set("Content-Type", "text/plain")
-        w.WriteHeader(http.StatusNotFound)
-        fmt.Fprintln(w, "404 Not Found")
+        w.WriteHeader(http.StatusInternalServerError)
+        fmt.Fprintln(w, "500 Internal Server Error")
     }
 
 Responding with an error is too similar to responding normally
