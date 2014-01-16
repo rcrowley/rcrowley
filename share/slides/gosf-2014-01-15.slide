@@ -20,12 +20,6 @@ Data and a set of operations on that data
 Networked using the HTTP protocol
 Structured and machine-parseable requests and responses
 
-* Polls
-
-Who has written at least one Go program?
-Who has Go in production?
-Who has *only* Go in production?
-
 * Hello, www!
 
     package main
