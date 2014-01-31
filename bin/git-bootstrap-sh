@@ -1,0 +1,164 @@
+#!/bin/sh
+
+#/ Usage: git-bootstrap-sh [--proper-name=<proper-name>] <name>
+#/   --proper-name=<proper-name> upper-cased name to be used in documentation
+#/   <name>                      name of the repository
+
+set -e
+
+usage() {
+	grep "^#/" "$0" | cut -c"4-" >&2
+	exit "$1"
+}
+while [ "$#" -gt 0 ]
+do
+	case "$1" in
+		--proper-name) PROPER_NAME="$2" shift 2;;
+		--proper-name=*) PROPER_NAME="$(echo "$1" | cut -c"15-")" shift;;
+		-h|--help) usage 0;;
+		-*) usage 1;;
+		*) break;;
+	esac
+done
+NAME="$1"
+[ "$NAME" ] || usage 1
+
+set -x
+
+mkdir "$HOME/src/github.com/$USER/$NAME"
+cd "$HOME/src/github.com/$USER/$NAME"
+
+git init
+git remote add "origin" "git@github.com:$USER/$NAME.git"
+
+cat >".gitignore" <<EOF
+*.deb
+*.swp
+EOF
+[ -f "$HOME/LICENSE" ] && cp "$HOME/LICENSE" "LICENSE"
+cat >"Makefile" <<EOF
+VERSION=0.0.0
+BUILD=0
+
+prefix=/usr/local
+bindir=\${prefix}/bin
+libdir=\${prefix}/lib
+mandir=\${prefix}/share/man
+
+all: ${NAME}_\$(VERSION)-\$(BUILD)_all.deb share/html/*.html
+	\$(MAKE) -C share/html
+
+clean:
+
+install: bin/* lib/* share/man/man*/*.[12345678]
+	install -d \$(DESTDIR)\$(bindir)
+	install bin/* \$(DESTDIR)\$(bindir)
+	install -d \$(DESTDIR)\$(libdir)
+	install -m644 lib/* \$(DESTDIR)\$(libdir)
+	install -d \$(DESTDIR)\$(mandir)/man1
+	install -m644 share/man/man1/*.1 \$(DESTDIR)\$(mandir)/man1
+
+uninstall:
+	make install DESTDIR=uninstall
+	-find uninstall -depth -type f -printf \$(DESTDIR)/%P\\n | xargs rm -f
+	-find uninstall -depth -type d -printf \$(DESTDIR)/%P\\n | xargs rmdir
+	rm -rf uninstall
+
+%.deb: bin/* lib/* share/man/man*/*.[12345678]
+	rm -f \$@
+	make install DESTDIR=install prefix=/usr
+	fakeroot fpm -Cinstall -m'$(git config "user.name") <$(git config "user.email")>' -n$NAME -v\$(VERSION)-\$(BUILD) -p\$@ -sdir -tdeb usr
+	rm -rf install
+
+share/man/man1/%.1: share/man/man1/%.1.ronn
+	ronn --manual=${PROPER_NAME:-"$NAME"} --roff \$<
+
+share/html/%.1.html: share/man/man1/%.1.ronn
+	ronn --html --manual=${PROPER_NAME:-"$NAME"} --style=toc \$<
+	mv \$(<:.ronn=.html) \$@
+
+.PHONY: all clean install uninstall
+EOF
+cat >"README.md" <<EOF
+# ${PROPER_NAME:-"$NAME"}
+
+TODO
+
+## Installation
+
+TODO
+
+## Usage
+
+TODO
+EOF
+mkdir -p "bin" "lib" "share/html" "share/man/man1"
+touch "bin/$NAME" "lib/$NAME.sh" "share/html/$NAME.1.html" "share/man/man1/$NAME.1"
+chmod 755 "bin/$NAME"
+cat >"share/man/man1/$NAME.1.ronn" <<EOF
+# $NAME(1) -- TODO
+
+## SYNOPSIS
+
+TODO
+
+## DESCRIPTION
+
+TODO
+
+## OPTIONS
+
+TODO
+
+## AUTHOR
+
+$(git config "user.name") <$(git config "user.email")>
+
+## SEE ALSO
+
+TODO
+EOF
+cat >"share/html/index.html" <<EOF
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>${PROPER_NAME:-"$NAME"}</title>
+</head>
+<body>
+<h1>${PROPER_NAME:-"$NAME"}</h1>
+<p>TODO</p>
+<ul>
+<li><a href="$NAME.1.html"><code>$NAME</code>(1)</a></li>
+</ul>
+<p>TODO</p>
+<p><a href="https://github.com/$USER/$NAME">https://github.com/$USER/$NAME</a></p>
+</body>
+</html>
+EOF
+git add "."
+git commit -m"Initialized by $(basename "$0")."
+
+git checkout --orphan "gh-pages"
+git rm -rf "."
+
+cat >".gitignore" <<EOF
+*.deb
+*.swp
+EOF
+cat >"Makefile" <<EOF
+all:
+	git checkout -q master
+	-cp share/html/* .
+	git checkout -q gh-pages
+	-git add .
+	-git commit -mgh-pages
+
+.PHONY: all
+EOF
+git add "."
+git commit -m"Initialized by $(basename "$0")."
+
+git checkout "master"
+
+# This is very important because we're creating Makefiles.
+# vim: noexpandtab
