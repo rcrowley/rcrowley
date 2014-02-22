@@ -12,6 +12,7 @@ au BufNewFile,BufRead *.clj setlocal shiftwidth=2 softtabstop=2 tabstop=2
 
 " Load the Vim configuration that ships with Go.  Additionally set us up to
 " run gofmt on save.
+let g:gofmt_command = "goimports"
 filetype off
 filetype plugin off
 set runtimepath+=$GOROOT/misc/vim

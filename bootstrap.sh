@@ -89,6 +89,7 @@ apt-get update
 
 # Install Go and clone dependencies.
 apt-get install "go"
+go get "code.google.com/p/go.tools/cmd/goimports"
 mkdir -p "src/github.com/rcrowley"
 if [ ! -d "src/github.com/rcrowley/go-metrics" ]
 then git clone "git@github.com:rcrowley/go-metrics.git" "src/github.com/rcrowley/go-metrics"
