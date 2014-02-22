@@ -10,9 +10,14 @@ colorscheme solarized
 " Clojure sort of uses 2 spaces.  It also uses single spaces.
 au BufNewFile,BufRead *.clj setlocal shiftwidth=2 softtabstop=2 tabstop=2
 
-" Go's gofmt defaults to tabs.  So should I.
-au FileType go setlocal noexpandtab
-au BufRead,BufNewFile *.proto setlocal noexpandtab
+" Load the Vim configuration that ships with Go.  Additionally set us up to
+" run gofmt on save.
+filetype off
+filetype plugin off
+set runtimepath+=$GOROOT/misc/vim
+filetype plugin on
+syntax on
+autocmd FileType go autocmd BufWritePre <buffer> Fmt
 
 " JavaScript, especially node, likes to use 2 spaces but at Betable,
 " we use 4 spaces.
@@ -27,6 +32,10 @@ au FileType make setlocal noexpandtab
 
 " Markdown needs to be told it is.
 au BufRead,BufNewFile *.md setlocal filetype=markdown
+
+" Protocol buffers can be whatever but I like tabs because I mostly use
+" them with Go.
+au BufRead,BufNewFile *.proto setlocal noexpandtab
 
 " Silly Rubytards like 2 spaces.
 au FileType ruby setlocal shiftwidth=2 softtabstop=2 tabstop=2
