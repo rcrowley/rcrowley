@@ -1,0 +1,66 @@
+body, p, h1, h2 { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+body { margin: 0; }
+
+header, section, footer { display: block; }
+
+header {
+	height: 120px;
+	margin: 0;
+}
+header {
+	background: white url(/img/kcrc.jpg) no-repeat center right;
+	border-bottom: 2px solid purple;
+	height: 120px;
+	margin: 0;
+}
+header h1 {
+	padding: 24px 0 0 40px;
+	margin: 0;
+	vertical-align: center;
+}
+header h1 a, header h1 a:link, header h1 a:hover, header h1 a:active, header h1 a:visited, header h3 {
+	color: purple;
+	text-decoration: none;
+}
+header h3 {
+	margin: 0;
+	padding: 0 0 0 40px;
+	vertical-align: center;
+}
+
+section { margin: 0; }
+
+.map {
+	height: 300px;
+	margin: 1.5em 0 0 0;
+}
+
+.categories, .positions { float: left; }
+.categories { width: 35%; }
+.positions { width: 65%; }
+
+ul { list-style-type: none; }
+.categories ul { padding: 0 0.75em 0 1.5em; }
+.positions section { margin: 2.25em 2.25em 0.75em 2em; }
+.positions ul { padding: 0 1.5em 0 0.75em; }
+li {
+	border-left: 0.5em solid white;
+	margin: 1.5em 0;
+	padding: 0.75em;
+}
+li.highlight {
+	background: #fbeeff;
+	border-color: purple;
+}
+.categories li, .positions li { cursor: pointer; }
+li h1, li h2 { margin-top: 0; }
+li h1 { font-size: 32px; }
+
+footer {
+	border-top: 2px solid purple;
+	clear: both;
+	font-weight: bold;
+	padding-left: 35%;
+}
+footer * { margin-left: 2em; }
