@@ -11,7 +11,7 @@ do
     fi
 done
 if [ -z "$SSH_AUTH_SOCK" ]
-then eval "$(ssh-agent)"
+then eval "$(ssh-agent -t"600")"
 fi
 
 # After an ssh-agent is running, pull the latest home directory from GitHub.
