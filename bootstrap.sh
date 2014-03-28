@@ -78,7 +78,7 @@ then
     export GPG_AGENT_INFO
 fi
 if ! gpg-agent
-then gpg-agent --daemon --default-cache-ttl 315360000 --max-cache-ttl 315360000 --write-env-file ".gpg-agent-info"
+then gpg-agent --daemon --disable-scdaemon --write-env-file ".gpg-agent-info"
 fi
 sleep 1
 . "./.gpg-agent-info"
