@@ -7,7 +7,11 @@ PS1="\[\e[1;31m\]█\[\e[0m\] $(
     then echo "Arch"
     elif [ -s "/etc/redhat-release" ]
     then cat "/etc/redhat-release"
-    else lsb_release -sc 2>"/dev/null"
+    elif which "lsb_release" >"/dev/null" 2>"/dev/null"
+    then lsb_release -sc 2>"/dev/null"
+    elif which "sw_vers" >"/dev/null" 2>"/dev/null"
+    then sw_vers -productVersion
+    else echo "COMPUTER"
     fi
 ) \h$(
 	[ -f "/.lxcme" ] && {
