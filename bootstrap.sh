@@ -15,6 +15,14 @@ fi
 
 set -x
 
+# Setup FileVault and leave its recovery key in the home directory.
+if [ "$MAC_OS_X" ]
+then
+    if ! sudo fdesetup list
+    then sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
+    fi
+fi
+
 # Add known hosts entries to make this program more headless.
 mkdir -m"700" -p ".ssh"
 if ! grep -q "github.com" ".ssh/known_hosts"
@@ -64,16 +72,19 @@ then
 
     # Go releases aren't necessarily tagged to every OS X release so we have to
     # be a bit more clever about finding the URL of the package to install.
-    seq "$(sw_vers -productVersion | cut -d"." -f"2")" "-1" "6" |
-    while read MINOR
-    do
-        curl -O -f "http://go.googlecode.com/files/go$VERSION.darwin-amd64-osx10.$MINOR.pkg" || continue
-        trap "rm -f \"go$VERSION.darwin-amd64-osx10.$MINOR.pkg\"" EXIT INT QUIT TERM
-        sudo installer -package "go$VERSION.darwin-amd64-osx10.$MINOR.pkg" -target "/"
-        rm -f "go$VERSION.darwin-amd64-osx10.$MINOR.pkg"
-        trap "" EXIT INT QUIT TERM
-        break
-    done
+    if [ ! -d "/usr/local/go" ]
+    then
+        seq "$(sw_vers -productVersion | cut -d"." -f"2")" "-1" "6" |
+        while read MINOR
+        do
+            curl -O -f "http://go.googlecode.com/files/go$VERSION.darwin-amd64-osx10.$MINOR.pkg" || continue
+            trap "rm -f \"go$VERSION.darwin-amd64-osx10.$MINOR.pkg\"" EXIT INT QUIT TERM
+            sudo installer -package "go$VERSION.darwin-amd64-osx10.$MINOR.pkg" -target "/"
+            rm -f "go$VERSION.darwin-amd64-osx10.$MINOR.pkg"
+            trap "" EXIT INT QUIT TERM
+            break
+        done
+    fi
 
 else
     apt-get -y install "freight" "git" "gnupg-agent" "go" "mercurial" "pinentry-curses" "python-django" "ruby" "rubygems" "tmux" "vim"
