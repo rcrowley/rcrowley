@@ -31,7 +31,7 @@ September 2003 - May 2007
 
 Professional Experience
 
-Engineer
+Head of Operations
 Betable [2]
 April 2012 - present
 Built platform and APIs to real-money gaming: a service-oriented architecture
