@@ -18,8 +18,17 @@ set -x
 # Setup FileVault and leave its recovery key in the home directory.
 if [ "$MAC_OS_X" ]
 then
-    if ! sudo fdesetup list
-    then sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
+    if which "fdesetup" >"/dev/null" 2>"/dev/null"
+    then
+        if ! sudo fdesetup list
+        then sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
+        fi
+    else
+        set +x
+        echo >&2
+        echo "$(tput "bold")Make sure you turn on FileVault!$(tput "sgr0")" >&2
+        echo >&2
+        set -x
     fi
 fi
 
