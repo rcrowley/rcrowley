@@ -41,7 +41,7 @@ if ! grep -q "rcrowley.org" ".ssh/known_hosts"
 then ssh-keyscan "rcrowley.org" >>".ssh/known_hosts"
 fi
 
-# Add our Debian archive to APT and update the base system.
+# Add our Debian archive to APT.
 if [ -z "$MAC_OS_X" ]
 then
     cat >"/etc/apt/sources.list.d/rcrowley.list" <<EOF
@@ -51,7 +51,6 @@ EOF
     cp "var/cache/freight/keyring.gpg" "/etc/apt/trusted.gpg.d/rcrowley.gpg"
     export APT_LISTBUGS_FRONTEND="none" APT_LISTCHANGES_FRONTEND="none" DEBIAN_FRONTEND="noninteractive"
     apt-get update
-    apt-get -y upgrade
 fi
 
 # Build the Debian package for Go if it doesn't already exist.
@@ -99,6 +98,15 @@ else
     apt-get -y install "freight" "git" "gnupg-agent" "go" "mercurial" "pinentry-curses" "python-django" "ruby" "rubygems" "tmux" "vim"
     apt-get -y remove "pinentry-gtk2"
     which "fpm" || gem install --no-rdoc --no-ri "fpm"
+fi
+
+# TODO Install apps from the Mac App Store.
+
+# Update everything aggressively.
+if [ "$MAC_OS_X" ]
+then sudo softwareupdate -i -a
+else
+    apt-get -y upgrade
 fi
 
 # Clone the home directory.
