@@ -103,6 +103,7 @@ fi
 # Install and configure Mac GUI apps.
 if [ "$MAC_OS_X" ]
 then
+    # FIXME 1Password
     if [ ! -d "/Applications/Adium.app" ]
     then
         curl -O "http://softlayer-dal.dl.sourceforge.net/project/adium/Adium_1.5.9.dmg"
