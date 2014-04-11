@@ -100,13 +100,36 @@ else
     which "fpm" || gem install --no-rdoc --no-ri "fpm"
 fi
 
-# TODO Install apps from the Mac App Store.
+# Install and configure Mac GUI apps.
+if [ "$MAC_OS_X" ]
+then
+    if [ ! -d "/Applications/Adium.app" ]
+    then
+        curl -O "http://softlayer-dal.dl.sourceforge.net/project/adium/Adium_1.5.9.dmg"
+        # FIXME
+    fi
+    # FIXME Caffiene
+    if [ ! -d "/Applications/Google Chrome.app" ]
+    then
+        curl -O "https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg"
+        # FIXME
+    fi
+    if [ ! -d "/Applications/Papers2.app" ]
+    then
+        curl -O "http://downloads.mekentosj.com/papers_273.dmg"
+        # FIXME
+    fi
+    # FIXME VirtualBox
+    read -p"Install Slack and Textual from the Mac App Store; press <ENTER> to continue. "
+    open "/Applications/App Store.app"
+    # FIXME Pause until the App Store closes.
+    # FIXME defaults write ...
+fi
 
 # Update everything aggressively.
 if [ "$MAC_OS_X" ]
 then sudo softwareupdate -i -a
-else
-    apt-get -y upgrade
+else apt-get -y upgrade
 fi
 
 # Clone the home directory.
@@ -193,4 +216,12 @@ if [ -z "$MAC_OS_X" ]
 then
     grep -v "rcrowley.org" ".ssh/known_hosts" >"known_hosts"
     mv "known_hosts" ".ssh"
+fi
+
+# Parting advice.
+set +x
+echo >&2
+if [ "$MAC_OS_X" ]
+then echo "FileVault is now enabled but you need to reboot." >&2
+else echo "Change the rcrowley.org A record to complete the change." >&2
 fi
