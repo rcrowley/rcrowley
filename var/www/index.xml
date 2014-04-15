@@ -1,5 +1,23 @@
-<atom:feed xmlns:atom="http://www.w3.org/2005/Atom"><atom:title type="html">Richard Crowley&amp;#8217;s blog</atom:title><atom:link href="http://rcrowley.org/index.xml" rel="self" /><atom:link href="http://rcrowley.org/" rel="alternate" /><id>http://rcrowley.org/index.xml</id><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:entry><atom:title type="html">talks/gosf-2014-01-15.html</atom:title><atom:link href="http://rcrowley.org/talks/gosf-2014-01-15.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/gosf-2014-01-15.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/gosf-2014-01-15.html"&gt;http://rcrowley.org/talks/gosf-2014-01-15.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Go web services with Tiger Tonic
-</atom:title><atom:link href="http://rcrowley.org/articles/tiger-tonic.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/tiger-tonic.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom"><atom:title type="html">Richard Crowley&amp;#8217;s blog</atom:title><atom:link href="http://rcrowley.org/index.xml" rel="self" /><atom:link href="http://rcrowley.org/" rel="alternate" /><id>http://rcrowley.org/index.xml</id><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:entry><atom:title type="html">Certified
+</atom:title><atom:link href="http://rcrowley.org/2014/04/15/certified.html" rel="alternate" /><atom:id>http://rcrowley.org/2014/04/15/certified.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+&lt;article&gt;
+&lt;header&gt;
+	&lt;time datetime="2014-04-15" pubdate&gt;2014-04-15&lt;/time&gt;
+	&lt;h1&gt;Certified&lt;/h1&gt;
+&lt;/header&gt;
+
+&lt;p&gt;It&amp;#8217;s a scary Internet out there.  Between the growing value of the data exchanged online and the ever-present threat that the NSA decides you&amp;#8217;re interesting we&amp;#8217;re left with only one responsible thing to do:  Protect the confidentiality and integrity of our and our users&amp;#8217; data.&lt;/p&gt;
+
+&lt;p&gt;One important part of any strategy to protect our users&amp;#8217; data is encrypting that data when in motion and that means anywhere, anytime.  It&amp;#8217;s not good enough to only encrypt your payment pages.  It&amp;#8217;s not good enough to only encrypt traffic between users&amp;#8217; browsers and your load balancers.  Every connection that crosses a network should be made via TLS.  Period.&lt;/p&gt;
+
+&lt;p&gt;Traditionally this is either confusing because OpenSSL or expensive because Verisign.  Today I&amp;#8217;m introducing a new option.  &lt;a href="https://github.com/rcrowley/certified"&gt;Certified&lt;/a&gt; will help you generate and manage an internal CA for your company and its &lt;a href="https://github.com/rcrowley/certified/wiki"&gt;wiki&lt;/a&gt; includes a growing collection of examples for the various operating systems, server softwares, and programming languages we all use.&lt;/p&gt;
+
+&lt;p&gt;Be safe out there.&lt;/p&gt;
+
+&lt;/article&gt;
+
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/gosf-2014-01-15.html</atom:title><atom:link href="http://rcrowley.org/talks/gosf-2014-01-15.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/gosf-2014-01-15.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/gosf-2014-01-15.html"&gt;http://rcrowley.org/talks/gosf-2014-01-15.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Go web services with Tiger Tonic
+</atom:title><atom:link href="http://rcrowley.org/articles/tiger-tonic.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/tiger-tonic.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2013-12-13" pubdate&gt;2013-12-13&lt;/time&gt;
@@ -105,8 +123,8 @@ mux.Handle("POST", "/games/{id}/bet", handler)&lt;/code&gt;&lt;/pre&gt;
 
 &lt;/article&gt;
 
-</atom:content></atom:entry><atom:entry><atom:title type="html">talks/basho-chat-2013-12-03.html</atom:title><atom:link href="http://rcrowley.org/talks/basho-chat-2013-12-03.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/basho-chat-2013-12-03.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/basho-chat-2013-12-03.html"&gt;http://rcrowley.org/talks/basho-chat-2013-12-03.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/opsmatic-2013-11-19.html</atom:title><atom:link href="http://rcrowley.org/talks/opsmatic-2013-11-19.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/opsmatic-2013-11-19.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/opsmatic-2013-11-19.html"&gt;http://rcrowley.org/talks/opsmatic-2013-11-19.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/strange-loop-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/strange-loop-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/strange-loop-2013.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/strange-loop-2013.html"&gt;http://rcrowley.org/talks/strange-loop-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/surge-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/surge-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/surge-2013.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/surge-2013.html"&gt;http://rcrowley.org/talks/surge-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/puppetconf-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/puppetconf-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/puppetconf-2013.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/puppetconf-2013.html"&gt;http://rcrowley.org/talks/puppetconf-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/agile-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/agile-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/agile-2013.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/agile-2013.html"&gt;http://rcrowley.org/talks/agile-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Graceful stopping in Go
-</atom:title><atom:link href="http://rcrowley.org/articles/golang-graceful-stop.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/golang-graceful-stop.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/basho-chat-2013-12-03.html</atom:title><atom:link href="http://rcrowley.org/talks/basho-chat-2013-12-03.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/basho-chat-2013-12-03.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/basho-chat-2013-12-03.html"&gt;http://rcrowley.org/talks/basho-chat-2013-12-03.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/opsmatic-2013-11-19.html</atom:title><atom:link href="http://rcrowley.org/talks/opsmatic-2013-11-19.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/opsmatic-2013-11-19.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/opsmatic-2013-11-19.html"&gt;http://rcrowley.org/talks/opsmatic-2013-11-19.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/strange-loop-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/strange-loop-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/strange-loop-2013.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/strange-loop-2013.html"&gt;http://rcrowley.org/talks/strange-loop-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/surge-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/surge-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/surge-2013.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/surge-2013.html"&gt;http://rcrowley.org/talks/surge-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/puppetconf-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/puppetconf-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/puppetconf-2013.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/puppetconf-2013.html"&gt;http://rcrowley.org/talks/puppetconf-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">talks/agile-2013.html</atom:title><atom:link href="http://rcrowley.org/talks/agile-2013.html" rel="alternate" /><atom:id>http://rcrowley.org/talks/agile-2013.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/agile-2013.html"&gt;http://rcrowley.org/talks/agile-2013.html&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Graceful stopping in Go
+</atom:title><atom:link href="http://rcrowley.org/articles/golang-graceful-stop.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/golang-graceful-stop.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2013-04-27" pubdate&gt;2013-04-27&lt;/time&gt;
@@ -123,7 +141,7 @@ mux.Handle("POST", "/games/{id}/bet", handler)&lt;/code&gt;&lt;/pre&gt;
 &lt;/article&gt;
 
 </atom:content></atom:entry><atom:entry><atom:title type="html">Go acknowledgement test
-</atom:title><atom:link href="http://rcrowley.org/2013/04/19/golang-ack-test.html" rel="alternate" /><atom:id>http://rcrowley.org/2013/04/19/golang-ack-test.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:title><atom:link href="http://rcrowley.org/2013/04/19/golang-ack-test.html" rel="alternate" /><atom:id>http://rcrowley.org/2013/04/19/golang-ack-test.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2013-04-19" pubdate&gt;2013-04-19&lt;/time&gt;
@@ -134,8 +152,8 @@ mux.Handle("POST", "/games/{id}/bet", handler)&lt;/code&gt;&lt;/pre&gt;
 &lt;script src="https://gist.github.com/rcrowley/5423530.js"&gt;&lt;/script&gt;
 &lt;/article&gt;
 
-</atom:content></atom:entry><atom:entry><atom:title type="html">talks/nodejs-2013-02-19/</atom:title><atom:link href="http://rcrowley.org/talks/nodejs-2013-02-19/" rel="alternate" /><atom:id>http://rcrowley.org/talks/nodejs-2013-02-19/</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/nodejs-2013-02-19/"&gt;http://rcrowley.org/talks/nodejs-2013-02-19/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Federated Graphite
-</atom:title><atom:link href="http://rcrowley.org/articles/federated-graphite.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/federated-graphite.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:content></atom:entry><atom:entry><atom:title type="html">talks/nodejs-2013-02-19/</atom:title><atom:link href="http://rcrowley.org/talks/nodejs-2013-02-19/" rel="alternate" /><atom:id>http://rcrowley.org/talks/nodejs-2013-02-19/</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">&lt;a href="http://rcrowley.org/talks/nodejs-2013-02-19/"&gt;http://rcrowley.org/talks/nodejs-2013-02-19/&lt;/a&gt;</atom:content></atom:entry><atom:entry><atom:title type="html">Federated Graphite
+</atom:title><atom:link href="http://rcrowley.org/articles/federated-graphite.html" rel="alternate" /><atom:id>http://rcrowley.org/articles/federated-graphite.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2012-08-03" pubdate&gt;2012-08-03&lt;/time&gt;
@@ -217,7 +235,7 @@ $destinations = related_nodes(Graphite::Carbon::Cache, true)&lt;/code&gt;&lt;/pr
 &lt;/article&gt;
 
 </atom:content></atom:entry><atom:entry><atom:title type="html">Developing Operability
-</atom:title><atom:link href="http://rcrowley.org/2012/02/25/superconf.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/02/25/superconf.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:title><atom:link href="http://rcrowley.org/2012/02/25/superconf.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/02/25/superconf.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2012-02-25" pubdate&gt;2012-02-25&lt;/time&gt;
@@ -293,7 +311,7 @@ $destinations = related_nodes(Graphite::Carbon::Cache, true)&lt;/code&gt;&lt;/pr
 &lt;/article&gt;
 
 </atom:content></atom:entry><atom:entry><atom:title type="html">Square
-</atom:title><atom:link href="http://rcrowley.org/2012/01/03/square.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/01/03/square.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
+</atom:title><atom:link href="http://rcrowley.org/2012/01/03/square.html" rel="alternate" /><atom:id>http://rcrowley.org/2012/01/03/square.html</atom:id><atom:published>2014-04-15T17:21:46Z</atom:published><atom:updated>2014-04-15T17:21:46Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
 &lt;article&gt;
 &lt;header&gt;
 	&lt;time datetime="2012-01-03" pubdate&gt;2012-01-03&lt;/time&gt;
@@ -307,73 +325,6 @@ $destinations = related_nodes(Graphite::Carbon::Cache, true)&lt;/code&gt;&lt;/pr
 &lt;p&gt;It&amp;#8217;s been about two years since Matt and I set out to build heavily automated development environments and stumbled into a new configuration management workflow.&amp;nbsp; I can&amp;#8217;t understate how much I&amp;#8217;ve learned about both engineering and startups in that time.&amp;nbsp; For now, though, I want to spend my time engineering and not selling or searching for consulting work.&lt;/p&gt;
 
 &lt;p&gt;It&amp;#8217;s hip to be (a) square.&lt;/p&gt;
-
-&lt;/article&gt;
-
-</atom:content></atom:entry><atom:entry><atom:title type="html">Blueprints in the new AWS CloudFormation
-</atom:title><atom:link href="http://rcrowley.org/2011/10/04/aws-cloudformation.html" rel="alternate" /><atom:id>http://rcrowley.org/2011/10/04/aws-cloudformation.html</atom:id><atom:published>2014-04-02T16:22:59Z</atom:published><atom:updated>2014-04-02T16:22:59Z</atom:updated><atom:author><atom:name>Richard Crowley</atom:name></atom:author><atom:content type="html">
-&lt;article&gt;
-&lt;header&gt;
-	&lt;time datetime="2011-10-03" pubdate&gt;2011-10-03&lt;/time&gt;
-	&lt;h1&gt;Blueprints in the new AWS CloudFormation&lt;/h1&gt;
-&lt;/header&gt;
-
-&lt;p&gt;&lt;em&gt;Cross-posted from the &lt;a href="http://blog.devstructure.com/blueprints-in-the-new-aws-cloudformation"&gt;DevStructure Blog&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;Just last week, Amazon Web Services rolled out the &lt;a href="http://aws.typepad.com/aws/2011/09/amazon-linux-ami-production-status-new-features.html"&gt;first production release of the Amazon Linux AMI&lt;/a&gt; and with it some &lt;a href="http://aws.typepad.com/aws/2011/09/powerful-new-features-for-aws-cloudformation.html"&gt;powerful new features for CloudFormation&lt;/a&gt;.&amp;nbsp; There&amp;#8217;s a lot there (like updating stacks and IAM integration) but we at DevStructure are most excited about Application Bootstrapping.&lt;/p&gt;
-
-&lt;p&gt;The new Amazon Linux AMI comes with the &lt;code&gt;aws-cfn-bootstrap&lt;/code&gt; package, which can unpack tarballs, place configuration files, install packages, and restart services at provision time.&amp;nbsp; Sound familiar?&amp;nbsp; That&amp;#8217;s right, this new section of the CloudFormation template language uses the &lt;a href="http://devstructure.github.com/blueprint/blueprint.5.html"&gt;&lt;code&gt;blueprint&lt;/code&gt;(5)&lt;/a&gt; file format!&lt;/p&gt;
-
-&lt;p&gt;Amazon&amp;#8217;s PDF whitepaper, &lt;a href="https://s3.amazonaws.com/cloudformation-examples/BoostrappingApplicationsWithAWSCloudFormation.pdf"&gt;Bootstrapping Applications via AWS CloudFormation&lt;/a&gt;, walks through building a complete stack template by hand.&amp;nbsp; To summarize, you&amp;#8217;ll need to create an &lt;a href="http://docs.amazonwebservices.com/AWSCloudFormation/latest/UserGuide/index.html?aws-properties-iam-user.html"&gt;IAM resource&lt;/a&gt; and declare your EC2 instances like this:&lt;/p&gt;
-
-&lt;pre&gt;"Resources": {
-  "DemoInstance": {
-    &lt;strong&gt;"Metadata": {
-      "AWS::CloudFormation::Init": {
-        "config": &lt;em&gt;THIS IS WHERE THE BLUEPRINT GOES!&lt;/em&gt;
-      }
-    }&lt;/strong&gt;,
-    "Properties": {
-	    "ImageId": {"Fn::FindInMap": [
-	      "AWSRegionArch2AMI",
-	      {"Ref": "AWS::Region"},
-	      {"Fn::FindInMap": [
-	        "AWSInstanceType2Arch",
-	        {"Ref": "InstanceType"},
-	        "Arch"
-	      ]}
-	    ]},
-      "InstanceType": {"Ref": "InstanceType"},
-      "KeyName": {"Ref": "KeyName"},
-      "SecurityGroups": [{"Ref": "DemoSecurityGroup"}],
-      &lt;strong&gt;"UserData" : {"Fn::Base64" : {"Fn::Join" : ["", [
-        "#!/bin/sh\n",
-        "/opt/aws/bin/cfn-init",
-        " -s '", {"Ref" : "AWS::StackName"}, "'",
-        " -r 'DemoInstance'",
-        " --region '", { "Ref" : "AWS::Region" }, "'",
-        " --access-key '", {"Ref": "DemoKey"}, "'",
-        " --secret-key '", {"Fn::GetAtt": ["DemoKey", "SecretAccessKey"]}, "'",
-        "\n",
-        "/opt/aws/bin/cfn-signal",
-        " -e $?",
-        " '", {"Ref" : "DemoWaitConditionHandle"}, "'",
-        "\n"
-      ]]}}&lt;/strong&gt;
-    },
-    "Type": "AWS::EC2::Instance"
-  }
-}&lt;/pre&gt;
-
-&lt;p&gt;The user-data calls &lt;code&gt;cfn-init&lt;/code&gt; with the newly-generated IAM credentials to fetch and process the metadata, and &lt;code&gt;cfn-signal&lt;/code&gt; to report success or failure via a &lt;a href="http://docs.amazonwebservices.com/AWSCloudFormation/latest/UserGuide/index.html?aws-properties-waitcondition.html"&gt;WaitCondition&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Packages managed by Yum, Python&amp;#8217;s &lt;code&gt;easy_install&lt;/code&gt;, and RubyGems plus files and services all work natively within CloudFormation.&amp;nbsp; Source tarballs will work if you upload them someplace and provide the fully-qualified URL.&lt;/p&gt;
-
-&lt;p&gt;Going the other direction, the metadata from an existing CloudFormation template can be loaded into Blueprint by copying out the &lt;code&gt;"config"&lt;/code&gt; document fragment and passing it on standard input to &lt;a href="http://devstructure.github.com/blueprint/blueprint-create.1.html"&gt;&lt;code&gt;blueprint-create&lt;/code&gt;(1)&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Our thanks to the Reto Kramer, Chris Whitaker, and Adam Thomas for making it even easier to deploy blueprints to Amazon EC2.&lt;/p&gt;
-
-&lt;p&gt;Today, we&amp;#8217;re releasing Blueprint 3.1, which includes &lt;a href="https://github.com/devstructure/blueprint/compare/v3.0.8...v3.1.0"&gt;a number of fixes and improvements&lt;/a&gt; but most importantly, understands all of Amazon&amp;#8217;s extensions to the &lt;code&gt;blueprint&lt;/code&gt;(5) format, allowing seamless transition to and from AWS CloudFormation.&amp;nbsp; Get 3.1 from &lt;a href="https://github.com/devstructure/blueprint"&gt;GitHub&lt;/a&gt;, &lt;a href="https://github.com/devstructure/blueprint/wiki/Installing-with-a-package-manager"&gt;DevStructure&amp;#8217;s Debian archive&lt;/a&gt;, or from PyPI.&lt;/p&gt;
 
 &lt;/article&gt;
 
