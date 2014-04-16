@@ -26,7 +26,7 @@ then
     else
         set +x
         echo >&2
-        echo "$(tput "bold")Make sure you turn on FileVault!$(tput "sgr0")" >&2
+        read -p"$(tput "bold")Go turn on FileVault; press <ENTER> to continue.$(tput "sgr0") " >&2
         echo >&2
         set -x
     fi
@@ -223,6 +223,6 @@ fi
 set +x
 echo >&2
 if [ "$MAC_OS_X" ]
-then echo "FileVault is now enabled but you need to reboot." >&2
-else echo "Change the rcrowley.org A record to complete the change." >&2
+then echo "$(tput "bold")FileVault is now enabled but you need to reboot.$(tput "sgr0")" >&2
+else echo "$(tput "bold")Change the rcrowley.org A record to complete the change.$(tput "sgr0")" >&2
 fi
