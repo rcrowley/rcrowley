@@ -103,28 +103,58 @@ fi
 # Install and configure Mac GUI apps.
 if [ "$MAC_OS_X" ]
 then
-    # FIXME 1Password
-    if [ ! -d "/Applications/Adium.app" ]
-    then
-        curl -O "http://softlayer-dal.dl.sourceforge.net/project/adium/Adium_1.5.9.dmg"
-        # FIXME
-    fi
-    # FIXME Caffiene
+    mkdir -p "tmp"
+
+    # FIXME Caffeine
+
     if [ ! -d "/Applications/Google Chrome.app" ]
     then
-        curl -O "https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg"
-        # FIXME
+        if [ ! -f "tmp/chrome.dmg" ]
+        then curl -o"tmp/chrome.dmg" "https://dl.google.com/chrome/mac/stable/GGRO/googlechrome.dmg"
+        fi
+        if [ ! -d "/Volumes/Google Chrome" ]
+        then hdiutil attach -nobrowse "tmp/chrome.dmg"
+        fi
+        ditto --rsrc "/Volumes/Google Chrome/Google Chrome.app" "/Applications/Google Chrome.app"
+        hdiutil detach "/Volumes/Google Chrome"
     fi
+
     if [ ! -d "/Applications/Papers2.app" ]
     then
-        curl -O "http://downloads.mekentosj.com/papers_273.dmg"
-        # FIXME
+        if [ ! -f "tmp/papers.dmg" ]
+        then curl -o"tmp/papers.dmg" "http://downloads.mekentosj.com/papers_273.dmg"
+        fi
+        if [ ! -d "/Volumes/Papers2" ]
+        then yes | PAGER=":" hdiutil attach -nobrowse "tmp/papers.dmg"
+        fi
+        ditto --rsrc "/Volumes/Papers2/Papers2.app" "/Applications/Papers2.app"
+        hdiutil detach "/Volumes/Papers2"
     fi
-    # FIXME VirtualBox
-    read -p"Install Slack and Textual from the Mac App Store; press <ENTER> to continue. "
-    open "/Applications/App Store.app"
-    # FIXME Pause until the App Store closes.
+
+    if [ ! -d "/Applications/VirtualBox.app" ]
+    then
+        if [ ! -f "tmp/virtualbox.dmg" ]
+        then
+            curl -s "https://www.virtualbox.org/wiki/Downloads" |
+            grep -E -o 'http://download.virtualbox.org/virtualbox/[0-9]+\.[0-9]+\.[0-9]+/VirtualBox-[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-OSX.dmg' |
+            xargs curl -L -o"tmp/virtualbox.dmg"
+        fi
+        if [ ! -d "/Volumes/VirtualBox" ]
+        then hdiutil attach "tmp/virtualbox.dmg"
+        fi
+        installer -package "/Volumes/VirtualBox/VirtualBox.pkg" -target "/"
+        hdiutil detach "/Volumes/VirtualBox"
+    fi
+
+    set +x
+    echo >&2
+    read -p"$(tput "bold")Install 1Password, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
+    echo >&2
+    set -x
+    open -W "/Applications/App Store.app"
+
     # FIXME defaults write ...
+
 fi
 
 # Update everything aggressively.
