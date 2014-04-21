@@ -105,8 +105,6 @@ if [ "$MAC_OS_X" ]
 then
     mkdir -p "tmp"
 
-    # FIXME Caffeine
-
     if [ ! -d "/Applications/Google Chrome.app" ]
     then
         if [ ! -f "tmp/chrome.dmg" ]
@@ -148,7 +146,7 @@ then
 
     set +x
     echo >&2
-    read -p"$(tput "bold")Install 1Password, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
+    read -p"$(tput "bold")Install 1Password, Caffeine, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
     echo >&2
     set -x
     open -W "/Applications/App Store.app"
