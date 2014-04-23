@@ -1,0 +1,506 @@
+Building web services in Go
+
+Richard Crowley
+r@rcrowley.org
+[[http://rcrowley.org/talks/gophercon-2014.html]]
+@rcrowley
+
+* Hi, I’m Richard
+
+[[mailto:r@rcrowley.org]] or [[https://twitter.com/rcrowley][@rcrowley]]
+
+* Slack
+
+Almost certainly the best real-time
+messaging, archiving, and search
+for your team
+
+* Web services
+
+Data and a set of operations on that data
+Networked using the HTTP protocol
+Structured and machine-parseable requests and responses
+
+* Hello, www!
+
+    package main
+
+    import (
+        "fmt"
+        "net/http"
+    )
+
+    func main() {
+        http.HandleFunc(
+            "/",
+            func(w http.ResponseWriter, r *http.Request) {
+                fmt.Fprintln(w, "Hello, www!")
+            },
+        )
+        http.ListenAndServe(":8080", nil)
+    }
+
+* Noteworthy signature
+
+    func(w http.ResponseWriter, r *http.Request)
+
+* Reminds me of a certain interface
+
+    // In the standard library's net/http/server.go:
+    type Handler interface {
+        ServeHTTP(ResponseWriter, *Request)
+    }
+
+This is the lowest common denominator
+Embrace it
+
+* Implement http.Handler
+
+    type handler struct{}
+
+    func (h *handler) ServeHTTP(
+        w http.ResponseWriter,
+        r *http.Request,
+    ) {
+        w.Header().Set("Content-Type", "text/plain")
+        w.WriteHeader(http.StatusOK)
+        fmt.Fprintln(w, "Hello, www!")
+    }
+
+This time, set the status code and `Content-Type` header explicitly
+
+* Respond with JSON
+
+    func (h *handler) ServeHTTP(
+        w http.ResponseWriter,
+        r *http.Request,
+    ) {
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        enc := json.NewEncoder(w)
+        if err := enc.Encode(&MyResponse{}); nil != err {
+            fmt.Fprintf(w, `{"error":"%s"}`, err)
+        }
+    }
+
+Suddenly, things are a lot more verbose
+
+* Error responses
+
+    type notFoundHandler struct{}
+
+    func (h *notFoundHandler) ServeHTTP(
+        w http.ResponseWriter,
+        r *http.Request,
+    ) {
+        w.Header().Set("Content-Type", "text/plain")
+        w.WriteHeader(http.StatusInternalServerError)
+        fmt.Fprintln(w, "500 Internal Server Error")
+    }
+
+Responding with an error is too similar to responding normally
+There’s no `error` anywhere
+
+* Errors in idiomatic Go
+
+    func fail() error { return errors.New("fail") }
+    func multifail() (*Win, error) {
+        return nil, errors.New("multifail")
+    }
+
+Conventionally return an `error` last
+There are no exceptions because errors are not exceptional
+Use `error` to communicate what happened to the caller
+
+* JSON in, JSON out
+
+    handler := tigertonic.Marshaled(func(
+        url.URL, http.Header, *MyRequest,
+    ) (int, http.Header, *MyResponse, error) {
+        return http.StatusOK, nil, &MyResponse{}, nil
+    })
+
+Static request and response types
+No hassling with `json.Encoder`
+Responds 400, 406, and 415 appropriately
+Responds with JSON in case of error, too
+Returns an `http.Handler`
+
+* Not quite an interface
+
+    handler := tigertonic.Marshaled(func(
+        url.URL, http.Header, *MyRequest,
+    ) (int, http.Header, *MyResponse, error) {
+        return http.StatusOK, nil, &MyResponse{}, nil
+    })
+
+Verify the function arity and parameter types at early runtime
+Accept arbitrary types for the request and response bodies
+
+* Request unmarshaling
+
+    decoder := reflect.ValueOf(json.NewDecoder(r.Body))
+    out := decoder.MethodByName("Decode").Call([]reflect.Value{
+        reflect.New(m.v.Type().In(2).Elem()),
+    })
+
+Your code only sees static types
+
+* Response marshaling
+
+    json.NewEncoder(w).Encode(response)
+
+Just like earlier but abstracted
+
+* Error marshaling
+
+    func writeJSONError(w http.ResponseWriter, err error) {
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(errorStatusCode(err))
+        if jsonErr := json.NewEncoder(w).Encode(map[string]string{
+            "description": err.Error(),
+            "error":       errorName(err, "error"),
+        }); nil != err {
+            log.Println(jsonErr)
+        }
+    }
+
+Status code from `StatusCode()` or 500
+`"error"` from `Name()` or type name
+`"description"` from `Error()`
+
+* HTTPEquivError and NamedError
+
+    type ShotSelfInFoot struct { error }
+
+    func (err ShotSelfInFoot) Name() string {
+        return "how_embarrassing"
+    }
+
+    func (err ShotSelfInFoot) StatusCode() int {
+        return http.StatusInternalServerError
+    }
+
+    // {"error":"how_embarassing","description":"..."}
+
+Augmented errors extend communicating what happened to HTTP clients
+
+* Recap
+
+We can read JSON
+We can write JSON
+We can respond with an error
+But we can only support one endpoint
+
+* Handlers all the way up
+
+Handlers often call other handlers
+Some handlers multiplex requests to several other handlers
+Some handlers serve static content
+Some handlers transform requests or responses
+
+* Request multiplexing
+
+    mux := http.NewServeMux()
+    mux.Handle("/", &handler{})
+
+`http.ServeMux` only routes prefixes
+Let’s see what we can do ourselves
+
+* Roll your own mux
+
+    type Mux struct {}
+
+    func (Mux) ServeHTTP(w *http.ResponseWriter, r *http.Request) {
+        switch r.URL.Path {
+        case "/foo":
+            Foo(w, r)
+        case "/bar":
+            Bar(w, r)
+        }
+    }
+
+This is going to get tedious
+
+* Build a trie
+
+    type TrieServeMux struct {
+        methods map[string]http.Handler
+        param   *string
+        paths   map[string]*TrieServeMux
+    }
+
+Each URL component is a level in the trie
+HTTP methods are the final level in the trie
+Handlers are the leaves
+
+* Simple recursion
+
+    func (mux *TrieServeMux) find(r *http.Request, paths []string) (url.Values, http.Handler) {
+        if 0 == len(paths) {
+            if handler, ok := mux.methods[r.Method]; ok {
+                return nil, handler
+            }
+            return nil, MethodNotAllowedHandler{mux}
+        }
+        if _, ok := mux.paths[paths[0]]; ok {
+            return mux.paths[paths[0]].find(r, paths[1:])
+        }
+        return nil, NotFoundHandler{}
+    }
+
+Responds 404 and 405 appropriately
+
+* Wildcards
+
+    // Before returning a NotFoundHandler:
+    if nil != mux.param {
+        params, handler := mux.paths[*mux.param].find(r, paths[1:])
+        if nil == params {
+            params = make(url.Values)
+        }
+        params.Set(*mux.param, paths[0])
+        params.Set(strings.Trim(*mux.param, "{}"), paths[0])
+        return params, handler
+    }
+
+Wildcards are added to `r.URL.Query`
+
+* Usage
+
+    mux := tigertonic.NewTrieServeMux()
+
+    mux.HandleFunc("GET", "/foo", Foo)
+    mux.HandleFunc("GET", "/bar", Bar)
+
+    mux.Handle("POST", "/foo/{bar}/baz", &handler{})
+
+* Recap
+
+We can read JSON
+We can write JSON
+We can respond with an error
+We can multiplex to many handlers
+But we’re going to repeat ourselves a lot
+
+* Composing handlers
+
+Think bottom-up
+Make handlers out of handlers
+
+* Middleware chains
+
+    handler := tigertonic.First(
+        enforceRateLimit,
+        checkAuthorization,
+        doActualWork,
+    )
+
+Call `ServeHTTP` on a list of handlers
+The first handler to call `w.WriteHeader(...)` ends the process
+Still an `http.Handler`
+
+* Detecting the first responder
+
+    type firstResponseWriter struct {
+        http.ResponseWriter
+        written bool
+    }
+
+    func (w *firstResponseWriter) WriteHeader(code int) {
+        w.written = true
+        w.ResponseWriter.WriteHeader(code)
+    }
+
+`ServeHTTP` wraps `w` and returns when `w.written` is `true`
+
+* Conditionals
+
+    handler := tigertonic.If(
+        func(r *http.Request) (http.Header, error) {
+            if "" == r.Header.Get("X-Condition") {
+                return nil, Forbidden{errors.New("forbidden")}
+            }
+            return nil, nil
+        }),
+        protectedHandler,
+    )
+
+`If` naturally wraps any `http.Handler`
+Special case of `First` middleware chains
+Yep, it’s an `http.Handler`
+
+* HTTP Basic auth
+
+    func HTTPBasicAuthFunc(f func(string, string) error, realm string, h http.Handler) FirstHandler {
+        header := http.Header{
+            "WWW-Authenticate": []string{fmt.Sprintf("Basic realm=\"%s\"", realm)},
+        }
+        return If(func(r *http.Request) (http.Header, error) {
+            username, password, err := httpBasicAuth(r.Header)
+            if nil != err {
+                return header, err
+            }
+            if err := f(username, password); nil != err {
+                return header, Unauthorized{err}
+            }
+            return nil, nil
+        }, h)
+    }
+
+Special case of `If`
+So it’s definitely an `http.Handler`
+
+* Visibility
+
+This is the real problem for production-ready web services
+`http.Handler` through and through
+
+* Logging
+
+    handler = tigertonic.ApacheLogged(handler)
+
+Apache combined logs
+
+    handler = tigertonic.JSONLogged(handler, nil)
+
+JSON request and response logs
+
+    handler = tigertonic.Logged(handler, nil)
+
+Pretty-printed request and response logs
+
+* Recording responses for logging
+
+    type TeeResponseWriter struct {
+        http.ResponseWriter
+        Body       bytes.Buffer
+        StatusCode int
+    }
+
+    func (w *TeeResponseWriter) Write(p []byte) (int, error) {
+        if n, err := w.ResponseWriter.Write(p); nil != err {
+            return n, err
+        }
+        return w.Body.Write(p)
+    }
+
+Write to both the buffer and the client
+Log after responding
+
+* Metrics
+
+    func (c *Counter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+        c.handler.ServeHTTP(w, r)
+        c.Inc(1)
+    }
+
+    func (t *Timer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+        defer t.UpdateSince(time.Now())
+        t.handler.ServeHTTP(w, r)
+    }
+
+Handler + `go-metrics` = another handler
+
+* Metrics
+
+    handler = tigertonic.Counted(handler, "my-handler", nil)
+    handler = tigertonic.Timed(handler, "my-handler", nil)
+
+Higher-level, same idea:
+
+    handler = tigertonic.CountedByStatus(handler, "my-handler", nil)
+    handler = tigertonic.CountedByStatusXX(handler, "my-handler", nil)
+
+* Who calls the first handler?
+
+`http.Server`
+Reads requests and calls a single handler’s `ServeHTTP` for each one
+Configures listening addresses, timeouts, and TLS
+
+* Graceful stop
+
+An elusive goal in Go 1.2
+`net.Listener` + `sync.WaitGroup`
+`Connection:`close` headers
+Ultimately had to choose safety _or_ liveness
+
+* Go 1.3
+
+`http.Server` improvements
+`ConnState` callback
+`SetKeepAlivesEnabled` method
+
+* Track active connections
+
+	s.ConnState = func(conn net.Conn, state http.ConnState) {
+		switch state {
+		case http.StateNew:
+			s.wg.Add(1)
+		case http.StateActive:
+			s.mu.Lock()
+			delete(s.conns, conn.LocalAddr().String())
+			s.mu.Unlock()
+		case http.StateIdle:
+			select {
+			case <-ch:
+				conn.Close()
+			default:
+				s.mu.Lock()
+				s.conns[conn.LocalAddr().String()] = conn
+				s.mu.Unlock()
+			}
+		case http.StateHijacked, http.StateClosed:
+			s.wg.Done()
+		}
+	}
+
+* Stop gracefully
+
+    func (s *Server) Close() error {
+        close(s.ch)
+        s.SetKeepAlivesEnabled(false)
+        s.mu.Lock()
+        for _, l := range s.listeners {
+            if err := l.Close(); nil != err {
+                return err
+            }
+        }
+        s.listeners = nil
+        t := time.Now().Add(500 * time.Millisecond)
+        for _, c := range s.conns {
+            c.SetReadDeadline(t)
+        }
+        s.conns = make(map[string]net.Conn)
+        s.mu.Unlock()
+        s.wg.Wait()
+        return nil
+    }
+
+* Recap
+
+We can read JSON
+We can write JSON
+We can respond with an error
+We can multiplex to many handlers
+We can compose functionality
+We can stop gracefully
+
+* Parting advice
+
+Embrace `http.Handler`
+Provide abstractions within
+Compose bottom-up
+Remember that errors are not exceptional
+
+* Links
+
+[[https://github.com/rcrowley/go-metrics]]
+[[https://github.com/rcrowley/go-tigertonic]]
+[[http://golang.org/pkg/net/http/]]
+[[http://tip.golang.org/pkg/net/http/]]
+
+* A word from my sponsors
+
+[[https://slack.com/jobs]]
+TODO quotes
