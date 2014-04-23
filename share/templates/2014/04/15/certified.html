@@ -1,0 +1,17 @@
+{% block content %}
+<article>
+<header>
+	<time datetime="2014-04-15" pubdate>2014-04-15</time>
+	<h1>{% block title %}Certified{% endblock %}</h1>
+</header>
+
+<p>It&#8217;s a scary Internet out there.  Between the growing value of the data exchanged online and the ever-present threat that the NSA decides you&#8217;re interesting we&#8217;re left with only one responsible thing to do:  Protect the confidentiality and integrity of our and our users&#8217; data.</p>
+
+<p>One important part of any strategy to protect our users&#8217; data is encrypting that data when in motion and that means anywhere, anytime.  It&#8217;s not good enough to only encrypt your payment pages.  It&#8217;s not good enough to only encrypt traffic between users&#8217; browsers and your load balancers.  Every connection that crosses a network should be made via TLS.  Period.</p>
+
+<p>Traditionally this is either confusing because OpenSSL or expensive because Verisign.  Today I&#8217;m introducing a new option.  <a href="https://github.com/rcrowley/certified">Certified</a> will help you generate and manage an internal CA for your company and its <a href="https://github.com/rcrowley/certified/wiki">wiki</a> includes a growing collection of examples for the various operating systems, server softwares, and programming languages we all use.</p>
+
+<p>Be safe out there.</p>
+
+</article>
+{% endblock %}
