@@ -21,7 +21,9 @@ then
     if which "fdesetup" >"/dev/null" 2>"/dev/null"
     then
         if ! sudo fdesetup list
-        then sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
+        then
+            FDESETUP="yes"
+            sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
         fi
     else
         set +x
@@ -490,6 +492,10 @@ fi
 set +x
 echo >&2
 if [ "$MAC_OS_X" ]
-then echo "$(tput "bold")FileVault is now enabled but you need to reboot.$(tput "sgr0")" >&2
+then
+    if [ "$FDESETUP" ]
+    then echo "$(tput "bold")FileVault is now enabled but you need to reboot.$(tput "sgr0")" >&2
+    else echo "$(tput "bold")Good to go!$(tput "sgr0")" >&2
+    fi
 else echo "$(tput "bold")Change the rcrowley.org A record to complete the change.$(tput "sgr0")" >&2
 fi
