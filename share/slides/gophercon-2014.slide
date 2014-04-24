@@ -87,9 +87,9 @@ Suddenly, things are a lot more verbose
 
 * Error responses
 
-    type notFoundHandler struct{}
+    type internalServerErrorHandler struct{}
 
-    func (h *notFoundHandler) ServeHTTP(
+    func (h *internalServerErrorHandler) ServeHTTP(
         w http.ResponseWriter,
         r *http.Request,
     ) {
@@ -209,7 +209,7 @@ Let’s see what we can do ourselves
 
 * Roll your own mux
 
-    type Mux struct {}
+    type Mux struct{}
 
     func (Mux) ServeHTTP(w *http.ResponseWriter, r *http.Request) {
         switch r.URL.Path {
@@ -503,4 +503,3 @@ Remember that errors are not exceptional
 * A word from my sponsors
 
 [[https://slack.com/jobs]]
-TODO quotes

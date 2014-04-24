@@ -215,9 +215,9 @@ func (h *handler) ServeHTTP(
         <h3>Error responses</h3>
         
   
-  <div class="code"><pre>type notFoundHandler struct{}
+  <div class="code"><pre>type internalServerErrorHandler struct{}
 
-func (h *notFoundHandler) ServeHTTP(
+func (h *internalServerErrorHandler) ServeHTTP(
     w http.ResponseWriter,
     r *http.Request,
 ) {
@@ -510,7 +510,7 @@ mux.Handle(&#34;/&#34;, &amp;handler{})</pre></div>
         <h3>Roll your own mux</h3>
         
   
-  <div class="code"><pre>type Mux struct {}
+  <div class="code"><pre>type Mux struct{}
 
 func (Mux) ServeHTTP(w *http.ResponseWriter, r *http.Request) {
     switch r.URL.Path {
@@ -1165,9 +1165,6 @@ handler = tigertonic.CountedByStatusXX(handler, &#34;my-handler&#34;, nil)</pre>
   
   <p>
     <a href="https://slack.com/jobs" target="_blank">slack.com/jobs</a>
-<br>
-
-    TODO quotes
   </p>
   
 
