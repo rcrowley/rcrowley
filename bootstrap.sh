@@ -146,10 +146,16 @@ then
 
     set +x
     echo >&2
-    read -p"$(tput "bold")Install 1Password, Caffeine, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
+    #read -p"$(tput "bold")Install 1Password, Caffeine, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
     echo >&2
     set -x
     open -W "/Applications/App Store.app"
+
+    # Launch Caffeine.
+    open "/Applications/Caffeine.app"
+
+    # For PlistBuddy.
+    export PATH="$PATH:/usr/libexec"
 
     # Configure Terminal.app with Solarized colors, 161 columns, and so on.
     # This could have beem much simpler but we need the PlistBuddy shenanigans
@@ -193,22 +199,198 @@ then
                 TextColor = <62706c69 73743030 d4010203 04050615 16582476 65727369 6f6e5824 6f626a65 63747359 24617263 68697665 72542474 6f701200 0186a0a3 07080f55 246e756c 6cd3090a 0b0c0d0e 554e5352 47425c4e 53436f6c 6f725370 61636556 24636c61 73734f10 27302e39 33333333 33333333 3320302e 39303938 30333932 31362030 2e383335 32393431 31373600 10028002 d2101112 135a2463 6c617373 6e616d65 5824636c 61737365 73574e53 436f6c6f 72a21214 584e534f 626a6563 745f100f 4e534b65 79656441 72636869 766572d1 17185472 6f6f7480 0108111a 232d3237 3b41484e 5b628c8e 9095a0a9 b1b4bdcf d2d70000 00000000 01010000 00000000 00190000 00000000 00000000 00000000 00d9>;
                 name = rcrowley;
                 type = "Window Settings";
+                useOptionAsMetaKey = 1;
             };
         }
     '
-    #killall "cfprefsd"
-    /usr/libexec/PlistBuddy -c "Add :Window\ Settings:rcrowley:columnCount integer 161" "$HOME/Library/Preferences/com.apple.Terminal.plist"
-    /usr/libexec/PlistBuddy -c "Add :Window\ Settings:rcrowley:rowCount integer 43" "$HOME/Library/Preferences/com.apple.Terminal.plist"
+    PlistBuddy -c "Add :Window\ Settings:rcrowley:columnCount integer 161" "$HOME/Library/Preferences/com.apple.Terminal.plist"
+    PlistBuddy -c "Add :Window\ Settings:rcrowley:rowCount integer 42" "$HOME/Library/Preferences/com.apple.Terminal.plist"
     defaults write "com.apple.Terminal" "Default Window Settings" "rcrowley"
     defaults write "com.apple.Terminal" "Startup Window Settings" "rcrowley"
 
-    # FIXME Trackpad prefs.
-    # FIXME Show home directory in Finder sidebar.
-    # FIXME Don't show the clock in the menu bar.
-    # FIXME Messages logins without storing passwords?
-    # FIXME Dock contents.
-    # FIXME Launch Caffeine.
-    # FIXME Chrome extensions and bookmarks.  Maybe via Chrome itself?
+    # Trackpad:  Don't tap to click.  Don't two-finger tap to right-click.
+    # FIXME How do I make the OS pay attention to these settings immediately.
+    defaults write "com.apple.AppleMultitouchTrackpad" "Clicking" "0"
+    defaults write "com.apple.AppleMultitouchTrackpad" "TrackpadRightClick" "0"
+    defaults write "com.apple.driver.AppleBluetoothMultitouch.trackpad" "Clicking" "0"
+    defaults write "com.apple.driver.AppleBluetoothMultitouch.trackpad" "TrackpadRightClick" "0"
+
+    # Finder:  Show all file extensions.  Show ~ in the sidebar.  Show
+    # ~/Library in Finder windows.
+    # FIXME How do I make the OS pay attention to these settings immediately.
+    defaults write ".GlobalPreferences" "AppleShowAllExtensions" "1"
+    defaults write "com.apple.sidebarlists" "favoriteitems" '
+        {
+            Controller = CustomListItems;
+            CustomListItems =     (
+                        {
+                    Alias = <00000000 011a0003 00010000 cf28a298 0000482b 00000000 00022817 00022818 0000cefe 5c850000 00000920 fffe0000 00000000 0000ffff ffff0001 001c0002 28170002 26cc0002 26c70002 26c60000 002f0000 002c0000 002b000e 00320018 006d0079 0044006f 00630075 006d0065 006e0074 0073002e 00630061 006e006e 00650064 00530065 00610072 00630068 000f001a 000c004d 00610063 0069006e 0074006f 00730068 00200048 00440012 005e5379 7374656d 2f4c6962 72617279 2f436f72 65536572 76696365 732f4669 6e646572 2e617070 2f436f6e 74656e74 732f5265 736f7572 6365732f 4d794c69 62726172 6965732f 6d79446f 63756d65 6e74732e 63616e6e 65645365 61726368 00130001 2f00ffff 0000>;
+                    CustomItemProperties =             {
+                        "com.apple.LSSharedFileList.Binding" = <646e6962 00000000 02000000 00000000 00000000 00000000 00000000 67000000 00000000 66696c65 3a2f2f2f 53797374 656d2f4c 69627261 72792f43 6f726553 65727669 6365732f 46696e64 65722e61 70702f43 6f6e7465 6e74732f 5265736f 75726365 732f4d79 4c696272 61726965 732f6d79 446f6375 6d656e74 732e6361 6e6e6564 53656172 63682f00 00000000 00000000 00000000 00000000 00000000 00000000 000000>;
+                        "com.apple.LSSharedFileList.TemplateSystemSelector" = 1935819078;
+                    };
+                    Name = "All My Files";
+                },
+                        {
+                    CustomItemProperties =             {
+                        "com.apple.LSSharedFileList.SpecialItemIdentifier" = "com.apple.LSSharedFileList.IsMeetingRoom";
+                    };
+                    Name = "domain-AirDrop";
+                    URL = "nwnode://domain-AirDrop";
+                },
+                        {
+                    Alias = <00000000 00940003 00010000 cf28a298 0000482b 00000000 00000002 00000051 0000cdc1 84210000 00000920 fffe0000 00000000 0000ffff ffff0001 0000000e 001a000c 00410070 0070006c 00690063 00610074 0069006f 006e0073 000f001a 000c004d 00610063 0069006e 0074006f 00730068 00200048 00440012 000c4170 706c6963 6174696f 6e730013 00012f00 ffff0000>;
+                    CustomItemProperties =             {
+                        "com.apple.LSSharedFileList.Binding" = <646e6962 00000000 01000000 00000000 00000000 00000000 00000000 00000000 00000000 73707061 02000000 00000000>;
+                        "com.apple.LSSharedFileList.TemplateSystemSelector" = 1935819120;
+                    };
+                    Name = Applications;
+                },
+                        {
+                    Alias = <00000000 00a20003 00010000 cf28a298 0000482b 00000000 0008fd85 0008fe02 0000cf28 a3a20000 00000920 fffe0000 00000000 0000ffff ffff0001 00080008 fd850002 65d9000e 00100007 00440065 0073006b 0074006f 0070000f 001a000c 004d0061 00630069 006e0074 006f0073 00680020 00480044 00120016 55736572 732f7263 726f776c 65792f44 65736b74 6f700013 00012f00 00150002 000fffff 0000>;
+                    CustomItemProperties =             {
+                        "com.apple.LSSharedFileList.Binding" = <646e6962 00000000 01000000 00000000 00000000 00000000 00000000 00000000 00000000 6b736564 02000000 00000000>;
+                        "com.apple.LSSharedFileList.TemplateSystemSelector" = 1935819892;
+                    };
+                    Name = Desktop;
+                },
+                        {
+                    Alias = <00000000 00a80003 00010000 cf28a298 0000482b 00000000 0008fd85 0008fd86 0000cf28 a3a20000 00000920 fffe0000 00000000 0000ffff ffff0001 00080008 fd850002 65d9000e 00140009 0044006f 00630075 006d0065 006e0074 0073000f 001a000c 004d0061 00630069 006e0074 006f0073 00680020 00480044 00120018 55736572 732f7263 726f776c 65792f44 6f63756d 656e7473 00130001 2f000015 0002000f ffff0000>;
+                    CustomItemProperties =             {
+                        "com.apple.LSSharedFileList.Binding" = <646e6962 00000000 01000000 00000000 00000000 00000000 00000000 00000000 00000000 73636f64 02000000 00000000>;
+                        "com.apple.LSSharedFileList.TemplateSystemSelector" = 1935819875;
+                    };
+                    Name = Documents;
+                },
+                        {
+                    Alias = <00000000 00a80003 00010000 cf28a298 0000482b 00000000 0008fd85 0008fd88 0000cf28 a3a20000 00000920 fffe0000 00000000 0000ffff ffff0001 00080008 fd850002 65d9000e 00140009 0044006f 0077006e 006c006f 00610064 0073000f 001a000c 004d0061 00630069 006e0074 006f0073 00680020 00480044 00120018 55736572 732f7263 726f776c 65792f44 6f776e6c 6f616473 00130001 2f000015 0002000f ffff0000>;
+                    CustomItemProperties =             {
+                        "com.apple.LSSharedFileList.Binding" = <646e6962 00000000 01000000 00000000 00000000 00000000 00000000 00000000 00000000 666e7764 02000000 00000000>;
+                        "com.apple.LSSharedFileList.TemplateSystemSelector" = 1935819884;
+                    };
+                    Name = Downloads;
+                },
+                        {
+                    Alias = <00000000 00980003 00010000 cf28a298 0000482b 00000000 000265d9 0008fd85 0000cf7b 58e60000 00000920 fffe0000 00000000 0000ffff ffff0001 00040002 65d9000e 00120008 00720063 0072006f 0077006c 00650079 000f001a 000c004d 00610063 0069006e 0074006f 00730068 00200048 00440012 000e5573 6572732f 7263726f 776c6579 00130001 2f000015 0002000f ffff0000>;
+                    CustomItemProperties =             {
+                        "com.apple.LSSharedFileList.Binding" = <646e6962 00000000 01000000 00000000 00000000 00000000 00000000 00000000 00000000 646c6675 02000000 00000000>;
+                        "com.apple.LSSharedFileList.TemplateSystemSelector" = 1935820909;
+                    };
+                    Name = rcrowley;
+                }
+            );
+            CustomListProperties =     {
+                "com.apple.LSSharedFileList.Restricted.upgraded" = 9027;
+            };
+        }
+    '
+    chflags "nohidden" "$HOME/Library"
+
+    # Don't show the clock in the menu bar.
+    defaults write "com.apple.systemuiserver" "menuExtras" "$(defaults read "com.apple.systemuiserver" "menuExtras" | grep -v "Clock.menu")"
+
+    # Dock:  Chrome, Terminal, Slack, Messages, Downloads.
+    defaults write "com.apple.Dock" "persistent-apps" '
+        (
+                {
+                GUID = 1527825557;
+                "tile-data" =         {
+                    "bundle-identifier" = "com.google.Chrome";
+                    "dock-extra" = 0;
+                    "file-data" =             {
+                        "_CFURLAliasData" = <00000000 00b40003 00010000 cf28a298 0000482b 00000000 00000051 0009a5ee 0000cf61 04310000 00000920 fffe0000 00000000 0000ffff ffff0001 00040000 0051000e 00240011 0047006f 006f0067 006c0065 00200043 00680072 006f006d 0065002e 00610070 0070000f 001a000c 004d0061 00630069 006e0074 006f0073 00680020 00480044 0012001e 4170706c 69636174 696f6e73 2f476f6f 676c6520 4368726f 6d652e61 70700013 00012f00 ffff0000>;
+                        "_CFURLString" = "file:///Applications/Google%20Chrome.app/";
+                        "_CFURLStringType" = 15;
+                    };
+                    "file-label" = "Google Chrome";
+                    "file-mod-date" = 3479241777;
+                    "file-type" = 41;
+                    "parent-mod-date" = 3480968329;
+                };
+                "tile-type" = "file-tile";
+            },
+                {
+                GUID = 1527825558;
+                "tile-data" =         {
+                    "bundle-identifier" = "com.apple.Terminal";
+                    "dock-extra" = 0;
+                    "file-data" =             {
+                        "_CFURLAliasData" = <00000000 00b40003 00010000 cf28a298 0000482b 00000000 00000052 0000289e 0000ce3f 41d50000 00000920 fffe0000 00000000 0000ffff ffff0001 00080000 00520000 0051000e 001a000c 00540065 0072006d 0069006e 0061006c 002e0061 00700070 000f001a 000c004d 00610063 0069006e 0074006f 00730068 00200048 00440012 00234170 706c6963 6174696f 6e732f55 74696c69 74696573 2f546572 6d696e61 6c2e6170 70000013 00012f00 ffff0000>;
+                        "_CFURLString" = "file:///Applications/Utilities/Terminal.app/";
+                        "_CFURLStringType" = 15;
+                    };
+                    "file-label" = Terminal;
+                    "file-mod-date" = 3460252117;
+                    "file-type" = 41;
+                    "parent-mod-date" = 3475548489;
+                };
+                "tile-type" = "file-tile";
+            },
+                {
+                GUID = 1527825559;
+                "tile-data" =         {
+                    "bundle-identifier" = "com.tinyspeck.slackmacgap";
+                    "dock-extra" = 0;
+                    "file-data" =             {
+                        "_CFURLAliasData" = <00000000 009c0003 00010000 cf28a298 0000482b 00000000 00000051 0009d7de 0000cf6a 16790000 00000920 fffe0000 00000000 0000ffff ffff0001 00040000 0051000e 00140009 0053006c 00610063 006b002e 00610070 0070000f 001a000c 004d0061 00630069 006e0074 006f0073 00680020 00480044 00120016 4170706c 69636174 696f6e73 2f536c61 636b2e61 70700013 00012f00 ffff0000>;
+                        "_CFURLString" = "file:///Applications/Slack.app/";
+                        "_CFURLStringType" = 15;
+                    };
+                    "file-label" = Slack;
+                    "file-mod-date" = 3480968319;
+                    "file-type" = 41;
+                    "parent-mod-date" = 3480968329;
+                };
+                "tile-type" = "file-tile";
+            },
+                {
+                GUID = 649343258;
+                "tile-data" =         {
+                    "bundle-identifier" = "com.apple.iChat";
+                    "dock-extra" = 1;
+                    "file-data" =             {
+                        "_CFURLAliasData" = <00000000 00a60003 00010000 cf28a298 0000482b 00000000 00000051 0002f055 0000cbcd ed3f0000 00000920 fffe0000 00000000 0000ffff ffff0001 00040000 0051000e 001a000c 004d0065 00730073 00610067 00650073 002e0061 00700070 000f001a 000c004d 00610063 0069006e 0074006f 00730068 00200048 00440012 00194170 706c6963 6174696f 6e732f4d 65737361 6765732e 61707000 00130001 2f00ffff 0000>;
+                        "_CFURLString" = "file:///Applications/Messages.app/";
+                        "_CFURLStringType" = 15;
+                    };
+                    "file-label" = Messages;
+                    "file-mod-date" = 3419270463;
+                    "file-type" = 41;
+                    "parent-mod-date" = 3480968329;
+                };
+                "tile-type" = "file-tile";
+            }
+        )
+    '
+    defaults write "com.apple.Dock" "persistent-others" '
+        (
+                {
+                GUID = 649343269;
+                "tile-data" =         {
+                    arrangement = 2;
+                    displayas = 0;
+                    "file-data" =             {
+                        "_CFURLAliasData" = <00000000 00a80003 00010000 cf28a298 0000482b 00000000 0008fd85 0008fd88 0000cf28 a3a20000 00000920 fffe0000 00000000 0000ffff ffff0001 00080008 fd850002 65d9000e 00140009 0044006f 0077006e 006c006f 00610064 0073000f 001a000c 004d0061 00630069 006e0074 006f0073 00680020 00480044 00120018 55736572 732f7263 726f776c 65792f44 6f776e6c 6f616473 00130001 2f000015 0002000f ffff0000>;
+                        "_CFURLString" = "file:///Users/rcrowley/Downloads/";
+                        "_CFURLStringType" = 15;
+                    };
+                    "file-label" = Downloads;
+                    "file-mod-date" = 3480967398;
+                    "file-type" = 2;
+                    "parent-mod-date" = 3480966908;
+                    preferreditemsize = "-1";
+                    showas = 1;
+                };
+                "tile-type" = "directory-tile";
+            }
+        )
+    '
+    defaults write "com.apple.Dock" "tilesize" "29"
+
+    # TODO Configure Messages.app to login to AIM and Google Talk.
+
+    # Refresh the Dock, Finder, and menu bar.
+    killall "Dock" "Finder" "SystemUIServer"
 
 fi
 
