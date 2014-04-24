@@ -146,7 +146,7 @@ then
 
     set +x
     echo >&2
-    #read -p"$(tput "bold")Install 1Password, Caffeine, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
+    read -p"$(tput "bold")Install 1Password, Caffeine, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
     echo >&2
     set -x
     open -W "/Applications/App Store.app"
