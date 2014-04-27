@@ -31,34 +31,38 @@ September 2003 - May 2007
 
 Professional Experience
 
+Director of Operations
+Tiny Speck [2]
+April 2014 - present
+
 Head of Operations
-Betable [2]
-April 2012 - present
+Betable [3]
+April 2012 - April 2014
 Built platform and APIs to real-money gaming: a service-oriented architecture
 with heavily automated testing and deployment tools, financial infrastructure,
 and a datastore modeled as a distributed, replicated state machine.
 
 Founder & CTO
-DevStructure [3], San Francisco, CA
+DevStructure [4], San Francisco, CA
 February 2010 - April 2012
 Built Blueprint, a configuration management tool that reverse-engineers
 servers and generates shell, Puppet, or Chef code.  Built a hosted platform
 for users of Blueprint to backup, share, and deploy blueprints.
 
 Engineer
-OpenDNS [4], San Francisco, CA
+OpenDNS [5], San Francisco, CA
 April 2008 - February 2010
 Built a pipeline capable of aggregating and sorting more than 20 billion DNS
 queries each day by domain and hour for hundreds of thousands of users.
 
 XUL Hacker
-Flickr [5], San Francisco, CA
+Flickr [6], San Francisco, CA
 June 2007 - April 2008
-Built the cross-platform, open-source and extendable Flickr Uploadr [6] using
-Mozilla's XULRunner [7] platform.
+Built the cross-platform, open-source and extendable Flickr Uploadr [7] using
+Mozilla's XULRunner [8] platform.
 
 Operations Intern
-Yahoo! [8], Sunnyvale, CA
+Yahoo! [9], Sunnyvale, CA
 May 2006 - May 2007
 Automated collection and processing of data from the trouble ticket system and
 presented it in an intuitive and customizable way.
@@ -67,10 +71,10 @@ Biosequence Search Hardware Engineer
 Washington University, Saint Louis, MO
 January 2006 - May 2006
 Designed switching hardware for fast execution of the BLASTn and BLASTp
-algorithms [9] for deployment on FPGA [10] devices.
+algorithms [10] for deployment on FPGA [11] devices.
 
 Project Manager & Web Programmer
-STaRS Program at Washington University [11], Saint Louis, MO
+STaRS Program at Washington University [12], Saint Louis, MO
 October 2003 - January 2006
 Led a team of six programmers and designers to develop web sites and
 applications for University clients.  Built web applications using PHP, MySQL,
@@ -85,14 +89,15 @@ Eagle Scout, Troop 119, Boy Scouts of America
 
 
 
-[1] <http://www.wustl.edu>
-[2] <http://betable.com>
-[3] <http://devstructure.com>
-[4] <http://opendns.com>
-[5] <http://flickr.com>
-[6] <http://flickr.com/tools/uploadr/>
-[7] <http://developer.mozilla.org/en/docs/XULRunner>
-[8] <http://yahoo.com>
-[9] <http://blast.ncbi.nlm.nih.gov/Blast.cgi>
-[10] <http://www.xilinx.com/products/silicon-devices/fpga/index.htm>
-[11] <http://stars.wustl.edu>
+[1]  <http://www.wustl.edu>
+[2]  <http://tinyspeck.com>
+[3]  <http://betable.com>
+[4]  <http://devstructure.com>
+[5]  <http://opendns.com>
+[6]  <http://flickr.com>
+[7]  <http://flickr.com/tools/uploadr/>
+[8]  <http://developer.mozilla.org/en/docs/XULRunner>
+[9]  <http://yahoo.com>
+[10] <http://blast.ncbi.nlm.nih.gov/Blast.cgi>
+[11] <http://www.xilinx.com/products/silicon-devices/fpga/index.htm>
+[12] <http://stars.wustl.edu>
