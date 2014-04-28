@@ -435,11 +435,13 @@ then rm -f ".profile" "bootstrap.sh"
 fi
 git merge "origin/master"
 
+# Install goimports everywhere.
+. ".profile.d/go.sh"
+go get "code.google.com/p/go.tools/cmd/goimports"
+
 # Clone www's dependencies, install www, and start it.
 if [ -z "$MAC_OS_X" ]
 then
-    . ".profile.d/go.sh"
-    go get "code.google.com/p/go.tools/cmd/goimports"
     mkdir -p "src/github.com/rcrowley"
     if [ ! -d "src/github.com/rcrowley/go-metrics" ]
     then git clone "git@github.com:rcrowley/go-metrics.git" "src/github.com/rcrowley/go-metrics"
