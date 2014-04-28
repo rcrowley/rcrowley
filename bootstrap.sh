@@ -15,6 +15,15 @@ fi
 
 set -x
 
+# Ensure we have an SSH private key available to us.
+if [ "$MAC_OS_X" -a ! -f "$HOME/.ssh/id_rsa" ]
+then
+    ssh-keygen -f"$HOME/.ssh/id_rsa"
+    cat "$HOME/.ssh/id_rsa.pub"
+    read -p"$(tput "bold")Authorize this SSH public key on rcrowley.org; press <ENTER> to continue.$(tput "sgr0") " >&2
+fi
+ssh-add -l
+
 # Setup FileVault and leave its recovery key in the home directory.
 if [ "$MAC_OS_X" ]
 then
