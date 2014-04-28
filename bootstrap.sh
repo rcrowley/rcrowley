@@ -87,7 +87,7 @@ then
     if [ ! -d "/Library/Developer" ]
     then xcode-select --install
     fi
-    brew install "git" "gnupg" "gpg-agent" "tmux"
+    brew install "git" "gnupg" "gpg-agent" "mercurial" "tmux"
 
     # Go releases aren't necessarily tagged to every OS X release so we have to
     # be a bit more clever about finding the URL of the package to install.
