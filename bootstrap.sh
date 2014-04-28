@@ -410,13 +410,17 @@ then
     '
     defaults write "com.apple.Dock" "tilesize" "29"
 
+    # Ask for password immediately after the screen saver begins.
+    defaults write "com.apple.screensaver" "askForPassword" "1"
+    defaults write "com.apple.screensaver" "askForPasswordDelay" "0"
+
     # Bottom right hot corner starts the screensaver.
-    defaults write "com.apple.Dock" "wvous-br-corner" -int "5"
-    defaults write "com.apple.Dock" "wvous-br-modifier" -int "0"
+    #defaults write "com.apple.dock" "wvous-br-corner" "5"
+    #defaults write "com.apple.dock" "wvous-br-modifier" "0"
 
     # TODO Configure Messages.app to login to AIM and Google Talk.
 
-    # Refresh the Dock, Finder, and menu bar.
+    # Refresh the dock, Finder, and menu bar.
     killall "Dock" "Finder" "SystemUIServer"
 
 fi
