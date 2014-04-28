@@ -232,7 +232,7 @@ then
     defaults write "com.apple.Terminal" "Startup Window Settings" "rcrowley"
 
     # Trackpad:  Don't tap to click.  Don't two-finger tap to right-click.
-    # FIXME How do I make the OS pay attention to these settings immediately.
+    # FIXME How do I make the OS pay attention to these settings immediately?
     defaults write "com.apple.AppleMultitouchTrackpad" "Clicking" "0"
     defaults write "com.apple.AppleMultitouchTrackpad" "TrackpadRightClick" "0"
     defaults write "com.apple.driver.AppleBluetoothMultitouch.trackpad" "Clicking" "0"
@@ -240,7 +240,7 @@ then
 
     # Finder:  Show all file extensions.  Show ~ in the sidebar.  Show
     # ~/Library in Finder windows.
-    # FIXME How do I make the OS pay attention to these settings immediately.
+    # FIXME How do I make the OS pay attention to these settings immediately?
     defaults write ".GlobalPreferences" "AppleShowAllExtensions" "1"
     defaults write "com.apple.sidebarlists" "favoriteitems" '
         {
