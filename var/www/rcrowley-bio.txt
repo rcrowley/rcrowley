@@ -1,6 +1,7 @@
-Richard keeps the servers happy at Betable.  He's something of a polyglot,
-working frequently in C, Go, Java, JavaScript, Puppet, Python, Ruby, and
-shell.  He's the creator of the Blueprint configuration management tool, a
-contributor to Puppet, and previously worked at OpenDNS and Flickr.  He's
-passionate about engineering tools and practice and thinks vi is a better
-religion than emacs.
+Richard tightens things up as Director of Operations at Slack, almost
+certainly the best real-time messaging, archiving, and search tool for
+modern teams.  He's part developer, part operator, and gets worked up
+easily over configuration management, development enviornments, and
+distributed systems.  He's a contributor to Go and Puppet, and was
+previously head of operations at Betable and an engineer at OpenDNS and
+Flickr.  He thinks vi is a better religion than emacs.
