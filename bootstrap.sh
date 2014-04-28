@@ -140,6 +140,18 @@ then
         hdiutil detach "/Volumes/Papers2"
     fi
 
+    if [ ! -d "/Applications/Skype.app" ]
+    then
+        if [ ! -f "tmp/skype.dmg" ]
+        then curl -L -o"tmp/skype.dmg" "http://www.skype.com/go/getskype-macosx"
+        fi
+        if [ ! -d "/Volumes/Skype" ]
+        then hdiutil attach -nobrowse "tmp/skype.dmg"
+        fi
+        ditto --rsrc "/Volumes/Skype/Skype.app" "/Applications/Skype.app"
+        hdiutil detach "/Volumes/Skype"
+    fi
+
     if [ ! -d "/Applications/VirtualBox.app" ]
     then
         if [ ! -f "tmp/virtualbox.dmg" ]
