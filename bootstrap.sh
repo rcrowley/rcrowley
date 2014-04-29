@@ -106,6 +106,19 @@ then
         done
     fi
 
+    # Java <http://support.apple.com/kb/dl1572>.
+    if true # [ ! -d "/usr/bin/java" ]
+    then
+        if [ ! -f "tmp/java.dmg" ]
+        then curl -L -o"tmp/java.dmg" "http://support.apple.com/downloads/DL1572/en_US/JavaForOSX2013-05.dmg"
+        fi
+        if [ ! -d "/Volumes/Java for OS X 2013-005" ]
+        then hdiutil attach -nobrowse "tmp/java.dmg"
+        fi
+        sudo installer -package "/Volumes/Java for OS X 2013-005/JavaForOSX.pkg" -target "/"
+        hdiutil detach "/Volumes/Java for OS X 2013-005"
+    fi
+
 else
     apt-get -y install "freight" "git" "gnupg-agent" "go" "mercurial" "pinentry-curses" "python-django" "ruby" "rubygems" "tmux" "vim"
     apt-get -y remove "pinentry-gtk2"
