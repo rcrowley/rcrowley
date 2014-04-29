@@ -1,4 +1,4 @@
-set expandtab shiftwidth=4 softtabstop=4 tabstop=4
+set shiftwidth=4 softtabstop=4 tabstop=4
 set hlsearch
 set modeline
 set noai
@@ -8,7 +8,7 @@ set background=dark
 colorscheme solarized
 
 " Clojure sort of uses 2 spaces.  It also uses single spaces.
-au BufNewFile,BufRead *.clj setlocal shiftwidth=2 softtabstop=2 tabstop=2
+au BufNewFile,BufRead *.clj setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
 
 " Load the Vim configuration that ships with Go.  Additionally set us up to
 " run goimports on save.
@@ -35,13 +35,16 @@ au FileType make setlocal noexpandtab
 " Markdown needs to be told it is.
 au BufRead,BufNewFile *.md setlocal filetype=markdown
 
+" PHP follows the Flickr standards.
+au FileType php setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
+
 " Protocol buffers can be whatever but I like tabs because I mostly use
 " them with Go.
 au BufRead,BufNewFile *.proto setlocal noexpandtab
 
 " Silly Rubytards like 2 spaces.
-au FileType ruby setlocal shiftwidth=2 softtabstop=2 tabstop=2
-au BufRead,BufNewFile *.erb setlocal shiftwidth=2 softtabstop=2 tabstop=2
+au FileType ruby setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+au BufRead,BufNewFile *.erb setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
 
 " Capfile, Gemfile, Rakefile, *.ru, and *.gemspec files are Ruby.
 au BufRead,BufNewFile Capfile,Gemfile,Rakefile,*.ru,*.gemspec setlocal ft=ruby
