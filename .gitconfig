@@ -1,5 +1,6 @@
 [alias]
-	ci = commit -S
+	#ci = commit -S
+	ci = commit
 	co = checkout
 	lg = log --abbrev-commit --date=relative --graph --pretty='format:%C(yellow)%h%d%Creset %s %C(black)(%C(cyan)%aN%Creset %C(black)<%C(cyan)%aE%C(black)>, %C(cyan)%cr%C(black)) %C(magenta)%G?%Creset'
 	stat = status

@@ -1,5 +1,7 @@
 # rcrowley-ify a computer!
 
+# TODO Chef install.sh, chef.patch, and `sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri "knife-ec2" "unf"`
+
 VERSION="1.2.1"
 BUILD="rcrowley1"
 
@@ -81,14 +83,25 @@ fi
 # Install dependencies.
 if [ "$MAC_OS_X" ]
 then
+    sudo tee "/etc/paths" >"/dev/null" <<EOF
+/usr/local/bin
+/usr/local/sbin
+/usr/bin
+/usr/sbin
+/bin
+/sbin
+EOF
     if [ ! -f "/usr/local/bin/brew" ]
     then ruby -e "$(curl -fsSL "https://raw.github.com/Homebrew/homebrew/go/install")"
     fi
     if [ ! -d "/Library/Developer" ]
     then xcode-select --install
     fi
-    brew install "git" "gnupg" "gpg-agent" "mercurial" "node" "tmux"
+    brew install "git" "gnupg" "gpg-agent" "mercurial" "node" "s3cmd" "tmux" "watch"
+    brew install "homebrew/php/php54-mcrypt"
     npm install "keybase"
+    sudo easy_install pip
+    sudo pip install awscli
 
     # Go releases aren't necessarily tagged to every OS X release so we have to
     # be a bit more clever about finding the URL of the package to install.
@@ -106,17 +119,40 @@ then
         done
     fi
 
-    # Java <http://support.apple.com/kb/dl1572>.
-    if true # [ ! -d "/usr/bin/java" ]
+    # Heroku toolbelt.
+    if [ ! -f "/usr/bin/heroku" ]
     then
-        if [ ! -f "tmp/java.dmg" ]
-        then curl -L -o"tmp/java.dmg" "http://support.apple.com/downloads/DL1572/en_US/JavaForOSX2013-05.dmg"
+        if [ ! -f "tmp/heroku.pkg" ]
+        then curl -L -o"tmp/heroku.pkg" "https://toolbelt.heroku.com/download/osx"
+        fi
+        sudo installer -package "tmp/heroku.pkg" -target "/"
+    fi
+
+    # Java 6 from Apple <http://support.apple.com/kb/dl1572>.
+    if [ ! -d "/System/Library/Frameworks/JavaVM.framework" ]
+    then
+        if [ ! -f "tmp/java6.dmg" ]
+        then curl -L -o"tmp/java6.dmg" "http://support.apple.com/downloads/DL1572/en_US/JavaForOSX2013-05.dmg"
         fi
         if [ ! -d "/Volumes/Java for OS X 2013-005" ]
-        then hdiutil attach -nobrowse "tmp/java.dmg"
+        then hdiutil attach -nobrowse "tmp/java6.dmg"
         fi
         sudo installer -package "/Volumes/Java for OS X 2013-005/JavaForOSX.pkg" -target "/"
         hdiutil detach "/Volumes/Java for OS X 2013-005"
+    fi
+
+    # Java 7 from Oracle <http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html>.
+    if [ ! -d "/Library/Java/JavaVirtualMachines/jdk1.7.0_55.jdk/Contents/Home" ]
+    then
+        if [ ! -f "tmp/java7.dmg" ]
+        then curl -L -o"tmp/java7.dmg" "http://download.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-macosx-x64.dmg?AuthParam=1398831473_a6ff4463d1f0ed16478723a653a7befe" # XXX This link may expire.
+        fi
+        if [ ! -d "/Volumes/JDK 7 Update 55" ]
+        then hdiutil attach -nobrowse "tmp/java7.dmg"
+        fi
+        ls -l "/Volumes/JDK 7 Update 55"
+        sudo installer -package "/Volumes/JDK 7 Update 55/JDK 7 Update 55.pkg" -target "/"
+        hdiutil detach "/Volumes/JDK 7 Update 55"
     fi
 
 else
@@ -197,6 +233,7 @@ then
     # Configure Terminal.app with Solarized colors, 161 columns, and so on.
     # This could have beem much simpler but we need the PlistBuddy shenanigans
     # in order to make Terminal.app actually accept our desired window size.
+: <<EOFEOF
     defaults write "com.apple.Terminal" "Window Settings" '
         {
             Basic =     {
@@ -236,12 +273,12 @@ then
                 TextColor = <62706c69 73743030 d4010203 04050615 16582476 65727369 6f6e5824 6f626a65 63747359 24617263 68697665 72542474 6f701200 0186a0a3 07080f55 246e756c 6cd3090a 0b0c0d0e 554e5352 47425c4e 53436f6c 6f725370 61636556 24636c61 73734f10 27302e39 33333333 33333333 3320302e 39303938 30333932 31362030 2e383335 32393431 31373600 10028002 d2101112 135a2463 6c617373 6e616d65 5824636c 61737365 73574e53 436f6c6f 72a21214 584e534f 626a6563 745f100f 4e534b65 79656441 72636869 766572d1 17185472 6f6f7480 0108111a 232d3237 3b41484e 5b628c8e 9095a0a9 b1b4bdcf d2d70000 00000000 01010000 00000000 00190000 00000000 00000000 00000000 00d9>;
                 name = rcrowley;
                 type = "Window Settings";
-                useOptionAsMetaKey = 1;
             };
         }
     '
     PlistBuddy -c "Add :Window\ Settings:rcrowley:columnCount integer 161" "$HOME/Library/Preferences/com.apple.Terminal.plist"
     PlistBuddy -c "Add :Window\ Settings:rcrowley:rowCount integer 42" "$HOME/Library/Preferences/com.apple.Terminal.plist"
+    PlistBuddy -c "Add :Window\ Settings:rcrowley:useOptionAsMetaKey bool true" "$HOME/Library/Preferences/com.apple.Terminal.plist"
     defaults write "com.apple.Terminal" "Default Window Settings" "rcrowley"
     defaults write "com.apple.Terminal" "Startup Window Settings" "rcrowley"
 
@@ -330,7 +367,7 @@ then
     defaults write "com.apple.Dock" "persistent-apps" '
         (
                 {
-                GUID = 1527825557;
+                GUID = 160385472;
                 "tile-data" =         {
                     "bundle-identifier" = "com.google.Chrome";
                     "dock-extra" = 0;
@@ -340,14 +377,14 @@ then
                         "_CFURLStringType" = 15;
                     };
                     "file-label" = "Google Chrome";
-                    "file-mod-date" = 3479241777;
-                    "file-type" = 41;
-                    "parent-mod-date" = 3480968329;
+                    "file-mod-date" = 0;
+                    "file-type" = 1;
+                    "parent-mod-date" = 0;
                 };
                 "tile-type" = "file-tile";
             },
                 {
-                GUID = 1527825558;
+                GUID = 160385473;
                 "tile-data" =         {
                     "bundle-identifier" = "com.apple.Terminal";
                     "dock-extra" = 0;
@@ -357,14 +394,14 @@ then
                         "_CFURLStringType" = 15;
                     };
                     "file-label" = Terminal;
-                    "file-mod-date" = 3460252117;
-                    "file-type" = 41;
-                    "parent-mod-date" = 3475548489;
+                    "file-mod-date" = 0;
+                    "file-type" = 1;
+                    "parent-mod-date" = 0;
                 };
                 "tile-type" = "file-tile";
             },
                 {
-                GUID = 1527825559;
+                GUID = 160385474;
                 "tile-data" =         {
                     "bundle-identifier" = "com.tinyspeck.slackmacgap";
                     "dock-extra" = 0;
@@ -374,31 +411,65 @@ then
                         "_CFURLStringType" = 15;
                     };
                     "file-label" = Slack;
-                    "file-mod-date" = 3480968319;
-                    "file-type" = 41;
-                    "parent-mod-date" = 3480968329;
+                    "file-mod-date" = 0;
+                    "file-type" = 1;
+                    "parent-mod-date" = 0;
                 };
                 "tile-type" = "file-tile";
             },
                 {
-                GUID = 649343258;
+                GUID = 607466720;
+                "tile-data" =         {
+                    "bundle-identifier" = "com.codeux.irc.textual";
+                    "dock-extra" = 0;
+                    "file-data" =             {
+                        "_CFURLAliasData" = <00000000 00a20003 00010000 cf28a298 0000482b 00000000 00000051 0009e193 0000cf62 5db60000 00000920 fffe0000 00000000 0000ffff ffff0001 00040000 0051000e 0018000b 00540065 00780074 00750061 006c002e 00610070 0070000f 001a000c 004d0061 00630069 006e0074 006f0073 00680020 00480044 00120018 4170706c 69636174 696f6e73 2f546578 7475616c 2e617070 00130001 2f00ffff 0000>;
+                        "_CFURLString" = "file:///Applications/Textual.app/";
+                        "_CFURLStringType" = 15;
+                    };
+                    "file-label" = Textual;
+                    "file-mod-date" = 0;
+                    "file-type" = 1;
+                    "parent-mod-date" = 0;
+                };
+                "tile-type" = "file-tile";
+            },
+                {
+                GUID = 160385475;
                 "tile-data" =         {
                     "bundle-identifier" = "com.apple.iChat";
-                    "dock-extra" = 1;
+                    "dock-extra" = 0;
                     "file-data" =             {
                         "_CFURLAliasData" = <00000000 00a60003 00010000 cf28a298 0000482b 00000000 00000051 0002f055 0000cbcd ed3f0000 00000920 fffe0000 00000000 0000ffff ffff0001 00040000 0051000e 001a000c 004d0065 00730073 00610067 00650073 002e0061 00700070 000f001a 000c004d 00610063 0069006e 0074006f 00730068 00200048 00440012 00194170 706c6963 6174696f 6e732f4d 65737361 6765732e 61707000 00130001 2f00ffff 0000>;
                         "_CFURLString" = "file:///Applications/Messages.app/";
                         "_CFURLStringType" = 15;
                     };
                     "file-label" = Messages;
-                    "file-mod-date" = 3419270463;
-                    "file-type" = 41;
-                    "parent-mod-date" = 3480968329;
+                    "file-mod-date" = 0;
+                    "file-type" = 1;
+                    "parent-mod-date" = 0;
+                };
+                "tile-type" = "file-tile";
+            },
+                {
+                "tile-data" =         {
+                    "bundle-identifier" = "com.skype.skype";
+                    "dock-extra" = 0;
+                    "file-data" =             {
+                        "_CFURLAliasData" = <00000000 009c0003 00010000 cf28a298 0000482b 00000000 00000051 0012e8d2 0000cf4f 0e170000 00000920 fffe0000 00000000 0000ffff ffff0001 00040000 0051000e 00140009 0053006b 00790070 0065002e 00610070 0070000f 001a000c 004d0061 00630069 006e0074 006f0073 00680020 00480044 00120016 4170706c 69636174 696f6e73 2f536b79 70652e61 70700013 00012f00 ffff0000>;
+                        "_CFURLString" = "file:///Applications/Skype.app/";
+                        "_CFURLStringType" = 15;
+                    };
+                    "file-label" = Skype;
+                    "file-mod-date" = 0;
+                    "file-type" = 1;
+                    "parent-mod-date" = 0;
                 };
                 "tile-type" = "file-tile";
             }
         )
     '
+
     defaults write "com.apple.Dock" "persistent-others" '
         (
                 {
@@ -436,6 +507,7 @@ then
 
     # Refresh the dock, Finder, and menu bar.
     killall "Dock" "Finder" "SystemUIServer"
+EOFEOF
 
 fi
 
@@ -456,6 +528,9 @@ if [ ! -f ".git/refs/heads/master" ]
 then rm -f ".profile" "bootstrap.sh"
 fi
 git merge "origin/master"
+
+# Make Mac OS X SSH agents timeout after 10 minutes, too.
+security set-keychain-settings -l -t"600"
 
 # Install goimports everywhere.
 . ".profile.d/go.sh"
@@ -509,11 +584,10 @@ then
     mkdir -p "src" "var/cache/freight" "var/lib" "var/www"
     curl -o"var/cache/freight/keyring.gpg" -s "http://packages.rcrowley.org/keyring.gpg"
     curl -o"var/cache/freight/pubkey.gpg" -s "http://packages.rcrowley.org/pubkey.gpg"
-    rsync -av "rcrowley.org":"src/git.squareup.com" "src"
+    rsync -av "rcrowley.org":"git" "."
     rsync -av "rcrowley.org":"var/backups" "var"
     rsync -av "rcrowley.org":"var/lib/Papers2" "var/lib"
     rsync -Hav "rcrowley.org":"var/lib/freight" "var/lib"
-    rsync -av "rcrowley.org":"var/lib/git" "var/lib"
     rsync -av "rcrowley.org":"var/www/arch" "var/www" || :
     rsync -av "rcrowley.org":"var/www/work" "var/www" || :
 fi

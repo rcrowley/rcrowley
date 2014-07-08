@@ -1,11 +1,17 @@
-set shiftwidth=4 softtabstop=4 tabstop=4
+set expandtab shiftwidth=4 softtabstop=4 tabstop=4
 set hlsearch
 set modeline
+set modelines=4
 set noai
+set ruler
 
 syntax on
 set background=dark
 colorscheme solarized
+
+" F1 bringing up the help screen is super annoying.
+map <F1> <Esc>
+imap <F1> <Esc>
 
 " Clojure sort of uses 2 spaces.  It also uses single spaces.
 au BufNewFile,BufRead *.clj setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
@@ -35,7 +41,8 @@ au FileType make setlocal noexpandtab
 " Markdown needs to be told it is.
 au BufRead,BufNewFile *.md setlocal filetype=markdown
 
-" PHP follows the Flickr standards.
+" Perl and PHP follow the Flickr standards.
+au FileType perl setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
 au FileType php setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
 
 " Protocol buffers can be whatever but I like tabs because I mostly use
