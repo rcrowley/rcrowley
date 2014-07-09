@@ -24,7 +24,7 @@ then
     cat "$HOME/.ssh/id_rsa.pub"
     read -p"$(tput "bold")Authorize this SSH public key on rcrowley.org; press <ENTER> to continue.$(tput "sgr0") " >&2
 fi
-ssh-add -l
+ssh-add -l || ssh-add
 
 # Setup FileVault and leave its recovery key in the home directory.
 if [ "$MAC_OS_X" ]
@@ -97,8 +97,8 @@ EOF
     if [ ! -d "/Library/Developer" ]
     then xcode-select --install
     fi
-    brew install "git" "gnupg" "gpg-agent" "mercurial" "node" "s3cmd" "tmux" "watch"
-    brew install "homebrew/php/php54-mcrypt"
+    brew upgrade "git" "gnupg" "gpg-agent" "mercurial" "node" "s3cmd" "tmux" "watch" || :
+    brew upgrade "homebrew/php/php54-mcrypt" || :
     npm install "keybase"
     sudo easy_install pip
     sudo pip install awscli
