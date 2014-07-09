@@ -529,8 +529,10 @@ then rm -f ".profile" "bootstrap.sh"
 fi
 git merge "origin/master"
 
-# Make Mac OS X SSH agents timeout after 10 minutes, too.
-security set-keychain-settings -l -t"600"
+# Lock the Mac OS X keychain (which includes the SSH agent) on sleep.
+if [ "$MAC_OS_X" ]
+then security set-keychain-settings -l
+fi
 
 # Install goimports everywhere.
 . ".profile.d/go.sh"
