@@ -551,7 +551,7 @@ git merge "origin/master"
 
 # Lock the Mac OS X keychain (which includes the SSH agent) on sleep.
 if [ "$MAC_OS_X" ]
-then security set-keychain-settings -l
+then : security set-keychain-settings -l
 fi
 
 # Install goimports everywhere.
