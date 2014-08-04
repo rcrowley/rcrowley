@@ -156,7 +156,7 @@ EOF
     fi
 
 else
-    apt-get -y install "freight" "git" "gnupg-agent" "go" "mercurial" "pinentry-curses" "python-django" "ruby" "rubygems" "tmux" "vim"
+    apt-get -y install "freight" "git" "gnupg-agent" "go" "graphviz" "mercurial" "php5-cli" "pinentry-curses" "python-django" "ruby" "rubygems" "tmux" "vim"
     apt-get -y remove "pinentry-gtk2"
     which "fpm" || gem install --no-rdoc --no-ri "fpm"
 fi
