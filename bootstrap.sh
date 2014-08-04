@@ -166,6 +166,23 @@ if [ "$MAC_OS_X" ]
 then
     mkdir -p "tmp"
 
+    if [ ! -d "/Applications/Dropbox.app" ]
+    then
+        if [ ! -f "tmp/dropbox.dmg" ]
+        then
+            curl -s "https://www.dropbox.com/release_notes" |
+            grep "release_type_stable" |
+            head -n"1" |
+            sed -E 's/^.*>([0-9]+\.[0-9]+\.[0-9]+)<.*$/\1/' |
+            xargs -I"_" curl -o"tmp/dropbox.dmg" "https://d1ilhw0800yew8.cloudfront.net/client/Dropbox%20_.dmg"
+        fi
+        if [ ! -d "/Volumes/Dropbox Installer" ]
+        then hdiutil attach -nobrowse "tmp/dropbox.dmg"
+        fi
+        ditto --rsrc "/Volumes/Dropbox Installer/Dropbox.app" "/Applications/Dropbox.app"
+        hdiutil detach "/Volumes/Dropbox Installer"
+    fi
+
     if [ ! -d "/Applications/Google Chrome.app" ]
     then
         if [ ! -f "tmp/chrome.dmg" ]
