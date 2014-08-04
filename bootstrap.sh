@@ -1,6 +1,8 @@
 # rcrowley-ify a computer!
 
 # TODO Chef install.sh, chef.patch, and `sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri "knife-ec2" "unf"`
+# TODO crontab
+# TODO Upgrade Go to 1.3
 
 VERSION="1.2.1"
 BUILD="rcrowley1"
@@ -80,7 +82,7 @@ then
     fi
 fi
 
-# Install dependencies.
+# Install command-line tools and other dependencies.
 if [ "$MAC_OS_X" ]
 then
     sudo tee "/etc/paths" >"/dev/null" <<EOF
@@ -166,6 +168,7 @@ if [ "$MAC_OS_X" ]
 then
     mkdir -p "tmp"
 
+    # Dropbox.
     if [ ! -d "/Applications/Dropbox.app" ]
     then
         if [ ! -f "tmp/dropbox.dmg" ]
@@ -183,6 +186,7 @@ then
         hdiutil detach "/Volumes/Dropbox Installer"
     fi
 
+    # Google Chrome.
     if [ ! -d "/Applications/Google Chrome.app" ]
     then
         if [ ! -f "tmp/chrome.dmg" ]
@@ -195,6 +199,7 @@ then
         hdiutil detach "/Volumes/Google Chrome"
     fi
 
+    # Papers 3.
     if [ ! -d "/Applications/Papers.app" ]
     then
         if [ ! -f "tmp/papers.dmg" ]
@@ -207,6 +212,7 @@ then
         hdiutil detach "/Volumes/Papers3"
     fi
 
+    # Skype.
     if [ ! -d "/Applications/Skype.app" ]
     then
         if [ ! -f "tmp/skype.dmg" ]
@@ -219,6 +225,7 @@ then
         hdiutil detach "/Volumes/Skype"
     fi
 
+    # VirtualBox.
     if [ ! -d "/Applications/VirtualBox.app" ]
     then
         if [ ! -f "tmp/virtualbox.dmg" ]
@@ -234,6 +241,7 @@ then
         hdiutil detach "/Volumes/VirtualBox"
     fi
 
+    # The rest come from the Mac App Store.
     if [ ! -d "/Applications/1Password.app" -o ! -d "/Applications/Caffeine.app" -o ! -d "/Applications/Slack.app" -o ! -d "/Applications/Textual.app" ]
     then
         set +x
@@ -247,7 +255,7 @@ then
     # Launch Caffeine.
     open "/Applications/Caffeine.app"
 
-    # For PlistBuddy.
+    # Export a PATH that includes PlistBuddy.
     export PATH="$PATH:/usr/libexec"
 
     # Configure Terminal.app with Solarized colors, 161 columns, and so on.
@@ -608,7 +616,6 @@ then
     curl -o"var/cache/freight/pubkey.gpg" -s "http://packages.rcrowley.org/pubkey.gpg"
     rsync -av "rcrowley.org":"git" "."
     rsync -av "rcrowley.org":"var/backups" "var"
-    rsync -av "rcrowley.org":"var/lib/Papers2" "var/lib"
     rsync -Hav "rcrowley.org":"var/lib/freight" "var/lib"
     rsync -av "rcrowley.org":"var/www/arch" "var/www" || :
     rsync -av "rcrowley.org":"var/www/work" "var/www" || :
