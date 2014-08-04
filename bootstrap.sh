@@ -234,12 +234,15 @@ then
         hdiutil detach "/Volumes/VirtualBox"
     fi
 
-    set +x
-    echo >&2
-    read -p"$(tput "bold")Install 1Password, Caffeine, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
-    echo >&2
-    set -x
-    open -W "/Applications/App Store.app"
+    if [ ! -d "/Applications/1Password.app" -o ! -d "/Applications/Caffeine.app" -o ! -d "/Applications/Slack.app" -o ! -d "/Applications/Textual.app" ]
+    then
+        set +x
+        echo >&2
+        read -p"$(tput "bold")Install 1Password, Caffeine, Slack, and Textual from the Mac App Store; press <ENTER> to continue.$(tput "sgr0") "
+        echo >&2
+        set -x
+        open -W "/Applications/App Store.app"
+    fi
 
     # Launch Caffeine.
     open "/Applications/Caffeine.app"
