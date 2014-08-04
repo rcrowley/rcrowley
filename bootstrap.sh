@@ -195,16 +195,16 @@ then
         hdiutil detach "/Volumes/Google Chrome"
     fi
 
-    if [ ! -d "/Applications/Papers2.app" ]
+    if [ ! -d "/Applications/Papers.app" ]
     then
         if [ ! -f "tmp/papers.dmg" ]
-        then curl -o"tmp/papers.dmg" "http://downloads.mekentosj.com/papers_273.dmg"
+        then curl -L -o"tmp/papers.dmg" "http://papersapp.com/downloads/mac/3"
         fi
-        if [ ! -d "/Volumes/Papers2" ]
+        if [ ! -d "/Volumes/Papers3" ]
         then yes | PAGER=":" hdiutil attach -nobrowse "tmp/papers.dmg"
         fi
-        ditto --rsrc "/Volumes/Papers2/Papers2.app" "/Applications/Papers2.app"
-        hdiutil detach "/Volumes/Papers2"
+        ditto --rsrc "/Volumes/Papers3/Papers.app" "/Applications/Papers.app"
+        hdiutil detach "/Volumes/Papers3"
     fi
 
     if [ ! -d "/Applications/Skype.app" ]
