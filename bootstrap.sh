@@ -1,9 +1,10 @@
 # rcrowley-ify a computer!
 
 # TODO Chef install.sh, chef.patch, and `sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri "knife-ec2" "unf"`
-# TODO crontab
+# TODO crontab?
 # TODO Upgrade Go to 1.3
 
+# Go version to install.
 VERSION="1.2.1"
 BUILD="rcrowley1"
 
@@ -29,22 +30,19 @@ fi
 ssh-add -l || ssh-add
 
 # Setup FileVault and leave its recovery key in the home directory.
+FDESETUP=""
 if [ "$MAC_OS_X" ]
 then
-    if which "fdesetup" >"/dev/null" 2>"/dev/null"
+    if ! sudo fdesetup list
     then
-        if ! sudo fdesetup list
-        then
-            FDESETUP="yes"
-            sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
-        fi
-    else
-        set +x
-        echo >&2
-        read -p"$(tput "bold")Go turn on FileVault; press <ENTER> to continue.$(tput "sgr0") " >&2
-        echo >&2
-        set -x
+        sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
+        FDESETUP="yes"
     fi
+fi
+
+# Lock the Mac OS X keychain (which includes the SSH agent) on sleep.
+if [ "$MAC_OS_X" ]
+then : security set-keychain-settings -l
 fi
 
 # Add known hosts entries to make this program more headless.
@@ -68,23 +66,11 @@ EOF
     apt-get update
 fi
 
-# Build the Debian package for Go if it doesn't already exist.
-if [ -z "$MAC_OS_X" ]
-then
-    if [ ! -f "var/lib/freight/apt/$(lsb_release -sc)/go_${VERSION}-${BUILD}_amd64.deb" ]
-    then
-        curl -O -f "http://go.googlecode.com/files/go$VERSION.linux-amd64.tar.gz"
-        trap "rm -rf \"go\" \"go$VERSION.linux-amd64.tar.gz\"" EXIT INT QUIT TERM
-        tar xf "go$VERSION.linux-amd64.tar.gz"
-        fakeroot fpm -m"Richard Crowley <r@rcrowley.org>" -n"go" -p"var/lib/freight/apt/$(lsb_release -sc)/go_${VERSION}-${BUILD}_amd64.deb" --prefix="/usr" -s"dir" -t"deb" -v"$VERSION-$BUILD" "go"
-        rm -rf "go" "go$VERSION.linux-amd64.tar.gz"
-        trap "" EXIT INT QUIT TERM
-    fi
-fi
-
 # Install command-line tools and other dependencies.
 if [ "$MAC_OS_X" ]
 then
+
+    # Reorder the PATH environment variable to put /usr/local ahead of /usr.
     sudo tee "/etc/paths" >"/dev/null" <<EOF
 /usr/local/bin
 /usr/local/sbin
@@ -93,12 +79,20 @@ then
 /bin
 /sbin
 EOF
+
+    # Install Homebrew.
     if [ ! -f "/usr/local/bin/brew" ]
     then ruby -e "$(curl -fsSL "https://raw.github.com/Homebrew/homebrew/go/install")"
     fi
+
+    # Install the XCode command-line tools.  This purposely comes after
+    # Homebrew because Homebrew behaves erratically when compilers are
+    # already available.
     if [ ! -d "/Library/Developer" ]
     then xcode-select --install
     fi
+
+    # Various dependencies and nice-to-haves.
     brew upgrade "git" "gnupg" "gpg-agent" "mercurial" "node" "s3cmd" "tmux" "watch" || :
     brew upgrade "homebrew/php/php54-mcrypt" || :
     npm install "keybase"
@@ -109,16 +103,15 @@ EOF
     # be a bit more clever about finding the URL of the package to install.
     if [ ! -d "/usr/local/go" ]
     then
+        cd "tmp"
         seq "$(sw_vers -productVersion | cut -d"." -f"2")" "-1" "6" |
         while read MINOR
         do
             curl -O -f "http://go.googlecode.com/files/go$VERSION.darwin-amd64-osx10.$MINOR.pkg" || continue
-            trap "rm -f \"go$VERSION.darwin-amd64-osx10.$MINOR.pkg\"" EXIT INT QUIT TERM
             sudo installer -package "go$VERSION.darwin-amd64-osx10.$MINOR.pkg" -target "/"
-            rm -f "go$VERSION.darwin-amd64-osx10.$MINOR.pkg"
-            trap "" EXIT INT QUIT TERM
             break
         done
+        cd ".."
     fi
 
     # Heroku toolbelt.
@@ -157,11 +150,20 @@ EOF
         hdiutil detach "/Volumes/JDK 7 Update 55"
     fi
 
+    # TODO Java 8 from Oracle.
+
 else
+
+    # Various dependencies and nice-to-haves.
     apt-get -y install "freight" "git" "gnupg-agent" "go" "graphviz" "mercurial" "php5-cli" "pinentry-curses" "python-django" "ruby" "rubygems" "tmux" "vim"
     apt-get -y remove "pinentry-gtk2"
     which "fpm" || gem install --no-rdoc --no-ri "fpm"
+
 fi
+
+# End of universally-useful bootstrapping.
+###############################################################################
+# Begin rcrowley-specific bootstrapping.
 
 # Install and configure Mac GUI apps.
 if [ "$MAC_OS_X" ]
@@ -259,7 +261,7 @@ then
     export PATH="$PATH:/usr/libexec"
 
     # Configure Terminal.app with Solarized colors, 161 columns, and so on.
-    cat >"tmp/rcrowley.terminal" <<EOF
+    cat >"tmp/rcrowley.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -523,7 +525,7 @@ then
 </dict>
 </plist>
 EOF
-    PlistBuddy -c "Merge tmp/rcrowley.terminal :Window\ Settings" "$HOME/Library/Preferences/com.apple.Terminal.plist"
+    PlistBuddy -c "Merge tmp/rcrowley.plist :Window\ Settings" "$HOME/Library/Preferences/com.apple.Terminal.plist"
     killall "cfprefsd"
     defaults write "com.apple.Terminal" "Default Window Settings" "rcrowley"
     defaults write "com.apple.Terminal" "Startup Window Settings" "rcrowley"
@@ -766,8 +768,8 @@ EOFEOF
     defaults write "com.apple.screensaver" "askForPasswordDelay" -integer "0"
 
     # Bottom right hot corner starts the screensaver.
-    #defaults write "com.apple.dock" "wvous-br-corner" "5"
-    #defaults write "com.apple.dock" "wvous-br-modifier" "0"
+    #defaults write "com.apple.dock" "wvous-br-corner" -integer "5"
+    #defaults write "com.apple.dock" "wvous-br-modifier" -integer "0"
 
     # TODO Configure Messages.app to login to AIM and Google Talk.
 
@@ -776,13 +778,13 @@ EOFEOF
 
 fi
 
-# Update everything aggressively.
+# Update all installed software aggressively.
 if [ "$MAC_OS_X" ]
 then sudo softwareupdate -i -a
 else apt-get -y upgrade
 fi
 
-# Clone the home directory.
+# Clone or pull the home directory.
 if [ ! -d ".git" ]
 then
     git init
@@ -794,18 +796,26 @@ then rm -f ".profile" "bootstrap.sh"
 fi
 git merge "origin/master"
 
-# Lock the Mac OS X keychain (which includes the SSH agent) on sleep.
-if [ "$MAC_OS_X" ]
-then : security set-keychain-settings -l
-fi
+# Start a GPG agent.
+. ".profile.d/gpg.sh"
 
 # Install goimports everywhere.
 . ".profile.d/go.sh"
 go get "code.google.com/p/go.tools/cmd/goimports"
 
-# Clone www's dependencies, install www, and start it.
+# Copy GPG key pairs from rcrowley.org.
+ssh "rcrowley.org" gpg --armor --export "packages@rcrowley.org" | gpg --import
+ssh "rcrowley.org" gpg --armor --export-secret-keys "packages@rcrowley.org" | gpg --import || :
+ssh "rcrowley.org" gpg --armor --export "r@rcrowley.org" | gpg --import
+ssh "rcrowley.org" gpg --armor --export-secret-keys "r@rcrowley.org" | gpg --import || :
+
 if [ -z "$MAC_OS_X" ]
 then
+
+    # Copy authorized SSH public keys from rcrowley.org.
+    scp "rcrowley.org":".ssh/authorized_keys" ".ssh"
+
+    # Clone www's dependencies, install www, and start it.
     mkdir -p "src/github.com/rcrowley"
     if [ ! -d "src/github.com/rcrowley/go-metrics" ]
     then git clone "git@github.com:rcrowley/go-metrics.git" "src/github.com/rcrowley/go-metrics"
@@ -832,22 +842,8 @@ script
 end script
 EOF
     start "www" || restart "www"
-fi
 
-# Copy authorized SSH public keys from rcrowley.org.
-if [ -z "$MAC_OS_X" ]
-then scp "rcrowley.org":".ssh/authorized_keys" ".ssh"
-fi
-
-# Copy GPG key pairs from rcrowley.org.
-ssh "rcrowley.org" gpg --armor --export "packages@rcrowley.org" | gpg --import
-ssh "rcrowley.org" gpg --armor --export-secret-keys "packages@rcrowley.org" | gpg --import || :
-ssh "rcrowley.org" gpg --armor --export "r@rcrowley.org" | gpg --import
-ssh "rcrowley.org" gpg --armor --export-secret-keys "r@rcrowley.org" | gpg --import || :
-
-# Copy files from the old rcrowley.org to the new rcrowley.org.
-if [ -z "$MAC_OS_X" ]
-then
+    # Copy files from the old rcrowley.org to the new rcrowley.org.
     mkdir -p "src" "var/cache/freight" "var/lib" "var/www"
     curl -o"var/cache/freight/keyring.gpg" -s "http://packages.rcrowley.org/keyring.gpg"
     curl -o"var/cache/freight/pubkey.gpg" -s "http://packages.rcrowley.org/pubkey.gpg"
@@ -856,21 +852,25 @@ then
     rsync -Hav "rcrowley.org":"var/lib/freight" "var/lib"
     rsync -av "rcrowley.org":"var/www/arch" "var/www" || :
     rsync -av "rcrowley.org":"var/www/work" "var/www" || :
-fi
 
-# Start a GPG agent and cache the Debian archive.
-. ".profile.d/gpg.sh"
-if [ -z "$MAC_OS_X" ]
-then
+    # Build the Debian package for Go if it doesn't already exist and cache the
+    # local Debian archive.
+    if [ ! -f "var/lib/freight/apt/$(lsb_release -sc)/go_${VERSION}-${BUILD}_amd64.deb" ]
+    then
+        curl -O -f "http://go.googlecode.com/files/go$VERSION.linux-amd64.tar.gz"
+        trap "rm -rf \"go\" \"go$VERSION.linux-amd64.tar.gz\"" EXIT INT QUIT TERM
+        tar xf "go$VERSION.linux-amd64.tar.gz"
+        fakeroot fpm -m"Richard Crowley <r@rcrowley.org>" -n"go" -p"var/lib/freight/apt/$(lsb_release -sc)/go_${VERSION}-${BUILD}_amd64.deb" --prefix="/usr" -s"dir" -t"deb" -v"$VERSION-$BUILD" "go"
+        rm -rf "go" "go$VERSION.linux-amd64.tar.gz"
+        trap "" EXIT INT QUIT TERM
+    fi
     freight cache
     apt-get update
-fi
 
-# Remove the old rcrowley.org's SSH host key.
-if [ -z "$MAC_OS_X" ]
-then
+    # Remove the old rcrowley.org's SSH host key.
     grep -v "rcrowley.org" ".ssh/known_hosts" >"known_hosts"
     mv "known_hosts" ".ssh"
+
 fi
 
 # Parting advice.
