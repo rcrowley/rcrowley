@@ -1,1 +1,1 @@
-ulimit -S -n 10000
+ulimit -n 10000
