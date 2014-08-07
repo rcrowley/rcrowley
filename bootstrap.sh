@@ -24,7 +24,20 @@ do
     esac
 done
 
-sudo -p"$0 requires %U privileges! Password: " -v
+if [ "$(uname)" = "Darwin" ]
+then sudo -p"$0 requires %U privileges! Password: " -v
+fi
+
+set -x
+
+# Add known hosts entries to make this program more headless.
+mkdir -m"700" -p ".ssh"
+if ! grep -q "github.com" ".ssh/known_hosts"
+then ssh-keyscan "github.com" >>".ssh/known_hosts"
+fi
+if ! grep -q "rcrowley.org" ".ssh/known_hosts"
+then ssh-keyscan "rcrowley.org" >>".ssh/known_hosts"
+fi
 
 ###############################################################################
 # Begin universal Mac bootstrapping.
@@ -33,8 +46,6 @@ sudo -p"$0 requires %U privileges! Password: " -v
 if [ "$(uname)" != "Darwin" ]
 then exit
 fi
-
-set -x
 
 # Ensure we have an SSH private key available to us.
 if [ ! -f "$HOME/.ssh/id_rsa" ]
@@ -55,15 +66,6 @@ fi
 
 # Lock the Mac OS X keychain (which includes the SSH agent) on sleep.
 : security set-keychain-settings -l
-
-# Add known hosts entries to make this program more headless.
-mkdir -m"700" -p ".ssh"
-if ! grep -q "github.com" ".ssh/known_hosts"
-then ssh-keyscan "github.com" >>".ssh/known_hosts"
-fi
-if ! grep -q "rcrowley.org" ".ssh/known_hosts"
-then ssh-keyscan "rcrowley.org" >>".ssh/known_hosts"
-fi
 
 # Reorder the PATH environment variable to put /usr/local ahead of /usr.
 sudo tee "/etc/paths" >"/dev/null" <<EOF
@@ -159,8 +161,6 @@ sudo softwareupdate -i -a
 if [ "$(uname)" != "Darwin" ]
 then exit
 fi
-
-set -x
 
 mkdir -p "tmp"
 
@@ -794,19 +794,17 @@ if [ "$(uname)" != "Linux" ]
 then exit
 fi
 
-set -x
-
 # Add our Debian archive to APT.
 sudo tee "/etc/apt/sources.list.d/rcrowley.list" <<EOF
 deb http://packages.rcrowley.org $(lsb_release -sc) main
 #deb-src http://packages.rcrowley.org $(lsb_release -sc) main
 EOF
-sudo cp "var/cache/freight/keyring.gpg" "/etc/apt/trusted.gpg.d/rcrowley.gpg"
+curl -s "http://packages.rcrowley.org/keyring.gpg" | sudo tee "/etc/apt/trusted.gpg.d/rcrowley.gpg" >"/dev/null"
 export APT_LISTBUGS_FRONTEND="none" APT_LISTCHANGES_FRONTEND="none" DEBIAN_FRONTEND="noninteractive"
 sudo apt-get update
 
 # Various dependencies and nice-to-haves.
-sudo apt-get -y install "freight" "git" "gnupg-agent" "go" "graphviz" "mercurial" "php5-cli" "pinentry-curses" "python-django" "ruby" "rubygems" "tmux" "vim"
+sudo apt-get -y install "build-essential" "freight" "git" "gnupg-agent" "go" "graphviz" "mercurial" "php5-cli" "pinentry-curses" "python-django" "ruby" "ruby-dev" "tmux" "vim"
 sudo apt-get -y remove "pinentry-gtk2"
 which "fpm" || sudo gem install --no-rdoc --no-ri "fpm"
 
@@ -818,8 +816,6 @@ sudo apt-get -y upgrade
 ###############################################################################
 # Begin rcrowley bootstrapping.
 (
-
-set -x
 
 # Clone or pull the home directory.
 if [ ! -d ".git" ]
@@ -856,8 +852,6 @@ if [ "$(uname)" != "Linux" ]
 then exit
 fi
 
-set -x
-
 # Copy authorized SSH public keys from rcrowley.org.
 scp "rcrowley.org":".ssh/authorized_keys" ".ssh"
 
@@ -869,6 +863,7 @@ fi
 if [ ! -d "src/github.com/rcrowley/go-tigertonic" ]
 then git clone "git@github.com:rcrowley/go-tigertonic.git" "src/github.com/rcrowley/go-tigertonic"
 fi
+. ".profile.d/go.sh"
 go install "www"
 sudo tee "/etc/init/www.conf" <<EOF
 description "www"
