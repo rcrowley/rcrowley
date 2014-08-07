@@ -7,7 +7,7 @@ do
     then export SSH_AUTH_SOCK="$PATHNAME"
     else
         rm -f "$PATHNAME"
-        rmdir --ignore-fail-on-non-empty "$(dirname "$PATHNAME")"
+        rmdir "$(dirname "$PATHNAME")" 2>"/dev/null" || :
     fi
 done
 if [ -z "$SSH_AUTH_SOCK" ]
