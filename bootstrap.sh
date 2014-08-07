@@ -4,7 +4,7 @@
 # TODO Upgrade Go to 1.3
 
 # Go version to install.
-VERSION="1.2.1"
+VERSION="1.3"
 BUILD="rcrowley1"
 
 #/ Usage: sh bootstrap.sh
@@ -898,7 +898,7 @@ rsync -av "rcrowley.org":"var/www/work" "var/www" || :
 # local Debian archive.
 if [ ! -f "var/lib/freight/apt/$(lsb_release -sc)/go_${VERSION}-${BUILD}_amd64.deb" ]
 then
-    curl -O -f "http://go.googlecode.com/files/go$VERSION.linux-amd64.tar.gz"
+    curl -L -O -f "http://golang.org/dl/go$VERSION.linux-amd64.tar.gz"
     trap "rm -rf \"go\" \"go$VERSION.linux-amd64.tar.gz\"" EXIT INT QUIT TERM
     tar xf "go$VERSION.linux-amd64.tar.gz"
     fakeroot fpm -m"Richard Crowley <r@rcrowley.org>" -n"go" -p"var/lib/freight/apt/$(lsb_release -sc)/go_${VERSION}-${BUILD}_amd64.deb" --prefix="/usr" -s"dir" -t"deb" -v"$VERSION-$BUILD" "go"
