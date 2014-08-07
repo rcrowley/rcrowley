@@ -2,21 +2,7 @@
 
 set -e
 
-#/ Usage: ssh <name> [<command> [<arg>[...]]]
-#/        ssh [<option>][...] [<username>@]<hostname> [<command> [<arg>[...]]]
+# Mark the SSH agent as having been used to stave off purging private keys.
+touch "$HOME/.ssh-agent-expiry"
 
-if [ "$#" -gt 1 ]
-then
-	exec /usr/bin/ssh "$@"
-fi
-
-NAME="$1"
-shift
-ADDR="$(
-	grep -s "lxc.network.ipv4" "/var/lib/lxc/$NAME/config" |
-	cut -d= -f2 |
-	tr -d " \t"
-)"
-[ -z "$ADDR" ] && ADDR="$NAME"
-
-exec /usr/bin/ssh "$ADDR" "$@"
+exec "/usr/bin/ssh" "$@"
