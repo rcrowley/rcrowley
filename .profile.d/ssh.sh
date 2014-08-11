@@ -1,4 +1,4 @@
-for PATHNAME in "/tmp/ssh-"*"/agent."*
+for PATHNAME in "/tmp/ssh-"*"/agent."* # "/tmp/launch-"*"/Listeners"
 do
     if [ ! -w "$PATHNAME" ]
     then continue

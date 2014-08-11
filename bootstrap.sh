@@ -47,6 +47,14 @@ if [ "$(uname)" != "Darwin" ]
 then exit
 fi
 
+# Setup FileVault and leave its recovery key in the home directory.
+FDESETUP=""
+if ! sudo fdesetup list
+then
+    sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
+    FDESETUP="yes"
+fi
+
 # Ensure we have an SSH private key available to us.
 if [ ! -f "$HOME/.ssh/id_rsa" ]
 then
@@ -56,16 +64,43 @@ then
 fi
 ssh-add -l || ssh-add
 
-# Setup FileVault and leave its recovery key in the home directory.
-FDESETUP=""
-if ! sudo fdesetup list
+# Configure the built-in SSH agent to forget decrypted keys after ten minutes
+# of inactivity.
+sudo tee "/usr/local/bin/ssh" >"/dev/null" <<'EOF'
+#!/bin/sh
+
+set -e
+
+# Mark the SSH agent as having been used to stave off purging private keys.
+touch "$HOME/.ssh-agent-last-used"
+
+exec "/usr/bin/ssh" "$@"
+EOF
+sudo chmod 755 "/usr/local/bin/ssh"
+sudo tee "/usr/local/bin/empty-unused-ssh-agent" >"/dev/null" <<'EOF'
+#!/bin/sh
+
+set -e
+
+# Don't bother if the SSH agent's been used in the last ten minutes.
+if ! find "$HOME/.ssh-agent-last-used" -mmin "+10" | grep -q ".ssh-agent-last-used"
 then
-    sudo fdesetup enable -outputplist -user "$USER" | tee "filevault.plist"
-    FDESETUP="yes"
+    echo "empty-unused-ssh-agent: not expired" >&2
+    exit
 fi
 
-# Lock the Mac OS X keychain (which includes the SSH agent) on sleep.
-: security set-keychain-settings -l
+# Empty the SSH agent of all decrypted private keys.
+find -L "/tmp" -name "launch-*" 2>"/dev/null" |
+xargs -I"_" find "_" -name "Listeners" |
+while read SSH_AUTH_SOCK
+do SSH_AUTH_SOCK="$SSH_AUTH_SOCK" ssh-add -D
+done
+EOF
+sudo chmod 755 "/usr/local/bin/empty-unused-ssh-agent"
+EDITOR="tee" crontab -e <<'EOF'
+MAILTO=""
+* * * * * /usr/local/bin/empty-unused-ssh-agent
+EOF
 
 # Reorder the PATH environment variable to put /usr/local ahead of /usr.
 sudo tee "/etc/paths" >"/dev/null" <<EOF
@@ -781,7 +816,7 @@ MAILTO=""
 * * * * * COUNT="$(grep -c "." "$HOME/TODO.txt")" DATE="$(date +"\%Y-\%m-\%d")"; grep -F -q "$DATE" "$HOME/TODO.csv" && sed -i "" "s/^$DATE,[0-9]*\$/$DATE,$COUNT/" "$HOME/TODO.csv" || echo "$DATE,$COUNT" >>"$HOME/TODO.csv"
 
 # Remove identities from the SSH agent after 10 minutes of inactivity.
-* * * * * find "$HOME/.ssh-agent-expiry" -mmin "+10" | grep -q ".ssh-agent-expiry" && . "$HOME/.profile.d/ssh.sh" && ssh-add -D
+* * * * * /usr/local/bin/empty-unused-ssh-agent
 EOF
 
 )

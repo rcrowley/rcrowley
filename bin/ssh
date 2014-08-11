@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -e
-
-# Mark the SSH agent as having been used to stave off purging private keys.
-touch "$HOME/.ssh-agent-expiry"
-
-exec "/usr/bin/ssh" "$@"
