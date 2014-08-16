@@ -904,7 +904,7 @@ description "www"
 start on runlevel [2345]
 stop on runlevel [!2345]
 respawn
-chdir /root
+chdir $HOME
 env GOMAXPROCS="4"
 script
     set -e
@@ -913,7 +913,7 @@ script
     (setsid logger -t"www" <"/tmp/www.log" &)
     exec >"/tmp/www.log" 2>"/tmp/www.log"
     rm "/tmp/www.log"
-    exec /root/bin/www
+    exec "$HOME/bin/www"
 end script
 EOF
 sudo start "www" || sudo restart "www"
