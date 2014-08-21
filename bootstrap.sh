@@ -3,7 +3,7 @@
 # TODO Chef install.sh, chef.patch, and `sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri "knife-ec2" "unf"`
 
 # Go version to install.
-VERSION="1.3"
+VERSION="1.3.1"
 BUILD="rcrowley1"
 
 #/ Usage: sh bootstrap.sh
@@ -138,7 +138,7 @@ then
     seq "$(sw_vers -productVersion | cut -d"." -f"2")" "-1" "6" |
     while read MINOR
     do
-        curl -O -f "http://go.googlecode.com/files/go$VERSION.darwin-amd64-osx10.$MINOR.pkg" || continue
+        curl -O -f "https://storage.googleapis.com/golang/go$VERSION.darwin-amd64-osx10.$MINOR.pkg" || continue
         sudo installer -package "go$VERSION.darwin-amd64-osx10.$MINOR.pkg" -target "/"
         break
     done
