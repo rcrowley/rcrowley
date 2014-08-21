@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/rcrowley/go-metrics"
-	"github.com/rcrowley/go-tigertonic"
 	"io"
 	"log"
 	"net/http"
@@ -12,6 +10,9 @@ import (
 	"os"
 	"path"
 	"time"
+
+	"github.com/rcrowley/go-metrics"
+	"github.com/rcrowley/go-tigertonic"
 )
 
 var (
@@ -37,6 +38,15 @@ func init() {
 			"rcrowley.org",
 			nil,
 		),
+	)
+	mux.Handle(
+		"GET",
+		"/jpeg.png",
+		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.Header().Set("Content-Type", "image/png")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte{0xFF, 0xD8})
+		}),
 	)
 	mux.Handle(
 		"GET",
