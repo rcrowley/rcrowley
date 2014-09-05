@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<title>MySQL at Slack</title>
+<body>
+<h1>MySQL at Slack</h1>
+
+<!-- TODO s/'/\&#8217;/g s/  /\&nbsp; /g -->
+
+<p><strong>tl;dr</strong>&nbsp; It&#8217;s the evolution of the Flickr way summarized in <em>Building Scalable Web Sites</em>.</p>
+
+<h2>Architecture</h2>
+
+<p>The <em>main</em> database is how you lookup what team you&#8217;re on.</p>
+
+<p>The <em>auxilliary</em> databases are vertically partitioned places to put non-team-scoped data.</p>
+
+<p>The <em>shards</em> are where the real action happens.&nbsp; Each team is assigned a shard and most everything about a team is stored there.</p>
+
+<p>With few exceptions, we run Percona Server 5.5.something.</p>
+
+<p>Most of our databases are on <code>i2.xlarge</code> instances.&nbsp; We use the emphemeral SSDs for InnoDB logs, InnoDB data, and binary logs.</p>
+
+<p>We let a few get too big so they&#8217;re on <code>i2.2xlarge</code> instances but we try to avoid that because we can&#8217;t fit twice as many teams on those despite being twice as big.</p>
+
+<h2>Master-master pairs</h2>
+
+<p>The main database, each auxilliary database, and each shard is a master-master pair.&nbsp; One side is in our <code>us-east-1d</code> and the other is in our <code>us-east-1e</code>.</p>
+
+<p>We write to both sides of the pair all the time.&nbsp; We ensure consistency by preferring the odd side for odd-numbered teams and the even side for even-numbered teams.</p>
+
+<p>This cuts the replication load in half and makes it easier for each side to keep up.</p>
+
+<p>If the preferred side isn&#8217;t reachable we try the other and rely on replication to restore consistency.&nbsp; This <strong>usually</strong> works.</p>
+
+<p>To add insult to injury, you can&#8217;t run <code>pt-table-checksum</code> against a master-master pair without moving all your real traffic to one side.</p>
+
+<h2>Tickets</h2>
+
+<p>None of the servers in those master-master pairs generate any identifiers themselves.&nbsp; Instead they get identifiers ahead of time from <em>ticket servers</em>.</p>
+
+<p>Each ticket sequence is a single row table that repeatedly runs SQL like this:</p>
+
+<pre>REPLACE INTO tickets (dummy) VALUES ('');
+SELECT LAST_INSERT_ID();</pre>
+
+<p>There are two ticket servers in each sequence, an odd one and and even one.&nbsp; We don&#8217;t make much effort to keep them in-sync, though I bet the tickets being roughly in order helps InnoDB a great deal.</p>
+
+<p>We&#8217;re experimenting with MySQL 5.6 on some ticket servers as a potential fix for a bug in which a lock is held, connections are all consumed, it waits for a few dozen seconds, and then everything returns to normal.</p>
+
+<p>The ticket servers probably shouldn&#8217;t be MySQL and maybe shouldn&#8217;t even be stateful.</p>
+
+<h2>Monitoring</h2>
+
+<p>We monitor all the normal things in Ganglia.</p>
+
+<p>We also attempt to monitor the how many bytes each slave&#8217;s relay log is behind the master&#8217;s because this is a better measure of durability.</p>
+
+<p>SQL replication lag isn&#8217;t a big deal on shards because teams prefer one side or the other.</p>
+
+<p>SQL replication lag <strong>is</strong> a big deal on the main database because we have no team from which to derive a preference.&nbsp; I&#8217;m considering defining the preference by table name.</p>
+
+<p>Our typical response to main database replication lag is to send all writes to the other side.</p>
+
+<h2>Backup and restore</h2>
+
+<p>We take full nightly backups at 10:00pm Pacific using <code>xtrabackup</code>.&nbsp; We haven&#8217;t experimented at all with incrementals because recovery time&#8217;s very important to us.</p>
+
+<p>Each server has an EBS volume attached for staging backups on their way to S3.</p>
+
+<p>Pay very close attention to what version of <code>xtrabackup</code> you&#8217;re using because slight mismatches will produce cryptic errors or infinite loops that fill your disks.</p>
+
+<p>Our goal is to reprovision every server, even databases, every 90 days to encourage ourselves to be really good at it.&nbsp; Our provisioner runs <code>knife ec2 server create</code>, restores the most recent backup, and starts replication in one command.&nbsp; As soon as replication is caught up we can put it into service.</p>
+
+<p>If a backup was taken more than a few hours ago it&#8217;s actually faster to make a new backup so there&#8217;s less catch-up.</p>
+
+<h2>Miscellaneous unsolicited advice</h2>
+
+<p>Beware:&nbsp; Percona&#8217;s packages always start MySQL no matter what you do.</p>
+
+<p>Host your own packages lest you get wildly different versions running together in production.</p>
+
+<p>Move OLAP workloads to their own clusters early and often.&nbsp; We can handle more than three times our current traffic excluding top-of-the-hour stats.</p>
+
+<hr>
+
+<ul>
+<li><a href="http://shop.oreilly.com/product/9780596102357.do"><em>Building Scalable Web Sites</em></a></li>
+<li><a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap/">Ticket Servers:&nbsp; Distributed Unique Primary Keys on the Cheap</a></li>
+</ul>
