@@ -5,6 +5,11 @@ set modelines=4
 set noai
 set ruler
 
+" Stop Vim from assuming the first match is what I want when tab-completing
+" filenames during :sp and :vsp commands.
+set wildmenu
+set wildignore=longest,list
+
 syntax on
 set background=dark
 colorscheme solarized
