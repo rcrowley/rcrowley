@@ -45,7 +45,7 @@ func init() {
 		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			w.Header().Set("Content-Type", "image/png; charset=utf-8")
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte{0xFF, 0xD8})
+			w.Write([]byte{0xFF, 0xD8, 0, 0, 0, 0, 0, 0, 0})
 		}),
 	)
 	mux.Handle(
