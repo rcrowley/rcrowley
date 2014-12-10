@@ -124,11 +124,12 @@ then xcode-select --install
 fi
 
 # Various dependencies and nice-to-haves.
-brew upgrade "git" "gnupg" "gpg-agent" "mercurial" "node" "s3cmd" "tmux" "watch" || :
+brew upgrade "git" "gnupg" "gpg-agent" "markdown" "mercurial" "node" "s3cmd" "tmux" "watch" || :
 brew upgrade "homebrew/php/php54-mcrypt" || :
 npm install "keybase"
-sudo easy_install pip
-sudo pip install awscli
+sudo easy_install "pip"
+sudo pip install "awscli"
+sudo pip install "virtualenv"
 
 # Go releases aren't necessarily tagged to every OS X release so we have to
 # be a bit more clever about finding the URL of the package to install.
@@ -875,6 +876,10 @@ ssh "rcrowley.org" gpg --armor --export "packages@rcrowley.org" | gpg --import
 ssh "rcrowley.org" gpg --armor --export-secret-keys "packages@rcrowley.org" | gpg --import || :
 ssh "rcrowley.org" gpg --armor --export "r@rcrowley.org" | gpg --import
 ssh "rcrowley.org" gpg --armor --export-secret-keys "r@rcrowley.org" | gpg --import || :
+
+# Make ready to work on Slack.
+sudo mkdir -p "/etc/slack"
+sudo touch "/etc/slack/credentials.php"
 
 )
 # End rcrowley bootstrapping.
