@@ -10,19 +10,24 @@ if (typeof XMLHttpRequest == "undefined") {
 	};
 }
 
-function _(node, tagName, namespace) {
+function _(node, tagName, namespace, defaultValue) {
 	try {
 		return node.getElementsByTagName(tagName)[0].firstChild.nodeValue;
 	}
 	catch (e) {
-		return _(node, namespace + ":" + tagName);
+		try {
+			return node.getElementsByTagName(tagName)[0].firstChild.nodeValue;
+		}
+		catch (e) {
+			return defaultValue || "";
+		}
 	}
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "/pinboard.xml", true);
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function () {
 		if (4 != xhr.readyState) { return; }
 
 		// Stop with the spinning.
@@ -47,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			var h1 = document.createElement("h1");
 			var a = document.createElement("a");
 			a.setAttribute("href", _(item, "link"));
-			a.appendChild(document.createTextNode(_(item, "title")));
+			a.appendChild(document.createTextNode(
+				_(item, "title", undefined, "(untitled)")));
 			h1.appendChild(a);
 			header.appendChild(h1);
 			article.appendChild(header);
