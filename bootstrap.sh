@@ -272,6 +272,19 @@ then
     hdiutil detach "/Volumes/VirtualBox"
 fi
 
+# Wickr
+if [ ! -d "/Applications/Wickr.app" ]
+then
+    if [ ! -f "tmp/wickr.dmg" ]
+    then curl -o"tmp/wickr.dmg" "https://mywickr.info/download.php?p=2"
+    fi
+    if [ ! -d "/Volumes/Wickr Installer" ]
+    then hdiutil attach "tmp/wickr.dmg"
+    fi
+    ditto --rsrc "/Volumes/Wickr Installer/Wickr.app" "/Applications/Wickr.app"
+    hdiutil detach "/Volumes/Wickr Installer"
+fi
+
 # The rest come from the Mac App Store.
 if [ ! -d "/Applications/1Password.app" -o ! -d "/Applications/Caffeine.app" -o ! -d "/Applications/Slack.app" -o ! -d "/Applications/Textual.app" ]
 then
