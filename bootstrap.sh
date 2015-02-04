@@ -96,10 +96,10 @@ do SSH_AUTH_SOCK="$SSH_AUTH_SOCK" ssh-add -D
 done
 EOF
 sudo chmod 755 "/usr/local/bin/empty-unused-ssh-agent"
-EDITOR="tee" crontab -e <<'EOF'
-MAILTO=""
-* * * * * /usr/local/bin/empty-unused-ssh-agent
-EOF
+#EDITOR="tee" crontab -e <<'EOF'
+#MAILTO=""
+#* * * * * /usr/local/bin/empty-unused-ssh-agent
+#EOF
 
 # Reorder the PATH environment variable to put /usr/local ahead of /usr.
 sudo tee "/etc/paths" >"/dev/null" <<EOF
