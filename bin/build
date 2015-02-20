@@ -54,7 +54,7 @@ class Atom(object):
                                qname('link'),
                                {'href': alternate,
                                 'rel': 'alternate'})
-        ElementTree.SubElement(feed, 'id').text = id
+        ElementTree.SubElement(feed, qname('id')).text = id
         ElementTree.SubElement(feed, qname('updated'))
         ElementTree.SubElement(
             ElementTree.SubElement(feed,
