@@ -230,6 +230,19 @@ then
     hdiutil detach "/Volumes/Google Chrome"
 fi
 
+# OmniGraffle.
+if [ ! -d "/Applications/OmniGraffle.app" ]
+then
+    if [ ! -f "tmp/omnigraffle.dmg" ]
+    then curl -L -o"tmp/omnigraffle.dmg" "https://www.omnigroup.com/download/latest/omnigraffle"
+    fi
+    if [ ! -d "/Volumes/OmniGraffle" ]
+    then yes | PAGER=":" hdiutil attach -nobrowse "tmp/omnigraffle.dmg"
+    fi
+    ditto --rsrc "/Volumes/OmniGraffle/OmniGraffle.app" "/Applications/OmniGraffle.app"
+    hdiutil detach "/Volumes/OmniGraffle"
+fi
+
 # Papers 3.
 if [ ! -d "/Applications/Papers.app" ]
 then
