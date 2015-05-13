@@ -3,7 +3,7 @@
 # TODO Chef install.sh, chef.patch, and `sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri "knife-ec2" "unf"`
 
 # Go version to install.
-VERSION="1.3.1"
+VERSION="1.4.2"
 BUILD="rcrowley1"
 
 #/ Usage: sh bootstrap.sh
