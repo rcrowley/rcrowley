@@ -113,7 +113,7 @@ EOF
 
 # Install Homebrew.
 if [ ! -f "/usr/local/bin/brew" ]
-then ruby -e "$(curl -fsSL "https://raw.github.com/Homebrew/homebrew/go/install")"
+then ruby -e "$(curl -LSfs "https://raw.githubusercontent.com/Homebrew/install/master/install")"
 fi
 
 # Install the XCode command-line tools.  This purposely comes after
