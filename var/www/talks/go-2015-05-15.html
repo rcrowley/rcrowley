@@ -1,0 +1,591 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Go</title>
+    <meta charset='utf-8'>
+    <script src='/static/slides.js'></script>
+  </head>
+
+  <body style='display: none'>
+
+    <section class='slides layout-widescreen'>
+      
+      <article>
+        <h1>Go</h1>
+        
+        
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+
+          </div>
+        
+      </article>
+      
+  
+  
+      <article>
+      
+        <h3>Go</h3>
+        
+  
+  <p>
+    Always google it as “golang”
+<br>
+
+    Thompson, Pike, Cox, Griesemer
+<br>
+
+    Statically typed
+<br>
+
+    Not classically object-oriented
+<br>
+
+    CSP primitives as syntax
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Hello, world!</h3>
+        
+  
+  <div class="code"><pre>package main
+
+import &#34;fmt&#34;
+
+func main() {
+    fmt.Println(&#34;Hello, world!&#34;)
+}</pre></div>
+  
+
+  
+  <p>
+    File scope only contains functions, types, and variables
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>More!</h3>
+        
+  
+  <div class="code"><pre>package main
+
+import &#34;fmt&#34;
+
+var format string = somethingThatReturnsAString()
+
+func init() {
+    format = &#34;Hello, %s!\n&#34;
+}
+
+func main() {
+    fmt.Printf(format, &#34;y&#39;all&#34;)
+}</pre></div>
+  
+
+  
+  <p>
+    Varibles initialize with any expression
+<br>
+
+    <code>init</code> functions run next, before <code>main</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Functions</h3>
+        
+  
+  <div class="code"><pre>func foo(bar int64) (string, bool) {
+    return fmt.Sprintf(&#34;%x&#34;, bar), bar &gt; 0
+}</pre></div>
+  
+
+  
+  <p>
+    May be named or anonymous 
+<br>
+
+    All functions are closures 
+<br>
+
+    Zero or more typed parameters 
+<br>
+
+    Parameters are pass-by-value 
+<br>
+
+    Zero or more typed return values
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Logic</h3>
+        
+  
+  <div class="code"><pre>if foo &gt; bar {
+    baz()
+}
+if quux := f(); quux != nil {
+    return
+}
+for i &gt; 0 {
+    i--
+}
+for i := 0; i &lt; 100; i&#43;&#43; {
+    foo *= i
+}
+for {
+    doIt()
+}
+for k, v := range m {
+    fmt.Printf(&#34;%v: %v\n&#34;, k, v)
+}</pre></div>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Primitives</h3>
+        
+  
+  <p>
+    <code>bool</code>
+<br>
+
+    <code>int</code>, <code>int8</code>, <code>int16</code>, <code>int32</code>, <code>int64</code>
+<br>
+
+    <code>uint</code>, <code>uint8</code>, <code>uint16</code>, <code>uint32</code>, <code>uint64</code>
+<br>
+
+    <code>byte</code>, <code>rune</code>, <code>string</code>
+<br>
+
+    <code>float32</code>, <code>float64</code>
+<br>
+
+    <code>complex64</code>, <code>complex128</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Errors</h3>
+        
+  
+  <div class="code"><pre>func fail() error { return errors.New(&#34;fail&#34;) }
+
+func multifail() (*Win, error) {
+    return nil, errors.New(&#34;multifail&#34;)
+}</pre></div>
+  
+
+  
+  <p>
+    Conventionally return an <code>error</code> last 
+<br>
+
+    There are no exceptions because errors are not exceptional 
+<br>
+
+    Use <code>error</code> to communicate what happened to the caller
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Arrays and slices</h3>
+        
+  
+  <div class="code"><pre>var array [8]string
+slice := make([]string, 8)</pre></div>
+  
+
+  
+  <p>
+    Rarely-sighted arrays have a fixed length
+<br>
+
+    Slices are references to an underlying array that can be reallocated to grow and shrink
+<br>
+
+    <code>make</code> constructs reference types like slices
+<br>
+
+    <code>len</code> and <code>cap</code> inspect them
+<br>
+
+    <code>append</code> and <code>copy</code> mutate them
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Maps</h3>
+        
+  
+  <div class="code"><pre>m := map[string]string{&#34;foo&#34;: &#34;bar&#34;}
+m[&#34;baz&#34;] = &#34;quux&#34;</pre></div>
+  
+
+  
+  <p>
+    Maps are reference types, too
+<br>
+
+    Keys can be any comparable type
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Pointers</h3>
+        
+  
+  <div class="code"><pre>func foo(p *int) { fmt.Printf(&#34;%d\n&#34;, *p) }
+var i int = 47
+var p *int = &amp;i
+foo(p)
+p = nil
+foo(p)</pre></div>
+  
+
+  
+  <p>
+    Anything can be pointed to
+<br>
+
+    Pointers are memory safe
+<br>
+
+    Pointer arithmetic is not allowed
+<br>
+
+    Dereferencing a <code>nil</code> pointer crashes
+<br>
+
+    your program
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Structs</h3>
+        
+  
+  <div class="code"><pre>type foo struct {
+    bar  int64
+    baz  float64
+    quux *foo
+}</pre></div>
+  
+
+  
+  <p>
+    Structs are types
+<br>
+
+    Zero or more named and typed fields
+<br>
+
+    Grant total control over memory layout
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Methods</h3>
+        
+  
+  <div class="code"><pre>func (f *foo) String() (string) {
+    return fmt.Sprintf(&#34;&lt;foo: %d %f %p&gt;&#34;, f.bar, f.baz, f.quux)
+}
+
+func (f *foo) Write(p []byte) (n int, err error) {
+    s := s.String()
+    n = len(s)
+    if tmp := len(p); n &gt; tmp {
+        n = tmp
+        err = errors.New(&#34;overflow&#34;)
+    }
+    copy(p, s)
+    return
+}</pre></div>
+  
+
+  
+  <p>
+    Receiver may be any concrete type
+<br>
+
+    Zero or more typed return values
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Exports</h3>
+        
+  
+  <div class="code"><pre>func Foo() {}
+
+type Bar struct {
+    Baz  int
+    quux int // inaccessible in other packages
+}</pre></div>
+  
+
+  
+  <p>
+    Uppercase first letter makes any name visible outside the package
+<br>
+
+    Applies to struct fields, too
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Interfaces</h3>
+        
+  
+  <div class="code"><pre>type Frobnicator interface {
+    Frob() error
+    Twiddle(int64) error
+    Tweak(float64) error
+}</pre></div>
+  
+
+  
+  <p>
+    Interfaces are also types
+<br>
+
+    Zero or more method signatures
+<br>
+
+    Types that implement all methods implement the interface implicitly
+<br>
+
+    <code>if f, ok := i.(Frobnicator); ok {}</code>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Embedding</h3>
+        
+  
+  <div class="code"><pre>type Foo struct {
+    bar int
+    Frobnicator
+}</pre></div>
+  
+
+  
+  <p>
+    Interfaces can embed other interfaces
+<br>
+
+    Structs can embed other structs
+<br>
+
+    Structs can even embed interfaces
+<br>
+
+    Methods are inherited
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>CSP</h3>
+        
+  
+  <p>
+    Tony Hoare’s <i>Communicating Sequential Processes</i> in CACM volume 21 issue 8
+<br>
+
+    “Do not communicate by sharing memory; instead, share memory by communicating.”
+<br>
+
+    Useful for connection handling, critical sections, and pooled operations
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Channels</h3>
+        
+  
+  <div class="code"><pre>ch := make(chan int, 1) // buffer length of 1
+ch &lt;- 47 // send
+&lt;-ch // receive</pre></div>
+  
+
+  
+  <p>
+    Buffered or unbuffered
+<br>
+
+    Concurrent send and receive operations
+<br>
+
+    <a href="http://rcrowley.org/2013/04/19/golang-ack-test.html" target="_blank">Faster than mutexes</a>
+  </p>
+  
+
+      
+      </article>
+  
+  
+  
+      <article>
+      
+        <h3>Goroutines</h3>
+        
+  
+  <div class="code"><pre>in := make(chan int)
+out := make(chan int)
+
+go func() {
+    prev := 0
+    for {
+        next := &lt;-in
+        out &lt;- prev &#43; next
+        prev = next
+    }
+}()</pre></div>
+  
+
+  
+  <p>
+    Inexpensive green threads
+<br>
+
+    Semi-cooperatively scheduled
+  </p>
+  
+
+      
+      </article>
+  
+  
+
+      <article>
+        <h3>Thank you</h3>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Richard Crowley
+  </p>
+  
+<p class="link"><a href="#ZgotmplZ" target="_blank"><a href="http://rcrowley.org/talks/go-2015-05-15.html" target="_blank">rcrowley.org/talks/go-2015-05-15.html</a></a></p><p class="link"><a href="http://twitter.com/rcrowley" target="_blank">@rcrowley</a></p>
+          </div>
+        
+      </article>
+
+    </section>
+
+    <div id="help">
+      Use the left and right arrow keys or click the left and right
+      edges of the page to navigate between slides.<br>
+      (Press 'H' or navigate to hide this message.)
+    </div>
+
+  </body>
+  
+</html>

@@ -1,0 +1,234 @@
+Go
+
+Richard Crowley
+[[http://rcrowley.org/talks/go-2015-05-15.html]]
+@rcrowley
+
+* Go
+
+Always google it as “golang”
+Thompson, Pike, Cox, Griesemer
+Statically typed
+Not classically object-oriented
+CSP primitives as syntax
+
+* Hello, world!
+
+    package main
+
+    import "fmt"
+
+    func main() {
+        fmt.Println("Hello, world!")
+    }
+
+File scope only contains functions, types, and variables
+
+* More!
+
+    package main
+
+    import "fmt"
+
+    var format string = somethingThatReturnsAString()
+
+    func init() {
+        format = "Hello, %s!\n"
+    }
+
+    func main() {
+        fmt.Printf(format, "y'all")
+    }
+
+Varibles initialize with any expression
+`init` functions run next, before `main`
+
+* Functions
+
+    func foo(bar int64) (string, bool) {
+        return fmt.Sprintf("%x", bar), bar > 0
+    }
+
+May be named or anonymous 
+All functions are closures 
+Zero or more typed parameters 
+Parameters are pass-by-value 
+Zero or more typed return values
+
+* Logic
+
+    if foo > bar {
+        baz()
+    }
+    if quux := f(); quux != nil {
+        return
+    }
+    for i > 0 {
+        i--
+    }
+    for i := 0; i < 100; i++ {
+        foo *= i
+    }
+    for {
+        doIt()
+    }
+    for k, v := range m {
+        fmt.Printf("%v: %v\n", k, v)
+    }
+
+* Primitives
+
+`bool`
+`int`, `int8`, `int16`, `int32`, `int64`
+`uint`, `uint8`, `uint16`, `uint32`, `uint64`
+`byte`, `rune`, `string`
+`float32`, `float64`
+`complex64`, `complex128`
+
+* Errors
+
+    func fail() error { return errors.New("fail") }
+
+    func multifail() (*Win, error) {
+        return nil, errors.New("multifail")
+    }
+
+Conventionally return an `error` last 
+There are no exceptions because errors are not exceptional 
+Use `error` to communicate what happened to the caller
+
+* Arrays and slices
+
+    var array [8]string
+    slice := make([]string, 8)
+
+Rarely-sighted arrays have a fixed length
+Slices are references to an underlying array that can be reallocated to grow and shrink
+`make` constructs reference types like slices
+`len` and `cap` inspect them
+`append` and `copy` mutate them
+
+* Maps
+
+    m := map[string]string{"foo": "bar"}
+    m["baz"] = "quux"
+
+Maps are reference types, too
+Keys can be any comparable type
+
+* Pointers
+
+    func foo(p *int) { fmt.Printf("%d\n", *p) }
+    var i int = 47
+    var p *int = &i
+    foo(p)
+    p = nil
+    foo(p)
+
+Anything can be pointed to
+Pointers are memory safe
+Pointer arithmetic is not allowed
+Dereferencing a `nil` pointer crashes
+your program
+
+* Structs
+
+    type foo struct {
+        bar  int64
+        baz  float64
+        quux *foo
+    }
+
+Structs are types
+Zero or more named and typed fields
+Grant total control over memory layout
+
+* Methods
+
+    func (f *foo) String() (string) {
+        return fmt.Sprintf("<foo: %d %f %p>", f.bar, f.baz, f.quux)
+    }
+
+    func (f *foo) Write(p []byte) (n int, err error) {
+        s := s.String()
+        n = len(s)
+        if tmp := len(p); n > tmp {
+            n = tmp
+            err = errors.New("overflow")
+        }
+        copy(p, s)
+        return
+    }
+
+Receiver may be any concrete type
+Zero or more typed return values
+
+* Exports
+
+    func Foo() {}
+
+    type Bar struct {
+        Baz  int
+        quux int // inaccessible in other packages
+    }
+
+Uppercase first letter makes any name visible outside the package
+Applies to struct fields, too
+
+* Interfaces
+
+    type Frobnicator interface {
+        Frob() error
+        Twiddle(int64) error
+        Tweak(float64) error
+    }
+
+Interfaces are also types
+Zero or more method signatures
+Types that implement all methods implement the interface implicitly
+`if`f,`ok`:=`i.(Frobnicator);`ok`{}`
+
+* Embedding
+
+    type Foo struct {
+        bar int
+        Frobnicator
+    }
+
+Interfaces can embed other interfaces
+Structs can embed other structs
+Structs can even embed interfaces
+Methods are inherited
+
+* CSP
+
+Tony Hoare’s _Communicating_Sequential_Processes_ in CACM volume 21 issue 8
+“Do not communicate by sharing memory; instead, share memory by communicating.”
+Useful for connection handling, critical sections, and pooled operations
+
+* Channels
+
+    ch := make(chan int, 1) // buffer length of 1
+    ch <- 47 // send
+    <-ch // receive
+
+Buffered or unbuffered
+Concurrent send and receive operations
+[[http://rcrowley.org/2013/04/19/golang-ack-test.html][Faster than mutexes]]
+
+* Goroutines
+
+    in := make(chan int)
+    out := make(chan int)
+
+    go func() {
+        prev := 0
+        for {
+            next := <-in
+            out <- prev + next
+            prev = next
+        }
+    }()
+
+Inexpensive green threads
+Semi-cooperatively scheduled
