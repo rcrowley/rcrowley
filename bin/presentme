@@ -10,8 +10,8 @@ set -e
 set -x
 
 which "present" || {
-    go get "code.google.com/p/go.talks/present"
-    go install "code.google.com/p/go.talks/present"
+    go get "golang.org/x/tools/cmd/present"
+    go install "golang.org/x/tools/cmd/present"
 }
 
 present -play="false" &
@@ -20,7 +20,7 @@ sleep 1
 
 cd "var/www"
 mkdir -p "static"
-curl -o"static/slides.js" "http://127.0.0.1:3999/static/slides.js"
+#curl -o"static/slides.js" "http://127.0.0.1:3999/static/slides.js"
 #curl -o"static/styles.css" "http://127.0.0.1:3999/static/styles.css"
 
 cd "talks"

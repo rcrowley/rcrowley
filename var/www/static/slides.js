@@ -465,6 +465,8 @@ function addPrintStyle() {
 };
 
 function handleDomLoaded() {
+  var el = document.getElementById('help');
+  if (el) { el.style.display = 'none'; }
   slideEls = document.querySelectorAll('section.slides > article');
 
   setupFrames();
