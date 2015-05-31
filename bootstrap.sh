@@ -834,10 +834,6 @@ killall "Dock" "Finder" "SystemUIServer"
 EDITOR="tee" crontab -e <<'EOF'
 MAILTO=""
 
-# RSI bot.
-# 0,30 * * * * curl -X"POST" --data-urlencode 'payload={"channel":"@rcrowley","username":"Doctor John A. Zoidberg","text":"Take a break!","icon_emoji":":woop:"}' -s "https://tinyspeck.slack.com/services/hooks/incoming-webhook?token=nDXGuRCJCBCxQIKVEzsgXRcs" >"/dev/null"
-# 3,33 * * * * curl -X"POST" --data-urlencode 'payload={"channel":"@rcrowley","username":"Bender Bending Rodriguez","text":"Back to work!","icon_emoji":":bender:"}' -s "https://tinyspeck.slack.com/services/hooks/incoming-webhook?token=nDXGuRCJCBCxQIKVEzsgXRcs" >"/dev/null"
-
 # TODO.txt metrics.
 * * * * * COUNT="$(grep -c "." "$HOME/TODO.txt")" DATE="$(date +"\%Y-\%m-\%d")"; grep -F -q "$DATE" "$HOME/TODO.csv" && sed -i "" "s/^$DATE,[0-9]*\$/$DATE,$COUNT/" "$HOME/TODO.csv" || echo "$DATE,$COUNT" >>"$HOME/TODO.csv"
 
