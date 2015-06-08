@@ -7,7 +7,6 @@
 !.gnupg
 !.profile
 !.profile.d
-!.ssh
 !.tmux.conf
 !.vimrc
 !.vim
