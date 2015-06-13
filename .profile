@@ -11,3 +11,11 @@ mesg y
 for PATHNAME in "$HOME/.profile.d/"*".sh"
 do . "$PATHNAME"
 done
+
+if which "tmux" >"/dev/null" 2>"/dev/null" && [ -z "$TMUX" ]
+then
+    if tmux has-session
+    then exec tmux attach
+    else exec tmux new
+    fi
+fi
