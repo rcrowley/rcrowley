@@ -16,7 +16,7 @@ fi
 
 # After an ssh-agent is running, pull the latest home directory from GitHub.
 # Don't bother doing this over and over on the Mac or once tmux is running.
-if ! which "sw_vers" >"/dev/null" 2>"/dev/null" && [ -z "$TMUX" -a "$HOME" = "$PWD" ]
+if ! which "sw_vers" >"/dev/null" 2>"/dev/null" && [ -z "$TMUX" ] && [ "$HOME" = "$PWD" ] && ssh-add -l >"/dev/null" 2>"/dev/null"
 then
     git remote update origin
     git pull origin master
