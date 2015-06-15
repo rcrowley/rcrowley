@@ -13,6 +13,8 @@ done
 if [ -z "$SSH_AUTH_SOCK" ]
 then eval "$(ssh-agent -t"600")"
 fi
+ln -fs "$SSH_AUTH_SOCK" "$HOME/.ssh/agent"
+export SSH_AUTH_SOCK="$HOME/.ssh/agent"
 
 # After an ssh-agent is running, pull the latest home directory from GitHub.
 # Don't bother doing this over and over on the Mac or once tmux is running.
