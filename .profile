@@ -6,6 +6,7 @@ if [ "$BASH" -a -f "$HOME/.bashrc" ]
 then . "$HOME/.bashrc"
 fi
 
+chgrp "tty" "$(tty)"
 mesg y
 
 for PATHNAME in "$HOME/.profile.d/"*".sh"
