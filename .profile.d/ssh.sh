@@ -13,7 +13,9 @@ done
 if [ -z "$SSH_AUTH_SOCK" ]
 then eval "$(ssh-agent -t"600")"
 fi
-ln -fs "$SSH_AUTH_SOCK" "$HOME/.ssh/agent"
+if [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/agent" ]
+then ln -fs "$SSH_AUTH_SOCK" "$HOME/.ssh/agent"
+fi
 export SSH_AUTH_SOCK="$HOME/.ssh/agent"
 
 # After an ssh-agent is running, pull the latest home directory from GitHub.
