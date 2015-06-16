@@ -22,6 +22,6 @@ export SSH_AUTH_SOCK="$HOME/.ssh/agent"
 # Don't bother doing this over and over on the Mac or once tmux is running.
 if [ "$(uname)" != "Darwin" ] && [ -z "$TMUX" ] && [ "$HOME" = "$PWD" ] && ssh-add -l >"/dev/null" 2>"/dev/null"
 then
-    git remote update origin
-    git pull origin master
+    git remote update "origin"
+    git pull --rebase "origin" "master"
 fi
