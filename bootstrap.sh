@@ -851,6 +851,12 @@ if [ "$(uname)" != "Linux" ]
 then exit
 fi
 
+# Blacklist the overlayfs kernel module per CVE-2015-1328.
+sudo tee "/etc/modprobe.d/blacklist-overlayfs.conf" <<EOF
+blacklist overlay
+blacklist overlayfs
+EOF
+
 # Add our Debian archive to APT.
 sudo tee "/etc/apt/sources.list.d/rcrowley.list" <<EOF
 deb http://packages.rcrowley.org $(lsb_release -sc) main
