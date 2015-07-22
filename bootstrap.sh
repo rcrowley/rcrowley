@@ -199,7 +199,7 @@ fi
 
 mkdir -p "tmp"
 
-# Dropbox.
+# Dropbox
 if [ ! -d "/Applications/Dropbox.app" ]
 then
     if [ ! -f "tmp/dropbox.dmg" ]
@@ -217,7 +217,7 @@ then
     hdiutil detach "/Volumes/Dropbox Installer"
 fi
 
-# Google Chrome.
+# Google Chrome
 if [ ! -d "/Applications/Google Chrome.app" ]
 then
     if [ ! -f "tmp/chrome.dmg" ]
@@ -230,7 +230,7 @@ then
     hdiutil detach "/Volumes/Google Chrome"
 fi
 
-# OmniGraffle.
+# OmniGraffle
 if [ ! -d "/Applications/OmniGraffle.app" ]
 then
     if [ ! -f "tmp/omnigraffle.dmg" ]
@@ -243,7 +243,7 @@ then
     hdiutil detach "/Volumes/OmniGraffle"
 fi
 
-# Papers 3.
+# Papers 3
 if [ ! -d "/Applications/Papers.app" ]
 then
     if [ ! -f "tmp/papers.dmg" ]
@@ -256,7 +256,7 @@ then
     hdiutil detach "/Volumes/Papers3"
 fi
 
-# Skype.
+# Skype
 if [ ! -d "/Applications/Skype.app" ]
 then
     if [ ! -f "tmp/skype.dmg" ]
@@ -269,7 +269,7 @@ then
     hdiutil detach "/Volumes/Skype"
 fi
 
-# VirtualBox.
+# VirtualBox
 if [ ! -d "/Applications/VirtualBox.app" ]
 then
     if [ ! -f "tmp/virtualbox.dmg" ]
@@ -283,6 +283,19 @@ then
     fi
     installer -package "/Volumes/VirtualBox/VirtualBox.pkg" -target "/"
     hdiutil detach "/Volumes/VirtualBox"
+fi
+
+# Viscosity
+if [ ! -d "/Applications/Viscosity.app" ]
+then
+    if [ ! -f "tmp/viscosity.dmg" ]
+    then curl -L -o"tmp/viscosity.dmg" "http://www.sparklabs.com/downloads/Viscosity.dmg"
+    fi
+    if [ ! -d "/Volumes/Viscosity" ]
+    then hdiutil attach "tmp/viscosity.dmg"
+    fi
+    ditto --rsrc "/Volumes/Viscosity/Viscosity.app" "/Applications/Viscosity.app"
+    hdiutil detach "/Volumes/Viscosity"
 fi
 
 # Wickr
