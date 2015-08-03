@@ -29,13 +29,28 @@ fi
 
 set -x
 
-# Add known hosts entries to make this program more headless.
+# Add known hosts entries and an SSH control socket to make this program
+# more headless.
 mkdir -m"700" -p ".ssh"
 if ! grep -q "github.com" ".ssh/known_hosts"
 then ssh-keyscan "github.com" >>".ssh/known_hosts"
 fi
 if ! grep -q "rcrowley.org" ".ssh/known_hosts"
 then ssh-keyscan "rcrowley.org" >>".ssh/known_hosts"
+fi
+if [ ! -f ".ssh/config" ]
+then cat >".ssh/config" <<EOF
+HashKnownHosts no
+ServerAliveCountMax 4320
+ServerAliveInterval 10
+TCPKeepAlive no
+Host rcrowley.org
+    ControlMaster auto
+    ControlPath /tmp/ssh-control-%r@%h:%p
+    ControlPersist 43200
+    ForwardAgent yes
+    User ubuntu
+EOF
 fi
 
 ###############################################################################
