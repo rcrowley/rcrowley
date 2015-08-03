@@ -9,7 +9,7 @@ header {
 	margin: 0;
 }
 header {
-	background: white url(/img/kcrc.jpg) no-repeat center right;
+	background: white url(../img/kcrc.jpg) no-repeat center right;
 	border-bottom: 2px solid purple;
 	height: 120px;
 	margin: 0;
