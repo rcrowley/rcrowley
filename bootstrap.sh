@@ -949,6 +949,36 @@ if [ "$(uname)" != "Linux" ]
 then exit
 fi
 
+# Install and configure Duo for SSH 2FA.
+if [ ! -f "/etc/pam_duo.conf" ]
+then
+    sudo tee "/etc/apt/sources.list.d/duo.list" <<EOF
+deb http://pkg.duosecurity.com/Ubuntu trusty main
+EOF
+    curl -s "https://www.duosecurity.com/APT-GPG-KEY-DUO" | sudo apt-key --keyring "/etc/apt/trusted.gpg.d/duo.gpg" add "-"
+    sudo apt-get update
+    sudo apt-get -y install "duo-unix"
+    sudo sed -i".orig" 's/auth\t\[success=1 default=ignore\]\tpam_unix.so nullok_secure/auth\trequisite\t\t\tpam_unix.so nullok_secure\t# rcrowley\nauth\t[success=1 default=ignore]\tpam_duo.so\t\t\t# rcrowley/' "/etc/pam.d/common-auth"
+    sudo sed -i".orig" 's/@include common-auth/auth\trequired\tpam_duo.so\t# rcrowley/' "/etc/pam.d/sshd"
+    set +x
+    echo >&2
+    read -p "$(tput "bold")Duo integration key:$(tput "sgr0") " DUO_IKEY
+    read -p "$(tput "bold")Duo secret key:$(tput "sgr0") " DUO_SKEY
+    read -p "$(tput "bold")Duo API hostname:$(tput "sgr0") " DUO_HOST
+    echo >&2
+    set -x
+    sudo tee "/etc/pam_duo.conf" >"/dev/null" <<EOF
+[duo]
+accept_env_factor = yes
+host = $DUO_HOST
+ikey = $DUO_IKEY
+skey = $DUO_SKEY
+EOF
+    sudo chmod 600 "/etc/pam_duo.conf"
+    sudo sed -i".orig" 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes\nAuthenticationMethods publickey,keyboard-interactive/' "/etc/ssh/sshd_config"
+    sudo restart "ssh"
+fi
+
 # Copy authorized SSH public keys from rcrowley.org.
 scp "rcrowley.org":".ssh/authorized_keys" ".ssh"
 
