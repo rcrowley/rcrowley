@@ -936,8 +936,8 @@ ssh "rcrowley.org" gpg --armor --export "r@rcrowley.org" | gpg --import
 ssh "rcrowley.org" gpg --armor --export-secret-keys "r@rcrowley.org" | gpg --import || :
 
 # Make ready to work on Slack.
-sudo mkdir -p "/etc/slack"
-sudo touch "/etc/slack/credentials.php"
+sudo mkdir -p "/etc/slack" "/etc/slack.d"
+sudo touch "/etc/slack/credentials.php" "/etc/slack.d/credentials.php"
 
 )
 # End rcrowley bootstrapping.
