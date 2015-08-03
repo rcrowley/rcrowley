@@ -980,6 +980,7 @@ script
 end script
 EOF
 sudo start "www" || sudo restart "www"
+sleep 1
 
 # Copy files from the old rcrowley.org to the new rcrowley.org.
 mkdir -p "src" "var/cache/freight" "var/lib" "var/www"
