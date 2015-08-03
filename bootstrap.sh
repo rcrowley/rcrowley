@@ -919,6 +919,8 @@ if [ ! -f ".git/refs/heads/master" ]
 then rm -f ".profile" "bootstrap.sh"
 fi
 git merge "origin/master"
+chmod 700 ".gnupg"
+chmod 600 ".gnupg/gpg.conf"
 
 # Start a GPG agent.
 . ".profile.d/gpg.sh"
