@@ -48,7 +48,6 @@ Host rcrowley.org
     ControlMaster auto
     ControlPath /tmp/ssh-control-%r@%h:%p
     ControlPersist 43200
-    ForwardAgent yes
     User ubuntu
 EOF
 fi
