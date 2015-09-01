@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+# Always refresh our key in the SSH agent after it expires.
+if ! ssh-add -l >"/dev/null"
+then ssh-add
+fi
+
+exec "/usr/bin/ssh" "$@"

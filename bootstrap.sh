@@ -32,12 +32,6 @@ set -x
 # Add known hosts entries and an SSH control socket to make this program
 # more headless.
 mkdir -m"700" -p ".ssh"
-if ! grep -q "github.com" ".ssh/known_hosts"
-then ssh-keyscan "github.com" >>".ssh/known_hosts"
-fi
-if ! grep -q "rcrowley.org" ".ssh/known_hosts"
-then ssh-keyscan "rcrowley.org" >>".ssh/known_hosts"
-fi
 if [ ! -f ".ssh/config" ]
 then cat >".ssh/config" <<EOF
 HashKnownHosts no
@@ -51,6 +45,13 @@ Host rcrowley.org
     User ubuntu
 EOF
 fi
+if ! grep -q "github.com" ".ssh/known_hosts"
+then ssh-keyscan "github.com" >>".ssh/known_hosts"
+fi
+if ! grep -q "rcrowley.org" ".ssh/known_hosts"
+then ssh-keyscan "rcrowley.org" >>".ssh/known_hosts"
+fi
+ssh "rcrowley.org" :
 
 ###############################################################################
 # Begin universal Mac bootstrapping.
@@ -76,44 +77,6 @@ then
     read -p"$(tput "bold")Authorize this SSH public key on rcrowley.org; press <ENTER> to continue.$(tput "sgr0") " >&2
 fi
 ssh-add -l || ssh-add
-
-# Configure the built-in SSH agent to forget decrypted keys after ten minutes
-# of inactivity.
-sudo tee "/usr/local/bin/ssh" >"/dev/null" <<'EOF'
-#!/bin/sh
-
-set -e
-
-# Mark the SSH agent as having been used to stave off purging private keys.
-touch "$HOME/.ssh-agent-last-used"
-
-exec "/usr/bin/ssh" "$@"
-EOF
-sudo chmod 755 "/usr/local/bin/ssh"
-sudo tee "/usr/local/bin/empty-unused-ssh-agent" >"/dev/null" <<'EOF'
-#!/bin/sh
-
-set -e
-
-# Don't bother if the SSH agent's been used in the last ten minutes.
-if ! find "$HOME/.ssh-agent-last-used" -mmin "+10" | grep -q ".ssh-agent-last-used"
-then
-    echo "empty-unused-ssh-agent: not expired" >&2
-    exit
-fi
-
-# Empty the SSH agent of all decrypted private keys.
-find -L "/tmp" -name "launch-*" 2>"/dev/null" |
-xargs -I"_" find "_" -name "Listeners" |
-while read SSH_AUTH_SOCK
-do SSH_AUTH_SOCK="$SSH_AUTH_SOCK" ssh-add -D
-done
-EOF
-sudo chmod 755 "/usr/local/bin/empty-unused-ssh-agent"
-#EDITOR="tee" crontab -e <<'EOF'
-#MAILTO=""
-#* * * * * /usr/local/bin/empty-unused-ssh-agent
-#EOF
 
 # Reorder the PATH environment variable to put /usr/local ahead of /usr.
 sudo tee "/etc/paths" >"/dev/null" <<EOF
@@ -975,7 +938,7 @@ skey = $DUO_SKEY
 EOF
     sudo chmod 600 "/etc/pam_duo.conf"
     sudo sed -i".orig" 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes\nAuthenticationMethods publickey,keyboard-interactive/' "/etc/ssh/sshd_config"
-    sudo restart "ssh"
+    sudo restart ssh
 fi
 
 # Copy authorized SSH public keys from rcrowley.org.
