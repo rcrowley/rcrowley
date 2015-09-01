@@ -1,10 +1,10 @@
 unset SSH_AUTH_SOCK
-for PATHNAME in "/tmp/ssh-"*"/agent."* # "/tmp/launch-"*"/Listeners"
+for PATHNAME in "/tmp/ssh-"*"/agent."* "/var/folders/"*"/"*"/"*"/ssh-"*"/agent."*
 do
     if [ ! -w "$PATHNAME" ]
     then continue
     fi
-    if [ "$(SSH_AUTH_SOCK="$PATHNAME" ssh-add -l)" != "Could not open a connection to your authentication agent." ]
+    if [ "$(SSH_AUTH_SOCK="$PATHNAME" ssh-add -l 2>&1)" != "Could not open a connection to your authentication agent." ]
     then export SSH_AUTH_SOCK="$PATHNAME"
     else
         rm -f "$PATHNAME"
