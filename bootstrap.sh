@@ -29,6 +29,8 @@ fi
 
 set -x
 
+mkdir -p "tmp"
+
 # Add known hosts entries and an SSH control socket to make this program
 # more headless.
 mkdir -m"700" -p ".ssh"
@@ -112,15 +114,10 @@ sudo pip install "virtualenv"
 # be a bit more clever about finding the URL of the package to install.
 if [ ! -d "/usr/local/go" ]
 then
-    cd "tmp"
-    seq "$(sw_vers -productVersion | cut -d"." -f"2")" "-1" "6" |
-    while read MINOR
-    do
-        curl -O -f "https://storage.googleapis.com/golang/go$VERSION.darwin-amd64-osx10.$MINOR.pkg" || continue
-        sudo installer -package "go$VERSION.darwin-amd64-osx10.$MINOR.pkg" -target "/"
-        break
-    done
-    cd ".."
+    if [ ! -f "tmp/golang.pkg" ]
+    then curl -o"tmp/golang.pkg" "https://storage.googleapis.com/golang/go$VERSION.darwin-amd64.pkg"
+    fi
+    sudo installer -package "go$VERSION.darwin-amd64.pkg" -target "/"
 fi
 
 # Heroku toolbelt.
