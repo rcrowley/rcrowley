@@ -914,11 +914,6 @@ fi
 # Install and configure Duo for SSH 2FA.
 if [ ! -f "/etc/pam_duo.conf" ]
 then
-    sudo tee "/etc/apt/sources.list.d/duo.list" <<EOF
-deb http://pkg.duosecurity.com/Ubuntu trusty main
-EOF
-    curl -s "https://www.duosecurity.com/APT-GPG-KEY-DUO" | sudo apt-key --keyring "/etc/apt/trusted.gpg.d/duo.gpg" add "-"
-    sudo apt-get update
     sudo apt-get -y install "duo-unix"
     sudo sed -i".orig" 's/auth\t\[success=1 default=ignore\]\tpam_unix.so nullok_secure/auth\trequisite\t\t\tpam_unix.so nullok_secure\t# rcrowley\nauth\t[success=1 default=ignore]\tpam_duo.so\t\t\t# rcrowley/' "/etc/pam.d/common-auth"
     sudo sed -i".orig" 's/@include common-auth/auth\trequired\tpam_duo.so\t# rcrowley/' "/etc/pam.d/sshd"
