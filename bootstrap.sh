@@ -118,7 +118,7 @@ then
     if [ ! -f "tmp/golang.pkg" ]
     then curl -o"tmp/golang.pkg" "https://storage.googleapis.com/golang/go$VERSION.darwin-amd64.pkg"
     fi
-    sudo installer -package "go$VERSION.darwin-amd64.pkg" -target "/"
+    sudo installer -package "tmp/golang.pkg" -target "/"
 fi
 
 # Heroku toolbelt.
