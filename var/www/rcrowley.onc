@@ -1,0 +1,44 @@
+{
+    "Certificates": [
+        {
+            "GUID": "{8d0fd217-203f-4001-a709-1c9e0452120c}",
+            "Type": "Authority",
+            "X509": "MIIFjjCCA3agAwIBAgIJAMUzoTixbqDmMA0GCSqGSIb3DQEBCwUAMGMxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEVMBMGA1UEChMMcmNyb3dsZXkub3JnMRgwFgYDVQQDEw9yY3Jvd2xleS5vcmcgQ0EwHhcNMTUwODI5MDU1MDMwWhcNMjUwODI2MDU1MDMwWjBjMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDVNhbiBGcmFuY2lzY28xFTATBgNVBAoTDHJjcm93bGV5Lm9yZzEYMBYGA1UEAxMPcmNyb3dsZXkub3JnIENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA523rqYHp0F4So6fjsgudOHepraJXiNIrqNMHMXvCATaJyPfmiMdjwMYrDzo5hqflS0AW/sC8zLE8FenwpG1lHsfAkK/9FhyHFjYWbb4zpfDAx1lLMow9oFtDLFhBR6oKnDf1pTGG+MrFhvx5n4/XlU3P65KyghAeMd7WfJ/6rTPsP/MA+oD25/qLSdTID7LRV0/Hj/oSGA2pc+d6+qAgH+K2TG4klNNDjJ0kXdNXEoHvg3Zu9NQDVfgelA1NEi6lP940MBw2k0xwFRs7x3v/glXB8bNiRjnM7movgkm4UEgsH3hLuLR2Kg5hGVeHBFdLb3dHTpUROPpU9T3x9IISauZ9ODkGVlr8Uf5kSXPJ211DVc8aLyOBGkrrYsl/ejfcA7c9MRtk83XtOGarsIlINH3KzuJz/ubfDwfPeKC5gZfdLYcqUQiV6i8iIZi/5V6wFdIhlii5B0t7LQw+ks/GEgyUfTYpvy9NYa1sxaCpE/OpnIxYNmsDakuGrQ7Lo8nZFX0l5gxd6EKQBJK/cBAlGgmtd6RvKJ4M3WeHLKdSho/5mhnItxErl6MGHim3UtBeX/lxSIEK7q+BB/LfCG47mdH1+Gq6+0dOIsyEyXUYWY/3wCLeHP/KtA59HPiMr9+TqpWDFYSGuIcVgX1nI6GBk8DFWXXdSfwHQl3YiSErO2MCAwEAAaNFMEMwEgYDVR0TAQH/BAgwBgEB/wIBATAOBgNVHQ8BAf8EBAMCAUYwHQYDVR0OBBYEFCt0J3viIJQBhfkm7UPDMHrUfjS/MA0GCSqGSIb3DQEBCwUAA4ICAQDDkq5gT6Z+lpQrto8LYtCyPs2kII8f/BtepBrOb2i7Xrpbq9+ftlH3Phl0WSENrY5aAIzodN9FjmhVWuw6IWvR0LI37c50imzaOdfrSFKjRTF93nO3myHKoe0jjmxTpWTq9TGx+u0HcRe8EHJzKNK1L1bsgHDMYUvj0bkPaG5dDhJs/t6PTGA/wXsbE8yPnFSV9zG0f4c/V5BGashhFqGe5MKNkxUJzkD4Cea7Nak0YeLYtwU2/KXmBLa2uk5kF2DJROhTzOLuKHv4PRzbxgIcVcHY06NkPVLuMamCpiQI0HJJmdvXUBaptAAucagmuk67LY7ey7jq14CR91wii0pWBwqDdFiLVxavmReAfVSAoNZrkk1uzVdOpG0f6oLGN2PW1ojt7s/VDDbIkBxt5FvMTFQ6KLdwJvfk483GEkwNV2MLP0/BGyzypqY+gRIC3wCNl/1dIzyplN59Cfjiod6DXNVjDUFLKxAbKdC9tL0/5n7zsz3HP/9Te1A4gzv7jSN6tlgxWeG0guZAQmrzkJR9HSRzAZQLwT904cUTMnwebAed2nr8bKrG+OA935YKNovvcPWQvibAbGruBg1u7sgnG6e6gmHU5MZZnnDVjFtkzPojhbCrKJ+LDCyB1g/+zfw3m5l+goGrL3j5CG/oHOE0Y8jy3hT03kZd36C8zgWEQw=="
+        }
+    ],
+    "NetworkConfigurations": [
+        {
+            "GUID": "{e378e1e6-4606-4df2-8ef3-7a69b9fb686d}",
+            "Name": "rcrowley.org",
+            "Recommended": [
+                "Host"
+            ],
+            "Type": "VPN",
+            "VPN": {
+                "Host": "rcrowley.org",
+                "OpenVPN": {
+                    "AuthRetry": "interact",
+                    "ClientCertPattern": {
+                        "IssuerCARef": [
+                            "{8d0fd217-203f-4001-a709-1c9e0452120c}"
+                        ]
+                    },
+                    "ClientCertType": "Pattern",
+                    "CompLZO": "true",
+                    "IgnoreDefaultRoute": false,
+                    "KeyDirection": "1",
+                    "Port": 1194,
+                    "Proto": "udp",
+                    "RemoteCertEKU": "TLS Web Server Authentication",
+                    "RemoteCertTLS": "server",
+                    "SaveCredentials": false,
+                    "ServerCARef": "{8d0fd217-203f-4001-a709-1c9e0452120c}",
+                    "ServerPollTimeout": 10,
+                    "Username": "rcrowley"
+                },
+                "Type": "OpenVPN"
+            }
+        }
+    ],
+    "Type": "UnencryptedConfiguration"
+}

@@ -919,9 +919,9 @@ then
     sudo sed -i".orig" 's/@include common-auth/auth\trequired\tpam_duo.so\t# rcrowley/' "/etc/pam.d/sshd"
     set +x
     echo >&2
-    read -p "$(tput "bold")Duo integration key:$(tput "sgr0") " DUO_IKEY
-    read -p "$(tput "bold")Duo secret key:$(tput "sgr0") " DUO_SKEY
-    read -p "$(tput "bold")Duo API hostname:$(tput "sgr0") " DUO_HOST
+    read -p "$(tput "bold")Duo integration key for SSH:$(tput "sgr0") " DUO_IKEY
+    read -p "$(tput "bold")Duo secret key for SSH:$(tput "sgr0") " DUO_SKEY
+    read -p "$(tput "bold")Duo API hostname for SSH:$(tput "sgr0") " DUO_HOST
     echo >&2
     set -x
     sudo tee "/etc/pam_duo.conf" >"/dev/null" <<EOF
@@ -966,18 +966,87 @@ script
     exec "$HOME/bin/www"
 end script
 EOF
-sudo start "www" || sudo restart "www"
+sudo start www || sudo restart www
 sleep 1
 
 # Copy files from the old rcrowley.org to the new rcrowley.org.
 mkdir -p "src" "var/cache/freight" "var/lib" "var/www"
 curl -o"var/cache/freight/keyring.gpg" -s "http://packages.rcrowley.org/keyring.gpg"
 curl -o"var/cache/freight/pubkey.gpg" -s "http://packages.rcrowley.org/pubkey.gpg"
+rsync -av "rcrowley.org":"etc" "."
 rsync -av "rcrowley.org":"git" "."
 rsync -av "rcrowley.org":"var/backups" "var"
 rsync -Hav "rcrowley.org":"var/lib/freight" "var/lib"
 rsync -av "rcrowley.org":"var/www/arch" "var/www" || :
 rsync -av "rcrowley.org":"var/www/work" "var/www" || :
+
+# Remove the old rcrowley.org's SSH host key.
+grep -v "rcrowley.org" ".ssh/known_hosts" >"known_hosts"
+mv "known_hosts" ".ssh"
+
+# Configure an OpenVPN server.
+sudo apt-get -y install "duo-openvpn" "openvpn"
+set +x
+echo >&2
+read -p "$(tput "bold")Duo integration key for OpenVPN:$(tput "sgr0") " DUO_IKEY
+read -p "$(tput "bold")Duo secret key for OpenVPN:$(tput "sgr0") " DUO_SKEY
+read -p "$(tput "bold")Duo API hostname for OpenVPN:$(tput "sgr0") " DUO_HOST
+echo >&2
+set -x
+sudo tee "/etc/openvpn/server.conf" >"/dev/null" <<EOF
+ca ca.crt
+cert server.crt
+comp-lzo
+dev tun
+dh dh4096.pem
+group nogroup
+ifconfig-pool-persist ipp.txt
+keepalive 10 600
+key server.key
+persist-key
+persist-tun
+#plugin /usr/lib/duo/duo_openvpn.so $DUO_IKEY $DUO_SKEY $DUO_HOST
+port 1194
+proto udp
+push "dhcp-option DNS 208.67.220.220"
+push "dhcp-option DNS 208.67.222.222"
+push "redirect-gateway def1 bypass-dhcp"
+resolv-retry infinite
+server 172.16.47.0 255.255.255.0
+status openvpn-status.log
+tls-server
+user nobody
+EOF
+sudo sed -i "s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/" "/etc/sysctl.conf"
+sudo start procps
+sudo tee "/etc/iptables.rules" >"/dev/null" <<EOF
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+-A POSTROUTING -s 172.16.47.0/24 -o eth0 -j MASQUERADE
+COMMIT
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+EOF
+sudo tee "/etc/network/if-up.d/iptables" >"/dev/null" <<EOF
+#!/bin/sh
+iptables-restore <"/etc/iptables.rules"
+EOF
+sudo chmod 755 "/etc/network/if-up.d/iptables"
+sudo sh "/etc/network/if-up.d/iptables"
+cat "etc/ssl/certs/root-ca.crt" "etc/ssl/certs/ca.crt" | sudo tee "/etc/openvpn/ca.crt" >"/dev/null"
+sudo cp "etc/ssl/certs/rcrowley.org.crt" "/etc/openvpn/server.crt"
+sudo cp "etc/ssl/private/rcrowley.org.key" "/etc/openvpn/server.key"
+sudo chmod 600 "/etc/openvpn/server.key"
+if [ ! -f "/etc/openvpn/dh4096.pem" ]
+then sudo openssl dhparam -out "/etc/openvpn/dh4096.pem" 4096
+fi
+sudo service openvpn restart
 
 # Build the Debian package for Go if it doesn't already exist and cache the
 # local Debian archive.
@@ -992,10 +1061,6 @@ then
 fi
 freight cache
 sudo apt-get update
-
-# Remove the old rcrowley.org's SSH host key.
-grep -v "rcrowley.org" ".ssh/known_hosts" >"known_hosts"
-mv "known_hosts" ".ssh"
 
 )
 # End rcrowley Linux bootstrapping.
