@@ -53,7 +53,6 @@ fi
 if ! grep -q "rcrowley.org" ".ssh/known_hosts"
 then ssh-keyscan "rcrowley.org" >>".ssh/known_hosts"
 fi
-ssh "rcrowley.org" :
 
 ###############################################################################
 # Begin universal Mac bootstrapping.
@@ -79,6 +78,7 @@ then
     read -p"$(tput "bold")Authorize this SSH public key on rcrowley.org; press <ENTER> to continue.$(tput "sgr0") " >&2
 fi
 ssh-add -l || ssh-add
+ssh "rcrowley.org" :
 
 # Reorder the PATH environment variable to put /usr/local ahead of /usr.
 sudo tee "/etc/paths" >"/dev/null" <<EOF
