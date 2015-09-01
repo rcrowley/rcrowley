@@ -103,8 +103,9 @@ then xcode-select --install
 fi
 
 # Various dependencies and nice-to-haves.
+brew install "git" "gnupg" "gpg-agent" "markdown" "mercurial" "node" "s3cmd" "tmux" "watch" || :
 brew upgrade "git" "gnupg" "gpg-agent" "markdown" "mercurial" "node" "s3cmd" "tmux" "watch" || :
-brew upgrade "homebrew/php/php54-mcrypt" || :
+#brew upgrade "homebrew/php/php54-mcrypt" || :
 npm install "keybase"
 sudo easy_install "pip"
 sudo pip install "awscli"
@@ -130,31 +131,31 @@ then
 fi
 
 # Java 6 from Apple <http://support.apple.com/kb/dl1572>.
-if [ ! -d "/System/Library/Frameworks/JavaVM.framework" ]
-then
-    if [ ! -f "tmp/java6.dmg" ]
-    then curl -L -o"tmp/java6.dmg" "http://support.apple.com/downloads/DL1572/en_US/JavaForOSX2013-05.dmg"
-    fi
-    if [ ! -d "/Volumes/Java for OS X 2013-005" ]
-    then hdiutil attach -nobrowse "tmp/java6.dmg"
-    fi
-    sudo installer -package "/Volumes/Java for OS X 2013-005/JavaForOSX.pkg" -target "/"
-    hdiutil detach "/Volumes/Java for OS X 2013-005"
-fi
+#if [ ! -d "/System/Library/Frameworks/JavaVM.framework" ]
+#then
+#    if [ ! -f "tmp/java6.dmg" ]
+#    then curl -L -o"tmp/java6.dmg" "http://support.apple.com/downloads/DL1572/en_US/JavaForOSX2013-05.dmg"
+#    fi
+#    if [ ! -d "/Volumes/Java for OS X 2013-005" ]
+#    then hdiutil attach -nobrowse "tmp/java6.dmg"
+#    fi
+#    sudo installer -package "/Volumes/Java for OS X 2013-005/JavaForOSX.pkg" -target "/"
+#    hdiutil detach "/Volumes/Java for OS X 2013-005"
+#fi
 
 # Java 7 from Oracle <http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html>.
-if [ ! -d "/Library/Java/JavaVirtualMachines/jdk1.7.0_55.jdk/Contents/Home" ]
-then
-    if [ ! -f "tmp/java7.dmg" ]
-    then curl -L -o"tmp/java7.dmg" "http://download.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-macosx-x64.dmg?AuthParam=1398831473_a6ff4463d1f0ed16478723a653a7befe" # XXX This link may expire.
-    fi
-    if [ ! -d "/Volumes/JDK 7 Update 55" ]
-    then hdiutil attach -nobrowse "tmp/java7.dmg"
-    fi
-    ls -l "/Volumes/JDK 7 Update 55"
-    sudo installer -package "/Volumes/JDK 7 Update 55/JDK 7 Update 55.pkg" -target "/"
-    hdiutil detach "/Volumes/JDK 7 Update 55"
-fi
+#if [ ! -d "/Library/Java/JavaVirtualMachines/jdk1.7.0_55.jdk/Contents/Home" ]
+#then
+#    if [ ! -f "tmp/java7.dmg" ]
+#    then curl -L -o"tmp/java7.dmg" "http://download.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-macosx-x64.dmg?AuthParam=1398831473_a6ff4463d1f0ed16478723a653a7befe" # XXX This link may expire.
+#    fi
+#    if [ ! -d "/Volumes/JDK 7 Update 55" ]
+#    then hdiutil attach -nobrowse "tmp/java7.dmg"
+#    fi
+#    ls -l "/Volumes/JDK 7 Update 55"
+#    sudo installer -package "/Volumes/JDK 7 Update 55/JDK 7 Update 55.pkg" -target "/"
+#    hdiutil detach "/Volumes/JDK 7 Update 55"
+#fi
 
 # TODO Java 8 from Oracle.
 
@@ -244,20 +245,20 @@ then
 fi
 
 # VirtualBox
-if [ ! -d "/Applications/VirtualBox.app" ]
-then
-    if [ ! -f "tmp/virtualbox.dmg" ]
-    then
-        curl -s "https://www.virtualbox.org/wiki/Downloads" |
-        grep -E -o 'http://download.virtualbox.org/virtualbox/[0-9]+\.[0-9]+\.[0-9]+/VirtualBox-[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-OSX.dmg' |
-        xargs curl -L -o"tmp/virtualbox.dmg"
-    fi
-    if [ ! -d "/Volumes/VirtualBox" ]
-    then hdiutil attach "tmp/virtualbox.dmg"
-    fi
-    installer -package "/Volumes/VirtualBox/VirtualBox.pkg" -target "/"
-    hdiutil detach "/Volumes/VirtualBox"
-fi
+#if [ ! -d "/Applications/VirtualBox.app" ]
+#then
+#    if [ ! -f "tmp/virtualbox.dmg" ]
+#    then
+#        curl -s "https://www.virtualbox.org/wiki/Downloads" |
+#        grep -E -o 'http://download.virtualbox.org/virtualbox/[0-9]+\.[0-9]+\.[0-9]+/VirtualBox-[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-OSX.dmg' |
+#        xargs curl -L -o"tmp/virtualbox.dmg"
+#    fi
+#    if [ ! -d "/Volumes/VirtualBox" ]
+#    then hdiutil attach "tmp/virtualbox.dmg"
+#    fi
+#    sudo installer -package "/Volumes/VirtualBox/VirtualBox.pkg" -target "/"
+#    hdiutil detach "/Volumes/VirtualBox"
+#fi
 
 # Viscosity
 if [ ! -d "/Applications/Viscosity.app" ]
