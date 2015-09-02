@@ -653,9 +653,6 @@ defaults write "com.apple.sidebarlists" "favoriteitems" '
 EOFEOF
 chflags "nohidden" "$HOME/Library"
 
-# Don't show the clock in the menu bar.
-defaults write "com.apple.systemuiserver" "menuExtras" "$(defaults read "com.apple.systemuiserver" "menuExtras" | grep -v "Clock.menu")"
-
 # Dock:  Chrome, Terminal, Slack, Messages, Skype, Papers, Downloads.
 defaults write "com.apple.Dock" "persistent-apps" '
     (
@@ -813,6 +810,10 @@ defaults write "com.apple.screensaver" "askForPasswordDelay" -integer "0"
 # Bottom right hot corner starts the screensaver.
 #defaults write "com.apple.dock" "wvous-br-corner" -integer "5"
 #defaults write "com.apple.dock" "wvous-br-modifier" -integer "0"
+
+# Death to smart quotes!
+defaults write "NSGlobalDomain" "NSAutomaticQuoteSubstitutionEnabled" -bool "false"
+defaults write "NSGlobalDomain" "NSAutomaticDashSubstitutionEnabled" -bool "false"
 
 # TODO Configure Messages.app to login to AIM and Google Talk.
 
