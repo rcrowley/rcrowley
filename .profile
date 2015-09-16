@@ -16,7 +16,7 @@ done
 if [ "$(uname)" != "Darwin" ] && which "tmux" >"/dev/null" 2>"/dev/null" && [ -z "$TMUX" ]
 then
     if tmux has-session
-    then exec tmux attach
+    then exec tmux attach -d
     else exec tmux new
     fi
 fi
