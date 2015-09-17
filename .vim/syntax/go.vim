@@ -1,1 +1,1 @@
-/usr/go/misc/vim/syntax/go.vim
+../../src/github.com/fatih/vim-go/syntax/go.vim

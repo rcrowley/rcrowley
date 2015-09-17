@@ -883,12 +883,16 @@ git merge "origin/master"
 chmod 700 ".gnupg"
 chmod 600 ".gnupg/gpg.conf"
 
-# Start a GPG agent.
-. ".profile.d/gpg.sh"
+# Install Go syntax highlighting.
+mkdir -p "src/github.com/fatih/vim-go"
+git clone "git://github.com/fatih/vim-go.git" "src/github.com/fatih/vim-go"
 
 # Install goimports everywhere.
 . ".profile.d/go.sh"
 go get "code.google.com/p/go.tools/cmd/goimports"
+
+# Start a GPG agent.
+. ".profile.d/gpg.sh"
 
 # Copy GPG key pairs from rcrowley.org.
 ssh "rcrowley.org" gpg --armor --export "packages@rcrowley.org" | gpg --import
