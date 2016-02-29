@@ -856,8 +856,9 @@ export APT_LISTBUGS_FRONTEND="none" APT_LISTCHANGES_FRONTEND="none" DEBIAN_FRONT
 sudo apt-get update
 
 # Various dependencies and nice-to-haves.
-sudo apt-get -y install "build-essential" "freight" "git" "gnupg-agent" "go" "graphviz" "mercurial" "php5-cli" "pinentry-curses" "python-django" "ruby" "ruby-dev" "tmux" "vim"
+sudo apt-get -y install "build-essential" "freight" "git" "gnupg-agent" "go" "graphviz" "mercurial" "php5-cli" "pinentry-curses" "python-django" "python-pip" "ruby" "ruby-dev" "tmux" "vim"
 sudo apt-get -y remove "pinentry-gtk2"
+sudo pip install "awscli"
 which "fpm" || sudo gem install --no-rdoc --no-ri "fpm"
 
 # Upgrade all installed software aggressively.
