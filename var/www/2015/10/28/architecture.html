@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Life beyond microservice architecture:&nbsp; An apostate&#8217;s opinion &mdash; Richard Crowley&#8217;s blog</title>
+<link type="text/css" rel="stylesheet" href="/css/typography.css" />
+<link type="text/css" rel="stylesheet" href="/css/2010-01-21.css" />
+<link type="application/atom+xml" rel="alternate" title="Richard Crowley&#8217;s blog" href="http://rcrowley.org/index.xml" />
+</head>
+<body>
+<header class="site"><h1><a href="/">Richard Crowley&#8217;s blog</a></h1></header>
+
+<article>
+<h1>Life beyond microservice architecture:<br>An apostate&#8217;s opinion</h1>
+
+<p>Microservices get all the ink these days.  The stories speak of unfathomable scale and immense productivity.  This is the new way, we're told.  As with moderation itself, this, too, in moderation.</p>
+
+<p>I believe in service-oriented architecture, at least in what I consider to be its important characteristics.  Services encapsulate data in order to maintain invariants as data is mutated.  Services communicate through well-defined APIs (no cheating).  The rest I can leave on the table.  Service discovery, especially.</p>
+
+<p>It has been five years since I set foot in a datacenter and now, as then, I couldn&#8217;t get one off the ground without help.  I&#8217;ve been spoiled by the cloud and AWS, in particular.  Even under regulatory scrutiny I can't imagine owning and operating my own gear anymore.  But if your risk assessments go differently and you decide to invest in metal and silicon or if you already have a chilly room full of hardware you should invest twice as much in engineering highly reliable and performant operating system provisioning &mdash; your own little homage to <code>aws ec2 run-instances</code>.  Build or buy, this is what enables you to treat your servers like cattle and not like pets.</p>
+
+<p>The particular Linux distribution you choose is, in my opinion, irrelevant.  Percona reports that they find RPM-based distributions in better health.  But I use Ubuntu because I like Debian and up-to-date packages.  I think it's more important to commit to minimizing your standard distribution than to convince yourself one package manager or release schedule is any more right than the others.  Whatever your starting point, remove what you can and standardize the rest.</p>
+
+<p>Your standard operating system distribution should be amenable to having your application(s) deployed on top of it.  Usually this means that your standard distribution should include your language runtime(s).  If your operating system is more concerned with its own integrity, its own upgrade cycle, or its own minimalism (see, moderation even in taking my advice) then it's doing net harm to your business.  Its primary purpose is, after all, to enable your application(s) to produce business value.</p>
+
+<p>I really do mean that I believe it's best to deploy your application by copying it to existing servers.  It's simple math, really.  If it takes an hour to bake an AMI comprised of my standard distribution plus my application then I can only deploy eight times each work day.  If instead I upgrade a package, fetch and extract a tarball, or <code>rsync</code>(1) a directory that contains nothing more than my interpreted source code, its dependencies, and static assests I can deploy hundreds of times each work day.  Hundreds may sound luxurious but it's just what I need if I'm going to deploy small changes frequently.  If a full rewrite is the riskiest thing you can do and not changing anything is risk-free then small changes represent the lowest-risk change management strategy.  Plus if you get the same amount done then small changes implies frequent changes, which our tools have kindly enabled, and this increases business value by decreasing the time code sits around undeployed (&#8220;inventory&#8221; if you remember <em style="background: none;">The Goal</em>).</p>
+
+<p>A perhaps unpleasant side-effect of deploying onto existing servers is the lost opportunity for total immutability.  Another way to look at this, though, is that decoupling provisioning from deploying provides an opportunity to optimize both independently.  Minimal standard distributions, possibly with read-only root partitions, can include a designated home directory for deployment artifacts.  UNIX users, groups, and file modes can render these artifacts relatively immutable.</p>
+
+<p>If the artifacts you&#8217;re going to build might be called &#8220;containers&#8221; &mdash; that is, use the Linux kernel namespaces to isolate your application from others and/or the underlying system &mdash; then I wholeheartedly believe you should also put in the effort to bring only what your application needs along with you.  That means your interpreted source code, its dependencies, and static assets as necessary.  If you're shipping object code then it should be statically linked or its dynamically linked dependencies should be included in your artifact.  If you absolutely can't standardize on one or a few versions of your language runtime then the same rules apply.  Not a whole &#8219;nother operating system userland, not another SSH, not another (out of date) copy of OpenSSL or any other of hundreds of libraries.  This makes your container a souped-up version of a package, tarball, or directory instead of a dumbed-down version of your standard distribution.</p>
+
+<p>Whatever the format of your container artifact, it&#8217;s all that should be in-scope when <code>systemd</code>(1) or whatever other process supervision tool you&#8217;re using sets up namespaces for your application.  Because the point of the namespaces is to provide a smaller surface area over which to make new and stronger security guarantees.  The various filesystem namespaces can hide out-of-scope files from your application.  The network namespace can protect other and administrative processes from your application&#8217;s prying eyes.  <code>seccomp</code>(2) and <code>bpf</code>(2) can prevent your application from even making system calls outside its purview.</p>
+
+<p>But part of everyday life is debugging production systems.  To that end I strongly prefer to have diagnostic tools available to me directly on all production systems.  At a minimum I think <code>curl</code>(1), <code>gdb</code>(1), <code>iostat</code>(1), <code>iptraf</code>(8), <code>nc</code>(1), <code>openssl</code>(1), <code>oprofile</code>(1), <code>strace</code>(1), <code>tcpdump</code>(1), and <code>vmstat</code>(8) should be available and I'm sure I've missed a few, too.  I think it's important for mount and network namespaces (especially) to arrange for these tools to interact with applications directly.  Having to engage in filesystem trickery to even run <code>gdb</code>(1) against my application increases MTTD and MTTR.  Every second counts if I&#8217;m debugging an outage because my users feel every marginal second.</p>
+
+<p>TODO Service discovery, DNS names, load balancers, peers</p>
+
+<p>TODO It's all code and code has to live somewhere</p>
+
+
+
+<p>TODO Multiple processes per server</p>
+
+<p>TODO Databases</p>
+
+<p>TODO Brownfield</p>
+
+
+
+<p>TODO 12 Factor-esque?</p>
+
+</article>
+
+<footer class="site">
+
+	<p><strong>Richard Crowley?</strong>&nbsp; Operations engineering and bourbon.&nbsp; <a href="/about.html">More&hellip;</a></p>
+
+	<p>Elsewhere:</p>
+	<ul>
+		<li><a href="http://github.com/rcrowley">GitHub</a></li>
+		<li><a href="http://twitter.com/rcrowley">Twitter</a></li>
+		<li><a href="http://pinboard.in/u:rcrowley">Pinboard</a></li>
+		<li><a href="http://flickr.com/photos/rcrowley/">Flickr</a></li>
+	</ul>
+	<p class="copyright">Copyright &copy; 2007-2015 Richard Crowley</p>
+</footer>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-20973978-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</body>
+</html>
+
