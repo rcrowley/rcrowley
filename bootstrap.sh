@@ -3,8 +3,7 @@
 # TODO Chef install.sh, chef.patch, and `sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri "knife-ec2" "unf"`
 
 # Go version to install.
-VERSION="1.5"
-BUILD="rcrowley1"
+GO_VERSION="1.6"
 
 #/ Usage: sh bootstrap.sh
 
@@ -116,7 +115,7 @@ sudo pip install "virtualenv"
 if [ ! -d "/usr/local/go" ]
 then
     if [ ! -f "tmp/golang.pkg" ]
-    then curl -o"tmp/golang.pkg" "https://storage.googleapis.com/golang/go$VERSION.darwin-amd64.pkg"
+    then curl -L -f -o"tmp/golang.pkg" "http://golang.org/dl/go$GO_VERSION.darwin-amd64.tar.gz"
     fi
     sudo installer -package "tmp/golang.pkg" -target "/"
 fi
@@ -856,13 +855,23 @@ export APT_LISTBUGS_FRONTEND="none" APT_LISTCHANGES_FRONTEND="none" DEBIAN_FRONT
 sudo apt-get update
 
 # Various dependencies and nice-to-haves.
-sudo apt-get -y install "build-essential" "freight" "git" "gnupg-agent" "go" "graphviz" "mercurial" "php5-cli" "pinentry-curses" "python-django" "python-pip" "ruby" "ruby-dev" "tmux" "vim"
+sudo apt-get -y install "build-essential" "freight" "git" "gnupg-agent" "graphviz" "mercurial" "php5-cli" "pinentry-curses" "python-django" "python-pip" "ruby" "ruby-dev" "tmux" "vim"
 sudo apt-get -y remove "pinentry-gtk2"
 sudo pip install "awscli"
 which "fpm" || sudo gem install --no-rdoc --no-ri "fpm"
 
 # Upgrade all installed software aggressively.
 sudo apt-get -y upgrade
+
+# Install Go directly.  I used to build Debian packages but this is easier.
+if [ ! -d "/usr/local/go" ]
+then
+    curl -L -O -f "http://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz"
+    trap "rm -f \"go$GO_VERSION.linux-amd64.tar.gz\"" EXIT INT QUIT TERM
+    sudo tar xf "go$GO_VERSION.linux-amd64.tar.gz" -C"/usr/local"
+    rm -f "go$GO_VERSION.linux-amd64.tar.gz"
+    trap "" EXIT INT QUIT TERM
+fi
 
 )
 # End universal Linux bootstrapping.
@@ -885,10 +894,16 @@ chmod 700 ".gnupg"
 chmod 600 ".gnupg/gpg.conf"
 
 # Install Go syntax highlighting.
-mkdir -p "src/github.com/fatih/vim-go"
-git clone "git://github.com/fatih/vim-go.git" "src/github.com/fatih/vim-go"
+if mkdir "src/github.com/fatih/vim-go"
+then git clone "git://github.com/fatih/vim-go.git" "src/github.com/fatih/vim-go"
+else
+    cd "src/github.com/fatih/vim-go"
+    git remote update "origin"
+    git pull "origin" "master"
+    cd "-"
+fi
 
-# Install goimports everywhere.
+# Install goimports, the most important Go package there is.
 . ".profile.d/go.sh"
 go get "code.google.com/p/go.tools/cmd/goimports"
 
@@ -1051,20 +1066,6 @@ if [ ! -f "/etc/openvpn/dh4096.pem" ]
 then sudo openssl dhparam -out "/etc/openvpn/dh4096.pem" 4096
 fi
 sudo service openvpn restart
-
-# Build the Debian package for Go if it doesn't already exist and cache the
-# local Debian archive.
-if [ ! -f "var/lib/freight/apt/$(lsb_release -sc)/go_${VERSION}-${BUILD}_amd64.deb" ]
-then
-    curl -L -O -f "http://golang.org/dl/go$VERSION.linux-amd64.tar.gz"
-    trap "rm -rf \"go\" \"go$VERSION.linux-amd64.tar.gz\"" EXIT INT QUIT TERM
-    tar xf "go$VERSION.linux-amd64.tar.gz"
-    fakeroot fpm -m"Richard Crowley <r@rcrowley.org>" -n"go" -p"var/lib/freight/apt/$(lsb_release -sc)/go_${VERSION}-${BUILD}_amd64.deb" --prefix="/usr" -s"dir" -t"deb" -v"$VERSION-$BUILD" "go"
-    rm -rf "go" "go$VERSION.linux-amd64.tar.gz"
-    trap "" EXIT INT QUIT TERM
-fi
-freight cache
-sudo apt-get update
 
 )
 # End rcrowley Linux bootstrapping.
