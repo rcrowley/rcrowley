@@ -1,7 +1,5 @@
 # rcrowley-ify a computer!
 
-# TODO Chef install.sh, chef.patch, and `sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri "knife-ec2" "unf"`
-
 # Go version to install.
 GO_VERSION="1.6"
 
@@ -49,9 +47,6 @@ fi
 if ! grep -q "github.com" ".ssh/known_hosts"
 then ssh-keyscan "github.com" >>".ssh/known_hosts"
 fi
-if ! grep -q "rcrowley.org" ".ssh/known_hosts"
-then ssh-keyscan "rcrowley.org" >>".ssh/known_hosts"
-fi
 
 ###############################################################################
 # Begin universal Mac bootstrapping.
@@ -74,10 +69,9 @@ if [ ! -f "$HOME/.ssh/id_rsa" ]
 then
     ssh-keygen -f"$HOME/.ssh/id_rsa"
     cat "$HOME/.ssh/id_rsa.pub"
-    read -p"$(tput "bold")Authorize this SSH public key on rcrowley.org; press <ENTER> to continue.$(tput "sgr0") " >&2
+    read -p"$(tput "bold")Authorize this SSH public key on GitHub and wherever else you need; press <ENTER> to continue.$(tput "sgr0") " >&2
 fi
 ssh-add -l || ssh-add
-ssh "rcrowley.org" :
 
 # Reorder the PATH environment variable to put /usr/local ahead of /usr.
 sudo tee "/etc/paths" >"/dev/null" <<EOF
@@ -819,16 +813,6 @@ defaults write "NSGlobalDomain" "NSAutomaticDashSubstitutionEnabled" -bool "fals
 # Refresh the dock, Finder, and menu bar.
 killall "Dock" "Finder" "SystemUIServer"
 
-EDITOR="tee" crontab -e <<'EOF'
-MAILTO=""
-
-# TODO.txt metrics.
-* * * * * COUNT="$(grep -c "." "$HOME/TODO.txt")" DATE="$(date +"\%Y-\%m-\%d")"; grep -F -q "$DATE" "$HOME/TODO.csv" && sed -i "" "s/^$DATE,[0-9]*\$/$DATE,$COUNT/" "$HOME/TODO.csv" || echo "$DATE,$COUNT" >>"$HOME/TODO.csv"
-
-# Remove identities from the SSH agent after 10 minutes of inactivity.
-* * * * * /usr/local/bin/empty-unused-ssh-agent
-EOF
-
 )
 # End rcrowley Mac bootstrapping.
 ###############################################################################
@@ -890,8 +874,11 @@ if [ ! -f ".git/refs/heads/master" ]
 then rm -f ".profile" "bootstrap.sh"
 fi
 git merge "origin/master"
-chmod 700 ".gnupg"
-chmod 600 ".gnupg/gpg.conf"
+
+# Setup GPG.
+aws s3 sync "s3://rcrowley/.gnupg" ".gnupg"
+chmod -R go-rwx ".gnupg"
+. ".profile.d/gpg.sh"
 
 # Install Go syntax highlighting.
 if mkdir "src/github.com/fatih/vim-go"
@@ -906,19 +893,6 @@ fi
 # Install goimports, the most important Go package there is.
 . ".profile.d/go.sh"
 go get "code.google.com/p/go.tools/cmd/goimports"
-
-# Start a GPG agent.
-. ".profile.d/gpg.sh"
-
-# Copy GPG key pairs from rcrowley.org.
-ssh "rcrowley.org" gpg --armor --export "packages@rcrowley.org" | gpg --import
-ssh "rcrowley.org" gpg --armor --export-secret-keys "packages@rcrowley.org" | gpg --import || :
-ssh "rcrowley.org" gpg --armor --export "r@rcrowley.org" | gpg --import
-ssh "rcrowley.org" gpg --armor --export-secret-keys "r@rcrowley.org" | gpg --import || :
-
-# Make ready to work on Slack.
-sudo mkdir -p "/etc/slack" "/etc/slack.d"
-sudo touch "/etc/slack/credentials.php" "/etc/slack.d/credentials.php"
 
 )
 # End rcrowley bootstrapping.
@@ -954,54 +928,6 @@ EOF
     sudo sed -i".orig" 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes\nAuthenticationMethods publickey,keyboard-interactive/' "/etc/ssh/sshd_config"
     sudo restart ssh
 fi
-
-# Copy authorized SSH public keys from rcrowley.org.
-scp "rcrowley.org":".ssh/authorized_keys" ".ssh"
-
-# Clone www's dependencies, install www, and start it.
-mkdir -p "src/github.com/rcrowley"
-if [ ! -d "src/github.com/rcrowley/go-metrics" ]
-then git clone "git@github.com:rcrowley/go-metrics.git" "src/github.com/rcrowley/go-metrics"
-fi
-if [ ! -d "src/github.com/rcrowley/go-tigertonic" ]
-then git clone "git@github.com:rcrowley/go-tigertonic.git" "src/github.com/rcrowley/go-tigertonic"
-fi
-. ".profile.d/go.sh"
-go install "www"
-sudo tee "/etc/init/www.conf" <<EOF
-description "www"
-start on runlevel [2345]
-stop on runlevel [!2345]
-respawn
-chdir $HOME
-env GOMAXPROCS="4"
-script
-    set -e
-    rm -f "/tmp/www.log"
-    mkfifo "/tmp/www.log"
-    (setsid logger -t"www" <"/tmp/www.log" &)
-    exec >"/tmp/www.log" 2>"/tmp/www.log"
-    rm "/tmp/www.log"
-    exec "$HOME/bin/www"
-end script
-EOF
-sudo start www || sudo restart www
-sleep 1
-
-# Copy files from the old rcrowley.org to the new rcrowley.org.
-mkdir -p "src" "var/cache/freight" "var/lib" "var/www"
-curl -o"var/cache/freight/keyring.gpg" -s "http://packages.rcrowley.org/keyring.gpg"
-curl -o"var/cache/freight/pubkey.gpg" -s "http://packages.rcrowley.org/pubkey.gpg"
-rsync -av "rcrowley.org":"etc" "."
-rsync -av "rcrowley.org":"git" "."
-rsync -av "rcrowley.org":"var/backups" "var"
-rsync -Hav "rcrowley.org":"var/lib/freight" "var/lib"
-rsync -av "rcrowley.org":"var/www/arch" "var/www" || :
-rsync -av "rcrowley.org":"var/www/work" "var/www" || :
-
-# Remove the old rcrowley.org's SSH host key.
-grep -v "rcrowley.org" ".ssh/known_hosts" >"known_hosts"
-mv "known_hosts" ".ssh"
 
 # Configure an OpenVPN server.
 sudo apt-get -y install "duo-openvpn" "openvpn"
@@ -1081,6 +1007,5 @@ then
     then echo "FileVault is now enabled but you need to reboot." >&2
     else echo "Good to go!" >&2
     fi
-else echo "Change the rcrowley.org A record to complete the change." >&2
 fi
 tput "sgr0"
