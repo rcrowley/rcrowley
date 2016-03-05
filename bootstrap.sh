@@ -37,10 +37,11 @@ HashKnownHosts no
 ServerAliveCountMax 4320
 ServerAliveInterval 10
 TCPKeepAlive no
-Host rcrowley.org
+Host ec2.rcrowley.org
     ControlMaster auto
     ControlPath /tmp/ssh-control-%r@%h:%p
     ControlPersist 43200
+    HostName 172.16.47.1
     User ubuntu
 EOF
 fi
