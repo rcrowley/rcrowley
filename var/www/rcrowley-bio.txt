@@ -1,7 +1,8 @@
-Richard tightens things up as Director of Operations at Slack, almost
-certainly the best real-time messaging, archiving, and search tool for
-modern teams.  He's part developer, part operator, and gets worked up
-easily over configuration management, development enviornments, and
-distributed systems.  He's a contributor to Go and Puppet, and was
-previously head of operations at Betable and an engineer at OpenDNS and
-Flickr.  He thinks vi is a better religion than emacs.
+Richard is Director of Service Engineering at Slack, almost certainly
+the best real-time messaging, archiving, and search tool for modern
+teams.  That means it's basically his fault if Slack goes down.  He's
+part developer, part operator, and gets worked up easily over
+configuration management, development enviornments, and distributed
+systems.  He's a contributor to Go and Puppet, and was previously head
+of operations at Betable and an engineer at OpenDNS and Flickr.  He
+thinks vi is a better religion than emacs.
