@@ -13,7 +13,7 @@ do
 done
 if [ -z "$SSH_AUTH_SOCK" ]
 then
-    eval "$(ssh-agent -t"43200")"
+    eval "$(ssh-agent)"
     ssh-add
 fi
 if [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/agent" ]
