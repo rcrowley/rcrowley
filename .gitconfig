@@ -19,6 +19,6 @@
 [core]
     editor = vim
 [user]
-	name = Richard Crowley
-	email = rcrowley@slack-corp.com
+    name = Richard Crowley
+    email = rcrowley@slack-corp.com
     signingkey = 53D2F050
