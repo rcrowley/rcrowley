@@ -893,7 +893,7 @@ fi
 
 # Install goimports, the most important Go package there is.
 . ".profile.d/go.sh"
-go get "code.google.com/p/go.tools/cmd/goimports"
+go get "golang.org/x/tools/cmd/goimports"
 
 )
 # End rcrowley bootstrapping.
