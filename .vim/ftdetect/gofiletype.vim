@@ -1,0 +1,1 @@
+../../src/github.com/fatih/vim-go/ftdetect/gofiletype.vim
