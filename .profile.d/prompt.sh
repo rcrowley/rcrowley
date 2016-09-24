@@ -22,6 +22,14 @@ PS1="\[\e[1;31m\]█\[\e[0m\] $(
 	[ "$(type -t __git_ps1)" ] &&
 	echo -n "\$(__git_ps1 ' \[\e[1;31m\](\[\e[0m\]%s\[\e[1;31m\])\[\e[0m\]')" ||
 	echo -n "\$(printf ' \[\e[1;31m\](\[\e[0m\]%s\[\e[1;31m\])\[\e[0m\]' \"\$(git branch | grep '^\*' | cut -c'3-')\")"
+)\$(
+    if git stash list | grep -q '.'
+    then
+        printf ' %s' \"\$(git stash list | cut -d':' -f'-2' | head -n'1')\"
+        if [ \"\$(git stash list | wc -l)\" -gt 1 ]
+        then printf ' ...'
+        fi
+    fi
 )\n\[\e[1;31m\]█\[\e[0m\] \[\e[1;31m\]$(
 	[ "$(whoami)" = "root" ] && echo "#" || echo "\$"
 )\[\e[0m\] "
